@@ -86,6 +86,25 @@ data "aws_iam_policy_document" "evidence_writer" {
     resources = [aws_s3_bucket.evidence.arn]
   }
 
+  # A few read-only actions the collectors need that SecurityAudit may not include.
+  statement {
+    sid = "ReadExtraConfiguration"
+    actions = [
+      "acm:GetCertificate",
+      "acm:DescribeCertificate",
+      "acm:ListCertificates",
+      "cloudtrail:DescribeTrails",
+      "cloudtrail:GetTrailStatus",
+      "ec2:DescribeFlowLogs",
+      "elasticloadbalancing:DescribeLoadBalancers",
+      "elasticloadbalancing:DescribeListeners",
+      "iam:GetAccessKeyLastUsed",
+      "iam:GetLoginProfile",
+      "iam:GetUser",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     sid       = "UseEvidenceKey"
     actions   = ["kms:GenerateDataKey", "kms:Decrypt"]

@@ -8,5 +8,10 @@ aws_profile = "secuguard"
 
 # Fill this in during Part 9, step 3 of MANUAL.md, then run 'terraform apply' again.
 # github_repository = "your-github-username/secuguard-grc-engineering"
-# github_owner_id      = "12345678"
-# github_repository_id = "987654321"
+# github_owner_id      = "number printed in Part 9, step 3"
+# github_repository_id = "number printed in Part 9, step 3"
+
+# Stage 2 creates deliberate, harmless weaknesses for the checks to find. See planted.tf.
+# The load balancer is the only one with a real cost, about $17 a month.
+# planted_findings      = true
+# planted_load_balancer = true

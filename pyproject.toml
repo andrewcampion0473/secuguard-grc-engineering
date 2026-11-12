@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "secuguard-grc"
-version = "0.1.0"
+version = "0.2.0"
 description = "GRC engineering demo for the fictional company SecuGuard: automated evidence collection and compliance checks on AWS."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "boto3>=1.35",
-    "moto[ec2,s3,kms,iam,sts]>=5.0",
+    "moto[ec2,s3,kms,iam,sts,acm,elbv2,cloudtrail]>=5.0",
+    "cryptography>=42",
 ]
 
 [project.optional-dependencies]

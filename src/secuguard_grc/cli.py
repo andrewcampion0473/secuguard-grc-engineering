@@ -1,4 +1,4 @@
-"""Command line entry point: secuguard collect | verify | collectors."""
+"""Command line entry point: secuguard collect | report | verify | test-lock | collectors | checks."""
 
 from __future__ import annotations
 
@@ -13,9 +13,11 @@ from botocore.exceptions import BotoCoreError, ClientError
 from . import __version__
 from .collectors import COLLECTORS
 from .collectors.base import FRAMEWORKS
-from .evidence import EvidenceRun, latest_manifest_sha256, list_runs, verify_chain, verify_run
-from .evidence import MANIFEST_NAME
-from .storage import read_chain_head, upload_run
+from .checks import run_checks
+from .evidence import MANIFEST_NAME, EvidenceRun, latest_manifest_sha256, list_runs, load_run
+from .evidence import utc_now, verify_chain, verify_run
+from .report import render_markdown, render_text
+from .storage import download_runs, read_chain_head, test_lock, upload_run
 
 DEFAULT_REGION = "us-east-1"
 DEFAULT_OUTPUT = "evidence"
@@ -51,7 +53,21 @@ def _run_collection(session, mode: str, output: Path, bucket: str | None) -> int
             relevant_to=collector.relevant_to,
             payload=payload,
         )
-        print(f"  ok      {collector.name:<8} -> {path}")
+        print(f"  ok      {collector.name:<14}-> {path}")
+    results = run_checks(run.payloads, utc_now(), source)
+    path = run.add(
+        collector="check-results",
+        description=(
+            "The outcome of every check, graded from the evidence files in this run. Each check "
+            "lists the resources it looked at and the requirements it reports against."
+        ),
+        api_calls=[],
+        relevant_to={fw: sorted(rows) for fw, rows in results["by_framework"].items()},
+        payload=results,
+    )
+    summary = results["summary"]
+    print(f"  graded  {len(results['checks'])} checks -> {path}")
+    print(f"          {summary['pass']} passed, {summary['fail']} failed, {summary['error']} could not be assessed")
     run.finalize()
     print(f"Manifest {run.run_dir / MANIFEST_NAME}")
     print(f"  sha256   {run.manifest_sha256}")
@@ -93,7 +109,76 @@ def cmd_collect(args) -> int:
         return 2
 
 
+def _session(args):
+    return boto3.Session(profile_name=getattr(args, "profile", None), region_name=getattr(args, "region", None))
+
+
+def _bucket(args) -> str | None:
+    return args.bucket or os.environ.get("SECUGUARD_EVIDENCE_BUCKET")
+
+
+def cmd_report(args) -> int:
+    target = Path(args.path)
+    if not (target / MANIFEST_NAME).is_file():
+        runs = list_runs(target)
+        if not runs:
+            print(f"No evidence runs found in {target}. Run 'secuguard collect' first.", file=sys.stderr)
+            return 2
+        target = runs[-1]
+    manifest, payloads = load_run(target)
+    results = payloads.pop("check-results", None)
+    if results is None or args.regrade:
+        # Older runs, or a request to grade again with the current checks.
+        results = run_checks(payloads, manifest["started_at"], manifest["source"])
+    render = render_markdown if args.markdown else render_text
+    print(render(results, manifest["run_id"], manifest["source"]))
+    if args.fail_on_findings and (results["summary"]["fail"] or results["summary"]["error"]):
+        return 1
+    return 0
+
+
+def cmd_test_lock(args) -> int:
+    bucket = _bucket(args)
+    if not bucket:
+        print("test-lock needs a bucket. Pass --bucket or set SECUGUARD_EVIDENCE_BUCKET.", file=sys.stderr)
+        return 2
+    try:
+        outcome = test_lock(_session(args).client("s3"), bucket)
+    except (ClientError, BotoCoreError) as error:
+        print(f"Could not run the lock test: {error}", file=sys.stderr)
+        return 2
+    print(f"Uploaded a marker file to s3://{bucket}/{outcome['key']}")
+    print(f"  lock mode     {outcome['lock_mode'] or 'none'}")
+    print(f"  locked until  {outcome['locked_until'] or 'not locked'}")
+    print("Tried to delete that stored version permanently, asking AWS to bypass the lock.")
+    if not outcome["delete_refused"]:
+        print("NOT PROTECTED. AWS deleted the file. Evidence in this vault can be removed.")
+        return 1
+    if outcome["lock_mode"] == "COMPLIANCE":
+        print(f"REFUSED ({outcome['error']}). The vault would not delete a locked file, even on request to bypass.")
+        return 0
+    print(f"REFUSED ({outcome['error']}), but the lock mode is not COMPLIANCE, so this identity may simply lack "
+          "permission. An administrator might still be able to delete evidence.")
+    return 1
+
+
 def cmd_verify(args) -> int:
+    if getattr(args, "bucket", None) or (args.vault and _bucket(args)):
+        import tempfile
+
+        bucket = _bucket(args)
+        with tempfile.TemporaryDirectory() as folder:
+            try:
+                count = download_runs(_session(args).client("s3"), bucket, folder)
+            except (ClientError, BotoCoreError) as error:
+                print(f"Could not read the vault: {error}", file=sys.stderr)
+                return 2
+            print(f"Read {count} files from s3://{bucket}/runs/")
+            args.bucket, args.vault, args.path = None, False, folder
+            return cmd_verify(args)
+    if args.vault:
+        print("--vault needs a bucket. Pass --bucket or set SECUGUARD_EVIDENCE_BUCKET.", file=sys.stderr)
+        return 2
     target = Path(args.path)
     if (target / MANIFEST_NAME).is_file():
         runs, problems = [target], verify_run(target)
@@ -126,6 +211,18 @@ def cmd_collectors(_args) -> int:
     return 0
 
 
+def cmd_checks(_args) -> int:
+    from .checks import CHECKS
+
+    for check in CHECKS:
+        print(f"{check.id}  {check.title}  [{check.severity}]")
+        print(f"  {check.why}")
+        for framework, requirements in check.frameworks.items():
+            print(f"  {framework}: {', '.join(requirements)}")
+        print()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="secuguard",
@@ -145,7 +242,27 @@ def main(argv: list[str] | None = None) -> int:
 
     verify = commands.add_parser("verify", help="Recompute hashes for one run folder or a whole evidence folder")
     verify.add_argument("path", nargs="?", default=DEFAULT_OUTPUT)
+    verify.add_argument("--vault", action="store_true", help="Verify the copy of record in the S3 vault")
+    verify.add_argument("--bucket", help="Evidence bucket name (or set SECUGUARD_EVIDENCE_BUCKET)")
+    verify.add_argument("--profile", help="AWS CLI profile name")
+    verify.add_argument("--region", default=DEFAULT_REGION)
     verify.set_defaults(func=cmd_verify)
+
+    report = commands.add_parser("report", help="Show check results for a run, by check and by framework")
+    report.add_argument("path", nargs="?", default=DEFAULT_OUTPUT, help="A run folder or an evidence folder")
+    report.add_argument("--markdown", action="store_true", help="Print Markdown, for pasting or publishing")
+    report.add_argument("--regrade", action="store_true", help="Grade the evidence again with the current checks")
+    report.add_argument("--fail-on-findings", action="store_true", help="Exit with an error if any check fails")
+    report.set_defaults(func=cmd_report)
+
+    lock = commands.add_parser("test-lock", help="Prove the vault refuses to delete a locked file")
+    lock.add_argument("--bucket", help="Evidence bucket name (or set SECUGUARD_EVIDENCE_BUCKET)")
+    lock.add_argument("--profile", help="AWS CLI profile name")
+    lock.add_argument("--region", default=DEFAULT_REGION)
+    lock.set_defaults(func=cmd_test_lock)
+
+    checks = commands.add_parser("checks", help="List every check and the requirements it reports against")
+    checks.set_defaults(func=cmd_checks)
 
     listing = commands.add_parser("collectors", help="List collectors and what each one gathers")
     listing.set_defaults(func=cmd_collectors)

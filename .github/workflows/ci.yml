@@ -1,5 +1,5 @@
 # Runs on every push. Needs no AWS account: it tests the code and runs a full
-# collection against the simulated environment.
+# collection, with checks, against the simulated environment.
 name: Tests
 
 on:
@@ -13,8 +13,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Install
@@ -25,3 +25,5 @@ jobs:
         run: secuguard collect --mock
       - name: Verify the evidence
         run: secuguard verify
+      - name: Publish the check results from the simulated environment
+        run: secuguard report --markdown >> "$GITHUB_STEP_SUMMARY"

@@ -24,7 +24,9 @@ def test_mock_collect_end_to_end(tmp_path):
     run = runs[-1]
     manifest = json.loads((run / "manifest.json").read_text())
     assert manifest["collector_errors"] == []
-    assert {f["collector"] for f in manifest["files"]} == {"network", "kms", "s3", "iam"}
+    assert {f["collector"] for f in manifest["files"]} == {
+        "network", "kms", "s3", "iam", "identities", "certificates", "loadbalancers", "audit_logging",
+        "check-results"}
 
     network = load(run, "network")
     assert network["source"]["mode"] == "mock"
@@ -37,11 +39,11 @@ def test_mock_collect_end_to_end(tmp_path):
     assert scopes == ["cde", "cde", "connected", "connected", "out-of-scope", "out-of-scope"]
 
     keys = load(run, "kms")["payload"]["keys"]
-    assert len(keys) == 1 and keys[0]["rotation"]["KeyRotationEnabled"] is True
+    assert sorted(k["rotation"]["KeyRotationEnabled"] for k in keys) == [False, True]
 
-    buckets = load(run, "s3")["payload"]["buckets"]
-    assert len(buckets) == 1
-    bucket = buckets[0]
+    buckets = {b["name"]: b for b in load(run, "s3")["payload"]["buckets"]}
+    assert len(buckets) == 2
+    bucket = buckets["secuguard-evidence-123456789012"]
     assert bucket["object_lock"]["ObjectLockEnabled"] == "Enabled"
     assert bucket["versioning"]["Status"] == "Enabled"
     assert bucket["public_access_block"]["BlockPublicAcls"] is True

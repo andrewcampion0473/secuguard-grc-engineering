@@ -4,7 +4,7 @@ This manual takes you from a Windows computer with nothing installed to a workin
 
 SecuGuard is a fictional company invented for this project. It is not a real business, and nothing here describes a real company's systems.
 
-**This manual covers stage 1 of the project.** New parts are added as each later stage is built.
+**This manual covers stages 1 and 2 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. New parts are added as each later stage is built.
 
 ## Contents
 
@@ -17,11 +17,14 @@ SecuGuard is a fictional company invented for this project. It is not a real bus
 - [Part 7: Build SecuGuard's cloud environment](#part-7-build-secuguards-cloud-environment)
 - [Part 8: Collect real evidence](#part-8-collect-real-evidence)
 - [Part 9: Publish to GitHub and collect evidence every day](#part-9-publish-to-github-and-collect-evidence-every-day)
-- [Part 10: Costs and shutting down](#part-10-costs-and-shutting-down)
-- [Part 11: Daily use](#part-11-daily-use)
-- [Part 12: When something goes wrong](#part-12-when-something-goes-wrong)
-- [Part 13: Glossary](#part-13-glossary)
-- [Part 14: What each file in the project does](#part-14-what-each-file-in-the-project-does)
+- [Part 10: Stage 2: Give the checks something to find](#part-10-stage-2-give-the-checks-something-to-find)
+- [Part 11: Read the check results](#part-11-read-the-check-results)
+- [Part 12: Prove the vault from the command line](#part-12-prove-the-vault-from-the-command-line)
+- [Part 13: Costs and shutting down](#part-13-costs-and-shutting-down)
+- [Part 14: Daily use](#part-14-daily-use)
+- [Part 15: When something goes wrong](#part-15-when-something-goes-wrong)
+- [Part 16: Glossary](#part-16-glossary)
+- [Part 17: What each file in the project does](#part-17-what-each-file-in-the-project-does)
 
 ---
 
@@ -66,12 +69,27 @@ Every piece of evidence names the requirements it supports in all three rulebook
 
 The FedRAMP 20x indicator names come from the rules FedRAMP publishes for computers to read, at https://github.com/FedRAMP/rules. This project uses version 2026.11.02.01 of those rules.
 
-Stage 1 collects and seals evidence. It does not yet judge it. The pass or fail checks arrive in the next stages, and each check is written once and reported against all three rulebooks.
+Stage 1 collects and seals evidence. It does not judge it. Stage 2 adds the pass or fail checks, and each check is written once and reported against all three rulebooks.
+
+### What stage 2 adds
+
+Stage 2 grades the evidence. Parts 10 to 12 cover it.
+
+- **Realistic resources with deliberate weaknesses**: users, a service account, a vendor role, certificates, a load balancer, an old encryption key, and a storage bucket
+- **Four more collectors**, for identities, certificates, load balancers, and logging
+- **19 checks** across network, encryption, identity, and logging. Each is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x.
+- **A report** showing results by check and by framework
+- **Two commands that prove the vault**: one tests the lock, one verifies the copy of record
 
 ### What comes later
 
-| Stage | What it adds | PCI DSS | SOC 2 | FedRAMP 20x |
-|---|---|---|---|---|
+| Stage | What it adds |
+|---|---|
+| 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made |
+| 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
+| 5 | A readable report, diagrams, and the video walkthrough |
+
+---|---|---|---|---|
 | 1 (this stage) | Sealed evidence, labelled for each rulebook | Labelled | Labelled | Labelled |
 | 2 | Checks on certificates and encryption strength | Checked | Checked | Checked |
 | 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made | Checked | Checked | Checked |
@@ -93,6 +111,8 @@ You only need eight ideas to follow the rest of this manual. Each one comes with
 **The cloud and AWS.** AWS (Amazon Web Services) rents out computers, storage, and networks over the internet. You build things there by clicking in a website or by sending instructions. When this manual says "the cloud environment," it means the things you rent from AWS.
 
 **The terminal.** A terminal is a window where you type commands instead of clicking buttons. On Windows the terminal program is called PowerShell. Every command in this manual is meant to be copied, pasted into PowerShell, and run by pressing Enter.
+
+**Service account.** An identity used by a program instead of a person.
 
 **Terraform.** Terraform is a tool that builds cloud environments from written instructions. Think of a blueprint. You hand Terraform the blueprint and it builds exactly that. Hand it the same blueprint tomorrow and it changes nothing. Tell it to tear down and it removes everything it built. The blueprint for this project is in the `terraform` folder.
 
@@ -160,7 +180,7 @@ terraform -version
 aws --version
 ```
 
-**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 12](#part-12-when-something-goes-wrong).
+**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 15](#part-15-when-something-goes-wrong).
 
 ### Step 5: Allow PowerShell to run setup scripts
 
@@ -262,10 +282,16 @@ secuguard collect --mock
 
 ```
 Run 20261110T150035Z-482913-a67f  (mock mode, account 123456789012, us-east-1)
-  ok      network  -> evidence\20261110T150035Z-482913-a67f\network.json
-  ok      kms      -> evidence\20261110T150035Z-482913-a67f\kms.json
-  ok      s3       -> evidence\20261110T150035Z-482913-a67f\s3.json
-  ok      iam      -> evidence\20261110T150035Z-482913-a67f\iam.json
+  ok      network       -> evidence\20261110T150035Z-482913-a67f\network.json
+  ok      kms           -> evidence\20261110T150035Z-482913-a67f\kms.json
+  ok      s3            -> evidence\20261110T150035Z-482913-a67f\s3.json
+  ok      iam           -> evidence\20261110T150035Z-482913-a67f\iam.json
+  ok      identities    -> evidence\20261110T150035Z-482913-a67f\identities.json
+  ok      certificates  -> evidence\20261110T150035Z-482913-a67f\certificates.json
+  ok      loadbalancers -> evidence\20261110T150035Z-482913-a67f\loadbalancers.json
+  ok      audit_logging -> evidence\20261110T150035Z-482913-a67f\audit_logging.json
+  graded  19 checks -> evidence\20261110T150035Z-482913-a67f\check-results.json
+          5 passed, 14 failed, 0 could not be assessed
 Manifest evidence\20261110T150035Z-482913-a67f\manifest.json
   sha256   8ae916fbe7992ae1...
   previous none (first run in this chain)
@@ -275,6 +301,7 @@ Your run name and fingerprints will be different. Here is what each line means:
 
 - **Run** is the name of this collection. It starts with the date and time.
 - Each **ok** line is one collector finishing and saving its evidence file.
+- **graded** is the checks reading that evidence and deciding pass or fail. Most fail on purpose. Parts 10 and 11 explain why and how to read the results.
 - **Manifest** is the packing slip listing every file and its fingerprint.
 - **sha256** is the fingerprint of the manifest itself.
 - **previous** is the fingerprint of the run before this one. There is none yet.
@@ -356,7 +383,7 @@ Remove-Item -Recurse evidence
 pytest
 ```
 
-**What you should see:** a row of dots and `11 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history.
+**What you should see:** a row of dots and `39 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
 
 ---
 
@@ -494,7 +521,7 @@ aws sso login --profile secuguard
 
 **What you will do:** have Terraform build the network and the evidence vault in your AWS account.
 **Time:** about 15 minutes.
-**Cost:** about one dollar a month while it exists.
+**Cost:** about $20 a month while it exists. Nearly all of that is one load balancer, which [Part 13](#part-13-costs-and-shutting-down) shows how to pause.
 
 ### What gets built
 
@@ -512,7 +539,7 @@ aws sso login --profile secuguard
 
 **An encryption key** that protects the vault and replaces itself every year.
 
-No servers are created in stage 1, so nothing is running up a bill by the hour.
+No servers are created. The only thing billed by the hour is the load balancer that stage 2 adds.
 
 ### Step 1: Go to the Terraform folder
 
@@ -548,7 +575,9 @@ terraform plan
 
 Terraform lists everything it intends to create and changes nothing. Read through it. Each block starting with `+` is one thing to be created.
 
-**What you should see:** the last line reads `Plan: 30 to add, 0 to change, 0 to destroy.`
+**What you should see:** the last line reads `Plan: 55 to add, 0 to change, 0 to destroy.`
+
+Of those 55, 30 are the foundation described above. The other 25 are deliberate, harmless weaknesses for the checks to find later. [Part 10](#part-10-stage-2-give-the-checks-something-to-find) explains each one and why it is safe.
 
 ### Step 5: Build it
 
@@ -558,7 +587,9 @@ terraform apply
 
 Terraform shows the plan again and asks for confirmation. Type `yes` and press Enter. The build takes about a minute.
 
-**What you should see:** `Apply complete! Resources: 30 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
+The load balancer takes two to three minutes to create, so expect a wait near the end.
+
+**What you should see:** `Apply complete! Resources: 55 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
 
 ```
 evidence_bucket = "secuguard-evidence-123456789012"
@@ -607,10 +638,10 @@ secuguard collect --profile secuguard --upload --bucket $bucket
 **What you should see:** the same kind of output as practice mode, with three differences. It says `aws mode`. The account number is your own. And a final line reads:
 
 ```
-Uploaded 6 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
+Uploaded 11 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
 ```
 
-The six files are the four evidence files, the manifest, and the manifest's fingerprint.
+The eleven files are eight evidence files, the check results, the manifest, and the manifest's fingerprint.
 
 The collectors only read. They ask AWS how things are configured and cannot change anything in your environment.
 
@@ -699,37 +730,28 @@ The daily collection runs on GitHub's computers, so GitHub needs permission to r
 
 AWS needs to know exactly which repository to trust. GitHub identifies a repository by its name and by two permanent numbers: one for your account and one for the repository. The numbers matter because a name can be given up and registered by someone else, but the numbers never change hands.
 
-1. Look up the two numbers. In PowerShell, run:
+1. Have PowerShell look up the two numbers and print the three lines you need:
 
    ```powershell
    $repo = Invoke-RestMethod https://api.github.com/repos/andrewcampion0473/secuguard-grc-engineering
+   "github_repository    = `"$($repo.full_name)`""
    "github_owner_id      = `"$($repo.owner.id)`""
    "github_repository_id = `"$($repo.id)`""
    ```
 
-   If you are setting up your own copy, use your own username in the address. This prints two lines, ready to paste, that look like this with your own numbers:
+   If you are setting up your own copy, use your own username in the address.
 
-   ```
-   github_owner_id      = "12345678"
-   github_repository_id = "987654321"
-   ```
-
-2. Open the settings file:
+   **What you should see:** three lines. The first ends with your repository name. The second and third each end with a number in quotation marks.
+2. Select those three printed lines in PowerShell and copy them.
+3. Open the settings file:
 
    ```powershell
    code terraform\terraform.tfvars
    ```
 
-3. Add these three lines at the bottom. Use the two lines PowerShell just printed for the second and third:
-
-   ```
-   github_repository    = "andrewcampion0473/secuguard-grc-engineering"
-   github_owner_id      = "12345678"
-   github_repository_id = "987654321"
-   ```
-
-4. Save the file with Ctrl+S.
-5. Apply the change:
+4. Paste the three lines at the bottom of the file. Use exactly what PowerShell printed. The numbers are different for every account and every repository, so numbers from anywhere else will not work.
+5. Save the file with Ctrl+S.
+6. Apply the change:
 
    ```powershell
    terraform -chdir=terraform apply
@@ -740,10 +762,10 @@ AWS needs to know exactly which repository to trust. GitHub identifies a reposit
 **What you should see:** `Apply complete! Resources: 4 added, 0 changed, 0 destroyed.` Among the outputs are a line that starts with `github_actions_role_arn = "arn:aws:iam::` and a line like this:
 
 ```
-github_actions_subject = "repo:andrewcampion0473@12345678/secuguard-grc-engineering@987654321:ref:refs/heads/main"
+github_actions_subject = "repo:andrewcampion0473@OWNER-NUMBER/secuguard-grc-engineering@REPOSITORY-NUMBER:ref:refs/heads/main"
 ```
 
-That last line is the exact identity AWS will accept. Only a job running from the main branch of that one repository matches it.
+In your output, your two numbers appear where this example says OWNER-NUMBER and REPOSITORY-NUMBER. That line is the exact identity AWS will accept. Only a job running from the main branch of that one repository matches it.
 
 ### Step 4: Give GitHub the two values it needs
 
@@ -777,24 +799,343 @@ Neither value is a secret. They are names, not keys. Knowing them does not let a
 3. Click **Run workflow**, then the green **Run workflow** button.
 4. Wait about a minute and refresh the page.
 
-**What you should see:** a green check mark. Click the run, then **collect**, then **Collect and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 6 files`.
+**What you should see:** a green check mark. Click the run, then **collect**, then **Collect, grade, and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 11 files`.
 
 From now on this runs by itself every day at 11:17 UTC. Each run links to the one before it, so the vault holds an unbroken daily record of how SecuGuard's environment was configured.
 
 ---
 
-## Part 10: Costs and shutting down
+## Part 10: Stage 2: Give the checks something to find
 
-### What stage 1 costs
+**What you will do:** update the project, add realistic resources with deliberate weaknesses to SecuGuard's AWS environment, and collect evidence about them.
+**Time:** about 30 minutes.
+**Cost:** about $18 a month more while the load balancer exists. See [Part 13](#part-13-costs-and-shutting-down).
 
-| Item | Cost |
+Stage 1 collected evidence and stopped there. Stage 2 adds **checks**. A check is a rule that reads the evidence and answers pass or fail, for example "every encryption key rotates automatically."
+
+A check that only ever says "pass" proves nothing, so stage 2 also adds things for the checks to catch. These are the problems GRC teams find in real accounts.
+
+### What gets added, and which check catches it
+
+| Area | What is created | The weakness | Check |
+|---|---|---|---|
+| Network | A firewall rule group in the office zone | SSH is open to the whole internet | NET-01 |
+| Encryption | An encryption key named `secuguard-legacy-no-rotation` | Automatic rotation is off | CRY-01 |
+| Storage | A bucket named `secuguard-legacy-exports-...` | No key of its own, and its public access protections are off | CRY-02, CRY-03 |
+| Certificates | A certificate for `legacy-api.secuguard.example` | A short 1024-bit key, and it expires 20 days after it is created | CRY-04, CRY-05 |
+| Certificates | A certificate for `portal.secuguard.example` | None. It is healthy, for comparison | |
+| Load balancer | A load balancer named `secuguard-portal` | It still accepts the outdated TLS 1.0 and 1.1 | CRY-06 |
+| People | A user named `secuguard-dev-alice` | Can sign in with a password and has no MFA | IAM-04 |
+| Machines | A service account named `secuguard-svc-reports` | Administrator rights attached directly, and an access key nobody has ever used | IAM-05, IAM-06 |
+| People | A user named `secuguard-audit-carol` | None. She gets read-only rights through a group, for comparison | |
+| Vendors | A role named `secuguard-legacy-vendor` | An outside account may use it with no extra proof of identity | IAM-07 |
+
+Other checks look at what is already true of your account. Those findings are real, not planted. For example, your account has no CloudTrail trail recording activity yet, and LOG-01 reports that.
+
+### Why this is safe to build in a real account
+
+- **The users and the role can do nothing.** Each one carries a permissions boundary, which is a hard cap on what an identity can do. This one denies every action. Their attached rights are visible to the checks but have no effect, even if a password or key leaked.
+- **The bucket is empty** and has no setting that makes it public. Only its protections are missing.
+- **Nothing is reachable from the internet.** The network still has no internet gateway. The open SSH rule and the load balancer have nothing behind them and no path in.
+
+To remove every planted weakness at any time, add `planted_findings = false` to `terraform\terraform.tfvars` and run `terraform -chdir=terraform apply`.
+
+### Step 1: Update the project files
+
+1. Download the newest `secuguard-grc-engineering.zip`.
+2. Unzip it over your project folder, replacing files when asked. Your `.venv`, `terraform.tfvars`, and `evidence` folder are not in the zip and are left alone.
+
+### Step 2: Update the Python parts
+
+Open PowerShell in the project folder, turn on the workspace, and install again. Stage 2 uses two more libraries.
+
+```powershell
+cd $HOME\Projects\secuguard-grc-engineering
+.\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+```
+
+Use your own folder if the project is somewhere else.
+
+**What you should see:** the last line starts with `Successfully installed`.
+
+### Step 3: Run the tests
+
+```powershell
+pytest
+```
+
+**What you should see:** `39 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
+
+### Step 4: Try it in practice mode first
+
+```powershell
+secuguard collect --mock
+secuguard report
+```
+
+**What you should see:** the first command prints eight `ok` lines, then a line like `graded 19 checks` followed by how many passed and failed. The second prints a table of every check, then the same results grouped by framework. [Part 11](#part-11-read-the-check-results) explains how to read it.
+
+Then delete the practice evidence so it does not mix with real evidence:
+
+```powershell
+Remove-Item -Recurse evidence
+```
+
+If you have real evidence in that folder that you want to keep, skip the delete. Practice runs are labelled `mock mode` and do no harm.
+
+### Step 5: Build the new resources in AWS
+
+1. Sign in:
+
+   ```powershell
+   aws sso login --profile secuguard
+   ```
+
+2. Let Terraform fetch one more plugin. Stage 2 uses it to generate the certificates.
+
+   ```powershell
+   terraform -chdir=terraform init -upgrade
+   ```
+
+   **What you should see:** `Terraform has been successfully initialized!`
+
+3. Preview the build:
+
+   ```powershell
+   terraform -chdir=terraform plan
+   ```
+
+   **What you should see:** the last line reads `Plan: 25 to add, 1 to change, 0 to destroy.` The one change gives the GitHub collector permission to read the new kinds of resources.
+
+   If you set the project up for the first time with this version of the manual, Part 7 already built these resources. Terraform then says `No changes`, and you can skip to step 6.
+
+4. Build it:
+
+   ```powershell
+   terraform -chdir=terraform apply
+   ```
+
+   Type `yes` when asked. The load balancer takes two to three minutes to create, so this apply is slower than the first one.
+
+   **What you should see:** `Apply complete! Resources: 25 added, 1 changed, 0 destroyed.`
+
+### Step 6: Collect evidence about the new resources
+
+```powershell
+$bucket = terraform -chdir=terraform output -raw evidence_bucket
+secuguard collect --profile secuguard --upload --bucket $bucket
+```
+
+**What you should see:** eight `ok` lines, a `graded 19 checks` line with pass and fail counts, and `Uploaded 11 files`. The eleven files are eight evidence files, the check results, the manifest, and the manifest's fingerprint.
+
+The check results are sealed and stored in the vault with the evidence they were graded from. Nobody can quietly change a "fail" to a "pass" afterward.
+
+---
+
+## Part 11: Read the check results
+
+**What you will do:** read the report, fix one real finding, and watch the result change.
+**Time:** about 20 minutes.
+
+### Step 1: Show the report
+
+```powershell
+secuguard report
+```
+
+This shows the newest run in your `evidence` folder. The top half lists every check:
+
+```
+Check   Result       Severity  What was checked
+------------------------------------------------------------------------------------------------
+NET-01  FAIL         high      No administrative port is open to the internet
+          x security group secuguard-planted-open-admin (sg-0abc...): open to the whole internet: SSH (port 22)
+NET-02  PASS         high      The card data zone accepts traffic only from in-scope systems
+CRY-01  FAIL         medium    Encryption keys rotate automatically
+          x KMS key alias/secuguard-legacy-no-rotation: automatic rotation is off
+```
+
+Each line starting with `x` names one resource that broke the rule and says why.
+
+The bottom half shows the same results turned around, by framework:
+
+```
+PCI DSS 4.0.1
+  1.3.1         FAIL         NET-01, NET-02
+  3.7.4         FAIL         CRY-01
+  10.3.2        PASS         LOG-02
+```
+
+Read a line as: "requirement 1.3.1 is spoken to by checks NET-01 and NET-02, and at least one of them failed." A requirement shows FAIL if any of its checks failed.
+
+This is the point of the whole project. Each check was written once. The report shows its result under PCI DSS, SOC 2, and FedRAMP 20x without any extra work.
+
+### What the four results mean
+
+| Result | Meaning |
 |---|---|
-| Encryption key | About $1 a month |
-| Evidence storage | Less than a cent a month |
-| Network, firewall rules, sign-in setup | Free |
-| GitHub Actions on a public repository | Free |
+| PASS | Every resource the check looked at meets the rule |
+| FAIL | At least one resource does not. The `x` lines name them. |
+| N/A | There was nothing of that kind to look at |
+| NO EVIDENCE | The evidence the check needs is missing or could not be collected, so it draws no conclusion |
 
-You can leave stage 1 running for the whole project. Later stages add services that cost more, and this manual will say so before you build them.
+NO EVIDENCE matters. A check never reports PASS on evidence it does not have. If a collector is refused permission, the checks that depend on it say so plainly.
+
+### What you should expect to see
+
+Your exact counts depend on your account. Expect most checks to fail, which is the intent of this stage.
+
+| Check | Expected | Why |
+|---|---|---|
+| NET-01, CRY-01 to CRY-06, IAM-04 to IAM-07 | FAIL | The planted weaknesses from Part 10 |
+| NET-02, LOG-02 | PASS | The card data zone and the evidence vault are built correctly |
+| IAM-01, IAM-02 | PASS | You protected the root user in Part 6 |
+| IAM-03 | FAIL | Real finding: no password policy has been set |
+| NET-03 | FAIL | Real finding: AWS's own default network in your account has a permissive default firewall group |
+| NET-04 | FAIL | Real finding: network traffic is not being logged |
+| LOG-01 | FAIL | Real finding: no CloudTrail trail is recording account activity |
+
+### Step 2: See what a check means
+
+```powershell
+secuguard checks
+```
+
+This lists all 19 checks. Each one shows a plain-language reason it matters and the requirements it reports against in each framework.
+
+### Step 3: Fix a real finding and watch it change
+
+IAM-03 fails because your account has no password policy. Fix it for real.
+
+1. Set a policy:
+
+   ```powershell
+   aws iam update-account-password-policy --minimum-password-length 14 --require-symbols --require-numbers --require-uppercase-characters --require-lowercase-characters --password-reuse-prevention 24 --profile secuguard
+   ```
+
+   It prints nothing when it works.
+
+2. Collect again:
+
+   ```powershell
+   secuguard collect --profile secuguard --upload --bucket $bucket
+   ```
+
+3. Show the report:
+
+   ```powershell
+   secuguard report
+   ```
+
+**What you should see:** IAM-03 now reads PASS, and PCI DSS requirement 8.3.6 with it. One more check passed than last time.
+
+You now have two sealed runs in the vault: one from before the fix showing FAIL, and one from after showing PASS. That pair is what an auditor asks for when they want proof that a finding was fixed.
+
+### Step 4: Save a copy of the report to share
+
+```powershell
+secuguard report --markdown | Out-File -Encoding utf8 report.md
+```
+
+This writes `report.md`, a formatted version with a Findings section that explains each failure. Open it in Visual Studio Code and press Ctrl+Shift+V to see it formatted.
+
+### Grading old evidence again
+
+Checks read evidence files. They do not talk to AWS. So you can grade a run from last week with today's checks:
+
+```powershell
+secuguard report --regrade
+```
+
+This matters when a framework changes or a check is improved. The evidence does not need to be collected again.
+
+---
+
+## Part 12: Prove the vault from the command line
+
+**What you will do:** test the vault's lock with one command, and verify the copy of record directly.
+**Time:** about 10 minutes.
+
+### Step 1: Test the lock
+
+In Part 8 you proved the lock by clicking through the AWS Console. This command does the same test in a few seconds and is easy to show someone.
+
+```powershell
+secuguard test-lock --profile secuguard --bucket $bucket
+```
+
+It uploads a small marker file, then asks AWS to delete that exact stored version for good, and to bypass the lock if it can. No evidence is touched.
+
+**What you should see:**
+
+```
+Uploaded a marker file to s3://secuguard-evidence-.../lock-test/20261112T....txt
+  lock mode     COMPLIANCE
+  locked until  2026-11-13 15:31 UTC
+Tried to delete that stored version permanently, asking AWS to bypass the lock.
+REFUSED (AccessDenied). The vault would not delete a locked file, even on request to bypass.
+```
+
+If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 15](#part-15-when-something-goes-wrong).
+
+### Step 2: Verify the copy of record
+
+`secuguard verify` checks the evidence folder on your computer. That folder does not hold the runs GitHub collects each day, so it is not the full record. This command checks the vault itself:
+
+```powershell
+secuguard verify --vault --profile secuguard --bucket $bucket
+```
+
+It reads every run from the vault, recomputes every fingerprint, and checks that each run links to the one before it.
+
+**What you should see:** a line saying how many files were read, then a result.
+
+If you followed Part 8 while the vault was still in its first, weaker lock mode, expect one problem to be reported: a file listed in a manifest but missing. That is the evidence file you deleted during that test. The report is correct. Evidence was destroyed, the record shows it, and it cannot be hidden. Every run after the switch to compliance mode verifies.
+
+### Step 3: Publish stage 2
+
+```powershell
+git add .
+git commit -m "Stage 2: checks across PCI DSS, SOC 2, and FedRAMP 20x"
+git push
+```
+
+**What you should see:** on GitHub, the **Tests** job goes green. Click into it and open its **Summary** page. The check results from the simulated environment are printed there as a formatted report.
+
+The daily **Collect evidence** job does the same with real results. Run it once by hand from the **Actions** tab, open the run, and look at its Summary page. From now on, each day's results for all three frameworks appear there without anyone running anything.
+
+---
+
+## Part 13: Costs and shutting down
+
+### What it costs
+
+| Item | Stage | Cost |
+|---|---|---|
+| Evidence encryption key | 1 | About $1 a month |
+| Evidence storage | 1 | Less than a cent a month |
+| Network, firewall rules, sign-in setup | 1 | Free |
+| GitHub Actions on a public repository | 1 | Free |
+| Load balancer with the outdated TLS policy | 2 | About $17 a month |
+| Second encryption key, with rotation off | 2 | About $1 a month |
+| Users, role, certificates, empty bucket | 2 | Free |
+
+Together that is about $20 a month. The load balancer is nearly all of it.
+
+### How to pause the load balancer
+
+If you will not touch the project for a while, remove the load balancer and keep everything else.
+
+1. Open `terraform\terraform.tfvars` and add this line:
+
+   ```
+   planted_load_balancer = false
+   ```
+
+2. Run `terraform -chdir=terraform apply` and type `yes`.
+
+Check CRY-06 then reports N/A, because there is no load balancer to look at. Delete the line and apply again to bring it back.
 
 ### How to remove everything
 
@@ -823,7 +1164,7 @@ Destroying the environment does not close your AWS account. If you want to close
 
 ---
 
-## Part 11: Daily use
+## Part 14: Daily use
 
 Once everything is set up, a working session looks like this.
 
@@ -840,7 +1181,12 @@ Then use whichever command you need.
 |---|---|
 | Collect in practice mode | `secuguard collect --mock` |
 | Collect from AWS and store in the vault | `secuguard collect --profile secuguard --upload --bucket $bucket` |
-| Check that evidence has not been altered | `secuguard verify` |
+| Show check results by check and by framework | `secuguard report` |
+| Save the report as a file to share | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` |
+| List the checks and what each reports against | `secuguard checks` |
+| Check that local evidence has not been altered | `secuguard verify` |
+| Check the copy of record in the vault | `secuguard verify --vault --profile secuguard --bucket $bucket` |
+| Prove the vault refuses deletion | `secuguard test-lock --profile secuguard --bucket $bucket` |
 | List the collectors and what each gathers | `secuguard collectors` |
 | Run the project's self-tests | `pytest` |
 | Preview changes to the cloud environment | `terraform -chdir=terraform plan` |
@@ -849,7 +1195,7 @@ Then use whichever command you need.
 
 ---
 
-## Part 12: When something goes wrong
+## Part 15: When something goes wrong
 
 **The AWS Console has no region name in the top bar, or says a service "is not available to your project."**
 The account was created with AWS's simplified sign-up. Do not choose **Activate advanced features**, because that cannot be undone. Create a new account with the advanced sign-up link in Part 6, step 1, and use that account for this project. The simplified account costs nothing while it sits unused, and you can close it later.
@@ -887,7 +1233,7 @@ The `AWS_ROLE_ARN` variable is missing. Check Part 9, step 4, and make sure you 
 **The Collect evidence job fails with "Not authorized to perform sts:AssumeRoleWithWebIdentity."**
 AWS did not recognize the repository. Check these in order:
 
-1. `terraform.tfvars` has all three lines from Part 9, step 3: `github_repository`, `github_owner_id`, and `github_repository_id`. Repositories created after July 15, 2026 need the two numbers. Without them, AWS is waiting for an older style of identity that GitHub no longer sends for new repositories.
+1. `terraform.tfvars` has all three lines from Part 9, step 3: `github_repository`, `github_owner_id`, and `github_repository_id`, and the two numbers are the ones PowerShell printed for your repository. Repositories created after July 15, 2026 need the two numbers. Without them, AWS is waiting for an older style of identity that GitHub no longer sends for new repositories.
 2. The repository name matches GitHub exactly, including capital letters.
 3. You ran `terraform -chdir=terraform apply` after saving the file.
 4. The job ran from the `main` branch.
@@ -904,12 +1250,30 @@ Some evidence is still locked. Locks last one day from the moment each file was 
 **Deleting a file in the evidence vault succeeded when it should have been refused.**
 Either the **Show versions** switch was off, in which case the file was only hidden and is still stored, or the vault is in governance mode. Check that `terraform/terraform.tfvars` does not set `evidence_lock_mode = "GOVERNANCE"`, run `terraform -chdir=terraform apply`, collect again, and repeat the test on the new run. Files uploaded before the change keep the lock they were given.
 
+**`terraform plan` or `apply` says a provider is missing, or mentions `hashicorp/tls`.**
+Stage 2 needs one more plugin. Run `terraform -chdir=terraform init -upgrade`, then try again.
+
+**`terraform apply` fails with "Invalid principal in policy" on the role `secuguard-legacy-vendor`.**
+AWS only lets a role trust an account number that exists. Make sure you have the newest project files, which use a real account number owned by AWS, and run `terraform -chdir=terraform apply` again. Everything already created stays in place, and only the role is added.
+
+**`terraform apply` fails while creating the weak certificate, the load balancer, or its listener.**
+AWS tightens what it accepts over time, and a deliberately weak setting may be refused. Copy the error text so it can be fixed in the project. To carry on meanwhile, add `planted_load_balancer = false` to `terraform\terraform.tfvars` if the load balancer or listener failed, then apply again. Everything already created stays in place.
+
+**A check shows NO EVIDENCE.**
+The collector it depends on could not read something. Run `secuguard report` and read the line starting with `!` under that check. If it names an access error on your own computer, sign in again with `aws sso login --profile secuguard`. If it happens only in the GitHub job, run `terraform -chdir=terraform apply` so the collector's role gets the stage 2 read permissions.
+
+**`secuguard test-lock` prints NOT PROTECTED.**
+The vault is not in compliance mode. Check that `terraform\terraform.tfvars` does not set `evidence_lock_mode = "GOVERNANCE"`, run `terraform -chdir=terraform apply`, and run the test again.
+
+**`secuguard report` says no evidence runs were found.**
+Run it from the project folder, and collect at least once first.
+
 **Something else.**
 Copy the full error text. Most of the time the last two or three lines say what is wrong. Search for that text along with the name of the tool that printed it.
 
 ---
 
-## Part 13: Glossary
+## Part 16: Glossary
 
 **Access portal.** The web page where you sign in to AWS with your everyday user.
 
@@ -921,7 +1285,13 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 **CDE.** Cardholder data environment. The systems that store, process, or send payment card data.
 
+**Certificate.** A file that proves a website or service is who it says it is, and lets connections to it be encrypted. It has an expiry date and a key of a certain strength.
+
 **Chain.** The link from each evidence run to the one before it, made by recording the earlier manifest's fingerprint.
+
+**Check.** A rule that reads collected evidence and answers pass or fail. This project has 19.
+
+**CloudTrail.** The AWS service that records who did what in an account.
 
 **Collector.** A small program that asks AWS about one area, such as the network, and saves the answer as evidence.
 
@@ -930,6 +1300,10 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **Evidence.** A saved, sealed record of how something was configured at a specific time.
 
 **FedRAMP.** The U.S. government program that sets security requirements for cloud services sold to federal agencies. FedRAMP 20x is its newer approach, built around automated proof.
+
+**Finding.** One resource that broke a check's rule, with the reason.
+
+**Flow logs.** Records of the network traffic going in and out of a network.
 
 **Git.** A tool that tracks every change made to a project's files.
 
@@ -945,6 +1319,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 **KMS.** Key Management Service. The AWS service that creates and guards encryption keys.
 
+**Load balancer.** A service that receives incoming connections and passes them to the systems behind it. It is where encryption settings for incoming traffic are chosen.
+
 **Manifest.** The list of every file in an evidence run and each file's hash.
 
 **MFA.** Multi-factor authentication. Signing in with a password plus a second proof, such as a code from your phone.
@@ -952,6 +1328,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **Mock mode.** Practice mode. The collectors run against a simulated AWS on your own computer.
 
 **Object Lock.** An S3 feature that stops a stored file from being changed or deleted until a set time has passed. This project uses its compliance mode, which nobody can override.
+
+**Permissions boundary.** A hard cap on what an identity can do, whatever rights are attached to it. This project uses one that denies everything to make the planted users harmless.
 
 **PCI DSS.** Payment Card Industry Data Security Standard. The security rules for anyone handling payment card data.
 
@@ -975,28 +1353,34 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 **Terminal.** A window for typing commands. On Windows, the terminal used here is PowerShell.
 
+**TLS.** The encryption used for connections over a network, such as web traffic. Versions 1.0 and 1.1 are outdated. 1.2 and 1.3 are current.
+
 **VPC.** Virtual Private Cloud. Your own private network inside AWS.
 
 ---
 
-## Part 14: What each file in the project does
+## Part 17: What each file in the project does
 
 | File or folder | What it is |
 |---|---|
 | `MANUAL.md` | This manual |
 | `README.md` | The short introduction people see first on GitHub |
 | `terraform/network.tf` | The blueprint for the network, its three zones, and the firewall rules |
+| `terraform/planted.tf` | The blueprint for the deliberate, harmless weaknesses the checks are meant to find |
 | `terraform/evidence.tf` | The blueprint for the evidence vault and its encryption key |
 | `terraform/github_oidc.tf` | The blueprint for GitHub's password-free, read-only access |
 | `terraform/variables.tf` | The settings you can change, each with an explanation |
 | `terraform/outputs.tf` | The values Terraform prints after building |
 | `terraform/terraform.tfvars.example` | A template for your personal settings file |
-| `src/secuguard_grc/collectors/` | The four collectors: network, encryption keys, storage, and sign-in settings |
+| `src/secuguard_grc/collectors/` | The eight collectors: network, encryption keys, storage, sign-in settings, identities, certificates, load balancers, and logging |
+| `src/secuguard_grc/checks.py` | The 19 checks, each with its reason and the requirements it reports against |
+| `src/secuguard_grc/report.py` | Turns check results into the terminal table and the Markdown report |
 | `src/secuguard_grc/evidence.py` | The sealing system: fingerprints, manifests, the chain, and verification |
-| `src/secuguard_grc/storage.py` | Copies each run into the vault |
+| `src/secuguard_grc/storage.py` | Copies each run into the vault, reads runs back for verification, and runs the lock test |
 | `src/secuguard_grc/cli.py` | Defines the `secuguard` commands |
 | `src/secuguard_grc/mock/environment.py` | Builds the simulated AWS used in practice mode |
 | `tests/` | Self-tests that prove tampering is caught |
+| `examples/sample-report.md` | The check results from one practice-mode run, as a formatted report |
 | `examples/sample-run/` | One practice-mode run, so readers can see evidence without installing anything |
 | `.github/workflows/ci.yml` | Tells GitHub to run the self-tests on every change |
 | `.github/workflows/collect-evidence.yml` | Tells GitHub to collect evidence every day |

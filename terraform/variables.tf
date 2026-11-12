@@ -68,3 +68,37 @@ variable "github_repository_id" {
     error_message = "Set both github_owner_id and github_repository_id, or neither."
   }
 }
+
+variable "planted_findings" {
+  description = <<-EOT
+    Create the deliberate weaknesses in planted.tf so the checks have real problems to
+    find. Every one is built to be harmless: the users and role are blocked from doing
+    anything, the bucket is empty, and nothing is reachable from the internet. Set to
+    false to remove them all.
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "planted_load_balancer" {
+  description = "Create the load balancer with an outdated TLS policy. It costs about $17 a month while it exists. Ignored when planted_findings is false."
+  type        = bool
+  default     = true
+}
+
+variable "planted_vendor_account_id" {
+  description = <<-EOT
+    The outside AWS account that the planted vendor role trusts. AWS rejects account
+    numbers that do not exist, so the default is an account AWS itself owns: the one
+    its load balancing service uses in us-east-1, published in the AWS documentation.
+    The role carries a deny-everything permissions boundary, so trusting it grants nothing.
+    You can put a second account of your own here instead.
+  EOT
+  type        = string
+  default     = "127311923021"
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.planted_vendor_account_id))
+    error_message = "planted_vendor_account_id must be a 12-digit AWS account number."
+  }
+}

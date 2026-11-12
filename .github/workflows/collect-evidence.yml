@@ -1,5 +1,5 @@
-# Collects evidence from the real AWS account every day and stores it in the
-# locked evidence bucket. No AWS keys are stored in GitHub. See Part 9 of MANUAL.md.
+# Collects evidence from the real AWS account every day, grades it, and stores it in
+# the locked evidence bucket. No AWS keys are stored in GitHub. See Part 9 of MANUAL.md.
 name: Collect evidence
 
 on:
@@ -17,18 +17,21 @@ jobs:
     if: ${{ vars.AWS_ROLE_ARN != '' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
       - name: Install
         run: pip install -e .
       - name: Get short-lived AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: us-east-1
-      - name: Collect and upload evidence
+      - name: Collect, grade, and upload evidence
         run: secuguard collect --upload --bucket "${{ vars.EVIDENCE_BUCKET }}"
       - name: Verify what was collected
         run: secuguard verify
+      # Findings do not fail the job. The job fails only if collection itself breaks.
+      - name: Publish the check results on this run's summary page
+        run: secuguard report --markdown >> "$GITHUB_STEP_SUMMARY"

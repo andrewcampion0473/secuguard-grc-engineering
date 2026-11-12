@@ -69,12 +69,14 @@ class EvidenceRun:
         self.started_at = now.strftime(_TIME_FORMAT)
         self.previous_manifest_sha256 = previous_manifest_sha256
         self.files: list[dict] = []
+        self.payloads: dict[str, Any] = {}
         self.errors: list[dict] = []
         self.manifest_sha256: str | None = None
 
     def add(self, *, collector: str, description: str, api_calls: list[str],
             relevant_to: dict, payload: Any) -> Path:
         payload = normalize(payload)
+        self.payloads[collector] = payload
         record = {
             "schema_version": SCHEMA_VERSION,
             "evidence_id": str(uuid.uuid4()),
@@ -194,3 +196,15 @@ def verify_chain(output_root: Path | str) -> list[str]:
                 "A run was altered, removed, or collected somewhere else."
             )
     return problems
+
+
+def load_run(run_dir: Path | str) -> tuple[dict, dict]:
+    """Read one run from disk. Returns (manifest, {collector name: payload})."""
+    run_dir = Path(run_dir)
+    manifest = json.loads((run_dir / MANIFEST_NAME).read_bytes())
+    payloads = {}
+    for entry in manifest.get("files", []):
+        path = run_dir / entry["path"]
+        if path.is_file():
+            payloads[entry["collector"]] = json.loads(path.read_bytes())["payload"]
+    return manifest, payloads

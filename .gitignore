@@ -19,3 +19,6 @@ crash.log
 .vscode/
 .DS_Store
 Thumbs.db
+
+# A report saved with 'secuguard report --markdown'. It names your account.
+/report.md
