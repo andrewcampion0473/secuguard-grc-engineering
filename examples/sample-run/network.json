@@ -1,0 +1,673 @@
+{
+  "api_calls": [
+    "ec2:DescribeVpcs",
+    "ec2:DescribeSubnets",
+    "ec2:DescribeRouteTables",
+    "ec2:DescribeSecurityGroups"
+  ],
+  "collected_at": "2026-11-12T01:26:40Z",
+  "collector": "network",
+  "description": "Network segmentation as configured right now: every VPC, subnet, route table, and security group rule, with the tags that mark each one as in or out of PCI scope.",
+  "evidence_id": "690f7fcb-07ea-46de-ae04-85f2cb053425",
+  "payload": {
+    "route_tables": [
+      {
+        "Associations": [
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": true,
+            "RouteTableAssociationId": "rtbassoc-35fd003050b6d888b",
+            "RouteTableId": "rtb-a095a88f26c9e86d6"
+          }
+        ],
+        "OwnerId": "123456789012",
+        "RouteTableId": "rtb-a095a88f26c9e86d6",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "172.31.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "Associations": [
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": true,
+            "RouteTableAssociationId": "rtbassoc-38daba7372bee6e13",
+            "RouteTableId": "rtb-362569ba1dfd4e02b"
+          }
+        ],
+        "OwnerId": "123456789012",
+        "RouteTableId": "rtb-362569ba1dfd4e02b",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      }
+    ],
+    "security_groups": [
+      {
+        "Description": "default VPC security group",
+        "GroupId": "sg-23a3e6f36edbaa4d6",
+        "GroupName": "default",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-23a3e6f36edbaa4d6",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "Description": "default VPC security group",
+        "GroupId": "sg-af0ee3203375b9d91",
+        "GroupName": "default",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-af0ee3203375b9d91",
+        "Tags": [],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "Description": "SecuGuard cde tier",
+        "GroupId": "sg-692094be75ddc390b",
+        "GroupName": "secuguard-cde",
+        "IpPermissions": [
+          {
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "ToPort": 443,
+            "UserIdGroupPairs": [
+              {
+                "Description": "HTTPS from shared services",
+                "GroupId": "sg-11be29d66ef6a12b6",
+                "UserId": "123456789012"
+              }
+            ]
+          }
+        ],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-692094be75ddc390b",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-cde"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "cde"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "Description": "SecuGuard shared tier",
+        "GroupId": "sg-11be29d66ef6a12b6",
+        "GroupName": "secuguard-shared",
+        "IpPermissions": [
+          {
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "ToPort": 443,
+            "UserIdGroupPairs": [
+              {
+                "Description": "HTTPS from corporate",
+                "GroupId": "sg-ae9d282753afd945a",
+                "UserId": "123456789012"
+              }
+            ]
+          }
+        ],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-11be29d66ef6a12b6",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-shared"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "connected"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "Description": "SecuGuard corporate tier",
+        "GroupId": "sg-ae9d282753afd945a",
+        "GroupName": "secuguard-corporate",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-ae9d282753afd945a",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-corporate"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "out-of-scope"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      }
+    ],
+    "subnets": [
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1a",
+        "AvailabilityZoneId": "use1-az6",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.0.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-7b1d4a673f13f00ba",
+        "SubnetId": "subnet-7b1d4a673f13f00ba",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1a",
+        "AvailabilityZoneId": "use1-az6",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.10.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-68c0d6bdcbdeacccd",
+        "SubnetId": "subnet-68c0d6bdcbdeacccd",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-cde-a"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "cde"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1a",
+        "AvailabilityZoneId": "use1-az6",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.20.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-a47931de35615d732",
+        "SubnetId": "subnet-a47931de35615d732",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-shared-a"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "connected"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1a",
+        "AvailabilityZoneId": "use1-az6",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.30.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-be7751da9a1e75fca",
+        "SubnetId": "subnet-be7751da9a1e75fca",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-corporate-a"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "out-of-scope"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1b",
+        "AvailabilityZoneId": "use1-az1",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.16.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-8f028246e45a807c3",
+        "SubnetId": "subnet-8f028246e45a807c3",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1b",
+        "AvailabilityZoneId": "use1-az1",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.11.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-ffe9b66c4a9f2ea01",
+        "SubnetId": "subnet-ffe9b66c4a9f2ea01",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-cde-b"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "cde"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1b",
+        "AvailabilityZoneId": "use1-az1",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.21.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-1b43144e63904bbe6",
+        "SubnetId": "subnet-1b43144e63904bbe6",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-shared-b"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "connected"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1b",
+        "AvailabilityZoneId": "use1-az1",
+        "AvailableIpAddressCount": 251,
+        "CidrBlock": "10.20.31.0/24",
+        "DefaultForAz": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": false,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-ecb041dd06be53854",
+        "SubnetId": "subnet-ecb041dd06be53854",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-corporate-b"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "out-of-scope"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1c",
+        "AvailabilityZoneId": "use1-az2",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.32.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-3277c1d83976d8786",
+        "SubnetId": "subnet-3277c1d83976d8786",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1d",
+        "AvailabilityZoneId": "use1-az4",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.48.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-93704418ac446240f",
+        "SubnetId": "subnet-93704418ac446240f",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1e",
+        "AvailabilityZoneId": "use1-az3",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.64.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-fb5eef87c7916677c",
+        "SubnetId": "subnet-fb5eef87c7916677c",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "AssignIpv6AddressOnCreation": false,
+        "AvailabilityZone": "us-east-1f",
+        "AvailabilityZoneId": "use1-az5",
+        "AvailableIpAddressCount": 4091,
+        "CidrBlock": "172.31.80.0/20",
+        "DefaultForAz": true,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Ipv6Native": false,
+        "MapPublicIpOnLaunch": true,
+        "OwnerId": "123456789012",
+        "PrivateDnsNameOptionsOnLaunch": {
+          "EnableResourceNameDnsAAAARecord": false,
+          "EnableResourceNameDnsARecord": false,
+          "HostnameType": "ip-name"
+        },
+        "State": "available",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-16192bc2ea2fc58e7",
+        "SubnetId": "subnet-16192bc2ea2fc58e7",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      }
+    ],
+    "vpcs": [
+      {
+        "CidrBlock": "172.31.0.0/16",
+        "CidrBlockAssociationSet": [
+          {
+            "AssociationId": "vpc-cidr-assoc-f41b2896c4234b9e3",
+            "CidrBlock": "172.31.0.0/16",
+            "CidrBlockState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "DhcpOptionsId": "default",
+        "InstanceTenancy": "default",
+        "Ipv6CidrBlockAssociationSet": [],
+        "IsDefault": true,
+        "OwnerId": "123456789012",
+        "State": "available",
+        "Tags": [],
+        "VpcId": "vpc-73b9d6ce8c19f5dfe"
+      },
+      {
+        "CidrBlock": "10.20.0.0/16",
+        "CidrBlockAssociationSet": [
+          {
+            "AssociationId": "vpc-cidr-assoc-8b336fe1c718341eb",
+            "CidrBlock": "10.20.0.0/16",
+            "CidrBlockState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "DhcpOptionsId": "default",
+        "InstanceTenancy": "default",
+        "Ipv6CidrBlockAssociationSet": [],
+        "IsDefault": false,
+        "OwnerId": "123456789012",
+        "State": "available",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-vpc"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          }
+        ],
+        "VpcId": "vpc-f6b06d149ef8a6d85"
+      }
+    ]
+  },
+  "payload_sha256": "cf9300f58ec6dc4422dced9c195cff0755f58e38a9a1cc37e1c96f5e15b3d7c4",
+  "relevant_to": {
+    "fedramp_20x": [
+      "KSI-CNA-RNT",
+      "KSI-CNA-ULN",
+      "KSI-CNA-MAT"
+    ],
+    "pci_dss_4_0_1": [
+      "1.2",
+      "1.3",
+      "1.4"
+    ],
+    "soc_2": [
+      "CC6.1",
+      "CC6.6"
+    ]
+  },
+  "run_id": "20261112T012640Z-172836-0914",
+  "schema_version": "1.0",
+  "source": {
+    "account_id": "123456789012",
+    "collected_by": "arn:aws:sts::123456789012:user/moto",
+    "mode": "mock",
+    "region": "us-east-1",
+    "tool_version": "0.1.0"
+  }
+}

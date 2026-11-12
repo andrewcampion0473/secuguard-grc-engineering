@@ -1,0 +1,3 @@
+* text=auto
+# Sample evidence must stay byte-for-byte identical or its hashes will not verify.
+examples/** -text

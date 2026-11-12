@@ -1,0 +1,41 @@
+{
+  "collector_errors": [],
+  "files": [
+    {
+      "bytes": 20641,
+      "collector": "network",
+      "path": "network.json",
+      "sha256": "aaddfae3019a95aa6d0c23b8446d3b9d9baeeb9eed2114511f7001d0066336bf"
+    },
+    {
+      "bytes": 4761,
+      "collector": "kms",
+      "path": "kms.json",
+      "sha256": "476a8536d268e5146e2ed1fcecf690d413231f4a0847a97097c8be741ab16853"
+    },
+    {
+      "bytes": 2016,
+      "collector": "s3",
+      "path": "s3.json",
+      "sha256": "4bd297077735867521cbb2b6e394bc5c9b63455a10540175e617a2671aff9ea7"
+    },
+    {
+      "bytes": 2413,
+      "collector": "iam",
+      "path": "iam.json",
+      "sha256": "343c04b67416ef683185b2d8de475445023017e911cace2f8f89ebee17fd1f84"
+    }
+  ],
+  "finished_at": "2026-11-12T01:26:40Z",
+  "previous_manifest_sha256": null,
+  "run_id": "20261112T012640Z-172836-0914",
+  "schema_version": "1.0",
+  "source": {
+    "account_id": "123456789012",
+    "collected_by": "arn:aws:sts::123456789012:user/moto",
+    "mode": "mock",
+    "region": "us-east-1",
+    "tool_version": "0.1.0"
+  },
+  "started_at": "2026-11-12T01:26:40Z"
+}
