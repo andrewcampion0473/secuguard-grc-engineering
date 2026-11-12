@@ -4,24 +4,24 @@
     "acm:DescribeCertificate",
     "acm:GetCertificate"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "certificates",
   "description": "Every certificate in AWS Certificate Manager: who issued it, when it expires, its key type and size, how it was signed, and what is using it. The key and date facts are read from the certificate itself.",
-  "evidence_id": "c0a2df65-3d51-4ddb-a14c-93167a9b73fe",
+  "evidence_id": "4e342817-2073-4e1d-a892-a4f7be075401",
   "payload": {
     "certificates": [
       {
-        "arn": "arn:aws:acm:us-east-1:123456789012:certificate/b7971d1a-57e6-4387-ab77-5f4e9f25eb43",
+        "arn": "arn:aws:acm:us-east-1:123456789012:certificate/cefc80d9-4f5d-46e4-a9d8-2889d67df62a",
         "domain_name": "legacy-api.secuguard.example",
         "in_use_by": [],
         "parsed": {
           "issuer": "O=SecuGuard (fictional),CN=legacy-api.secuguard.example",
           "key_bits": 1024,
           "key_type": "RSA",
-          "not_after": "2026-12-02T21:34:13Z",
-          "not_before": "2026-11-11T21:34:13Z",
+          "not_after": "2026-12-02T22:04:57Z",
+          "not_before": "2026-11-11T22:04:57Z",
           "self_signed": true,
-          "serial_number": "759556a16342eb826456cc401868f3be8c3f8cca",
+          "serial_number": "1e38f7b8e0dbab999e15454bb02e0b3a5af2884e",
           "signature_hash": "sha256",
           "subject": "O=SecuGuard (fictional),CN=legacy-api.secuguard.example"
         },
@@ -29,19 +29,19 @@
         "type": "IMPORTED"
       },
       {
-        "arn": "arn:aws:acm:us-east-1:123456789012:certificate/f4323237-0c70-4a74-bed5-87f8f3846415",
+        "arn": "arn:aws:acm:us-east-1:123456789012:certificate/253eb3f3-cf94-4885-9c8c-6d13c9b2f294",
         "domain_name": "portal.secuguard.example",
         "in_use_by": [
-          "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/secuguard-portal/94f69b4b7e0841ae/e8e4ff373841bc8d"
+          "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/secuguard-portal/09c5f5887e959e46/535fe88d89cdf70a"
         ],
         "parsed": {
           "issuer": "O=SecuGuard (fictional),CN=portal.secuguard.example",
           "key_bits": 2048,
           "key_type": "RSA",
-          "not_after": "2027-11-12T21:34:13Z",
-          "not_before": "2026-11-11T21:34:13Z",
+          "not_after": "2027-11-12T22:04:57Z",
+          "not_before": "2026-11-11T22:04:57Z",
           "self_signed": true,
-          "serial_number": "6f44da133222b03c1657cbcc7d58830ce476ea38",
+          "serial_number": "4c0e5a42547a25993b1aea09e7f19995c456c809",
           "signature_hash": "sha256",
           "subject": "O=SecuGuard (fictional),CN=portal.secuguard.example"
         },
@@ -50,7 +50,7 @@
       }
     ]
   },
-  "payload_sha256": "41e4d59b5e85da78624428f3214816bb7ed18733c4df77de14e45daa1d3ee94b",
+  "payload_sha256": "1f1cbbed41247b4716ad102bee34a74904715bb169b331f60e2d000909f1402a",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-SVC-ASM",
@@ -64,7 +64,7 @@
       "CC6.7"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

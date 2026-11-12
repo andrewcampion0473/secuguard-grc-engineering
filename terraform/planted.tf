@@ -45,6 +45,44 @@ resource "aws_vpc_security_group_ingress_rule" "planted_ssh_from_anywhere" {
   description       = "SSH from anywhere"
 }
 
+# NET-02, SCP-02, and SCP-03: an analytics group labelled out of scope that is allowed
+# straight into the card data zone. The label says PCI DSS does not apply to it. The
+# firewall rule says it does. This is scope drift.
+resource "aws_security_group" "planted_analytics" {
+  count = local.planted
+
+  name        = "secuguard-planted-analytics"
+  description = "Planted finding: labelled out of scope but allowed into the card data zone"
+  vpc_id      = aws_vpc.main.id
+
+  tags = merge(local.planted_tags, {
+    Name              = "secuguard-planted-analytics"
+    (local.scope_tag) = "out-of-scope"
+  })
+}
+
+resource "aws_vpc_security_group_ingress_rule" "planted_cde_from_analytics" {
+  count = local.planted
+
+  security_group_id            = aws_security_group.tier["cde"].id
+  referenced_security_group_id = aws_security_group.planted_analytics[0].id
+  ip_protocol                  = "tcp"
+  from_port                    = 5432
+  to_port                      = 5432
+  description                  = "Analytics straight to the card database"
+}
+
+# SCP-01 and SCP-03: a group nobody gave a PCI scope to.
+resource "aws_security_group" "planted_unclassified" {
+  count = local.planted
+
+  name        = "secuguard-planted-unclassified"
+  description = "Planted finding: no PCI scope declared"
+  vpc_id      = aws_vpc.main.id
+
+  tags = merge(local.planted_tags, { Name = "secuguard-planted-unclassified" })
+}
+
 # ------------------------------------------------------------------ encryption
 
 # CRY-01: an encryption key with automatic rotation switched off.

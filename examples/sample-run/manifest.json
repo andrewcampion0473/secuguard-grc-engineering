@@ -2,63 +2,69 @@
   "collector_errors": [],
   "files": [
     {
-      "bytes": 22139,
+      "bytes": 28701,
       "collector": "network",
       "path": "network.json",
-      "sha256": "d1e2299c4c288a2a1e0dbaeffa58b3a46c416137edf24f207d73b5285115ad9a"
+      "sha256": "58f5c0f11195768a2de574caf64ce7f5668b433ae907389a95f7dcf5f8191756"
     },
     {
       "bytes": 5830,
       "collector": "kms",
       "path": "kms.json",
-      "sha256": "91aaad91de9438b9380f7af290ab693e06d3ef3fc6826fcd716dc1c4c421f63d"
+      "sha256": "b8b3523f3158478e24daabd28b91aaaec7fe42a8dae904fc5258ccf2ec60233b"
     },
     {
       "bytes": 2252,
       "collector": "s3",
       "path": "s3.json",
-      "sha256": "42dac727e03f60e4bf221308efa27c01c673dde2f1bb3316e7b34159f89a1e74"
+      "sha256": "22d10260b7e17c9c1292759bb902ed723a0c35aff4fd9b8a61e57e7dce367fbe"
     },
     {
       "bytes": 2413,
       "collector": "iam",
       "path": "iam.json",
-      "sha256": "25bd14f08dd26348421af7e114862b0b20dd983c0069ad01610d5e64b92daddb"
+      "sha256": "f4d86ded83e1bbd347031e217652395a8fef6af5e9c9acb48afce5e43a887ad1"
     },
     {
       "bytes": 3199,
       "collector": "identities",
       "path": "identities.json",
-      "sha256": "5e934657c8981a06a65c4480e6c75271130724c1e153701f04c0d9fdbc4cb4c3"
+      "sha256": "cbc2d5bbf1c6648dbe8553cf99f3da3a22de1a7a94e834eb9a1a3169fafb21e6"
     },
     {
       "bytes": 2641,
       "collector": "certificates",
       "path": "certificates.json",
-      "sha256": "04e8c1df8f0795ec0606dc4c46291b997b0deb8f75bd8dd0765ee3d731217fae"
+      "sha256": "431e987272d95e3c106d7e154717c350ffb59c75a2d3347f92cf6e777761c5b5"
     },
     {
       "bytes": 1669,
       "collector": "loadbalancers",
       "path": "loadbalancers.json",
-      "sha256": "ac59c912c19fc778f891f9029b712c47eef00094f30c711c4b53282873e400f8"
+      "sha256": "5919ea978824063e0c7577392e00f8b2fc1f60010924824b2c3f533cf48ad84d"
     },
     {
       "bytes": 1024,
       "collector": "audit_logging",
       "path": "audit_logging.json",
-      "sha256": "ce100adb8308c68872bd660dcace82be9ca336e57b1b0e4205184ac7e8dd79c0"
+      "sha256": "ddf5f71ebd861252cbd2293e3ac2d1357be0753d897af973773d566f761a7c41"
     },
     {
-      "bytes": 24456,
+      "bytes": 1696,
+      "collector": "scope_baseline",
+      "path": "scope_baseline.json",
+      "sha256": "9b75e650f786da65e2488481e4bd7ff8eedd62e6a3fc5d83f7777762b0161300"
+    },
+    {
+      "bytes": 38155,
       "collector": "check-results",
       "path": "check-results.json",
-      "sha256": "f3f35b2746d53c2152693fc5d6aee7bcd321c2a7d004ab54a7c8a7d4dabe43b1"
+      "sha256": "a2e3b6eaab82c975f4369a420bf1cc8ced7249490f1481379ba3b2d9c890b4dd"
     }
   ],
-  "finished_at": "2026-11-12T21:34:14Z",
+  "finished_at": "2026-11-12T22:04:57Z",
   "previous_manifest_sha256": null,
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",
@@ -67,5 +73,5 @@
     "region": "us-east-1",
     "tool_version": "0.2.0"
   },
-  "started_at": "2026-11-12T21:34:14Z"
+  "started_at": "2026-11-12T22:04:57Z"
 }

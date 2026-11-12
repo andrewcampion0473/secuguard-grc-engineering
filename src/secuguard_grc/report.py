@@ -33,6 +33,21 @@ def render_text(results: dict, run_id: str, source: dict) -> str:
         for result in check["results"]:
             if result["status"] == "fail":
                 lines.append(f"{'':<8}  x {result['resource']}: {result['detail']}")
+    inv = results.get("inventories") or {}
+    if inv.get("scope"):
+        lines += ["", "PCI scope of the network", "-" * 96,
+                  f"{'Kind':<16}{'Name':<34}{'Declared':<15}{'Actually':<15}"]
+        for item in inv["scope"]:
+            flag = "  <-- mismatch" if item["effective"] == "connected" and item["declared"] not in {"cde", "connected"} else ""
+            lines.append(f"{item['kind']:<16}{item['name']:<34}{str(item['declared'] or 'not declared'):<15}"
+                         f"{item['effective']:<15}{flag}")
+    if inv.get("certificates"):
+        lines += ["", "Certificate inventory", "-" * 96,
+                  f"{'Name':<32}{'Issuer':<14}{'Key':<10}{'Expires':<12}In use by"]
+        for cert in inv["certificates"]:
+            issuer = cert["issuer"] if cert["issuer"] == "self-signed" else "CA-issued"
+            lines.append(f"{str(cert['name']):<32}{issuer:<14}{cert['key']:<10}{cert['expires']:<12}"
+                         f"{', '.join(cert['in_use_by']) or 'nothing'}")
     lines += ["", "The same results, by framework", "-" * 96]
     for framework, rows in results["by_framework"].items():
         lines.append(FRAMEWORK_NAMES.get(framework, framework))
@@ -73,6 +88,20 @@ def render_markdown(results: dict, run_id: str, source: dict) -> str:
                 if result["status"] == "fail":
                     out.append(f"- {result['resource']}: {result['detail']}")
             out.append("")
+    inv = results.get("inventories") or {}
+    if inv.get("scope"):
+        out += ["## PCI scope of the network", "",
+                "What each part of the network is declared to be, and what the firewall rules make it.", "",
+                "| Kind | Name | Declared | Actually | Reaches the card data zone by |", "|---|---|---|---|---|"]
+        out += [f"| {i['kind']} | {i['name']} | {i['declared'] or 'not declared'} | {i['effective']} | "
+                f"{'; '.join(i['reaches_cde_by'])} |" for i in inv["scope"]]
+        out.append("")
+    if inv.get("certificates"):
+        out += ["## Certificate inventory", "",
+                "| Name | Issuer | Key | Signature | Expires | In use by |", "|---|---|---|---|---|---|"]
+        out += [f"| {c['name']} | {c['issuer']} | {c['key']} | {c['signature']} | {c['expires']} | "
+                f"{', '.join(c['in_use_by']) or 'nothing'} |" for c in inv["certificates"]]
+        out.append("")
     out += ["## By framework", ""]
     for framework, rows in results["by_framework"].items():
         out += [f"### {FRAMEWORK_NAMES.get(framework, framework)}", "",

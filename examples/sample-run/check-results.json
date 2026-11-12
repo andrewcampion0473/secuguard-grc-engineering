@@ -1,15 +1,22 @@
 {
   "api_calls": [],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "check-results",
   "description": "The outcome of every check, graded from the evidence files in this run. Each check lists the resources it looked at and the requirements it reports against.",
-  "evidence_id": "67303c0a-1e23-4bff-ab78-b91c986d970a",
+  "evidence_id": "e4b7774c-7ea8-4602-9efe-c4780658a10d",
   "payload": {
     "by_framework": {
       "fedramp_20x": {
         "KSI-CMT-LMC": {
           "checks": [
+            "SCP-03",
             "LOG-01"
+          ],
+          "status": "fail"
+        },
+        "KSI-CNA-EIS": {
+          "checks": [
+            "SCP-02"
           ],
           "status": "fail"
         },
@@ -17,22 +24,25 @@
           "checks": [
             "NET-01",
             "NET-03",
-            "CRY-03"
+            "CRY-03",
+            "SCP-04"
           ],
           "status": "fail"
         },
         "KSI-CNA-RNT": {
           "checks": [
             "NET-01",
-            "NET-02"
+            "NET-02",
+            "SCP-04"
           ],
           "status": "fail"
         },
         "KSI-CNA-ULN": {
           "checks": [
-            "NET-02"
+            "NET-02",
+            "SCP-02"
           ],
-          "status": "pass"
+          "status": "fail"
         },
         "KSI-IAM-APM": {
           "checks": [
@@ -64,6 +74,13 @@
           ],
           "status": "fail"
         },
+        "KSI-PIY-GIV": {
+          "checks": [
+            "SCP-01",
+            "SCP-03"
+          ],
+          "status": "fail"
+        },
         "KSI-SVC-ASM": {
           "checks": [
             "CRY-01",
@@ -85,7 +102,8 @@
         "KSI-SVC-VCM": {
           "checks": [
             "CRY-04",
-            "CRY-06"
+            "CRY-06",
+            "CRY-07"
           ],
           "status": "fail"
         },
@@ -103,18 +121,37 @@
           ],
           "status": "pass"
         },
+        "1.2.2": {
+          "checks": [
+            "SCP-03"
+          ],
+          "status": "fail"
+        },
+        "1.2.3": {
+          "checks": [
+            "SCP-01"
+          ],
+          "status": "fail"
+        },
         "1.3.1": {
           "checks": [
             "NET-01",
-            "NET-02"
+            "NET-02",
+            "SCP-02"
           ],
           "status": "fail"
+        },
+        "1.3.2": {
+          "checks": [
+            "SCP-04"
+          ],
+          "status": "pass"
         },
         "1.4.1": {
           "checks": [
             "NET-02"
           ],
-          "status": "pass"
+          "status": "fail"
         },
         "1.4.2": {
           "checks": [
@@ -124,7 +161,8 @@
         },
         "1.4.4": {
           "checks": [
-            "CRY-03"
+            "CRY-03",
+            "SCP-04"
           ],
           "status": "fail"
         },
@@ -153,6 +191,14 @@
           ],
           "status": "pass"
         },
+        "12.5.2": {
+          "checks": [
+            "SCP-01",
+            "SCP-02",
+            "SCP-03"
+          ],
+          "status": "fail"
+        },
         "3.5.1": {
           "checks": [
             "CRY-02"
@@ -175,7 +221,8 @@
           "checks": [
             "CRY-04",
             "CRY-05",
-            "CRY-06"
+            "CRY-06",
+            "CRY-07"
           ],
           "status": "fail"
         },
@@ -242,12 +289,21 @@
         }
       },
       "soc_2": {
+        "CC3.4": {
+          "checks": [
+            "SCP-01",
+            "SCP-02",
+            "SCP-03"
+          ],
+          "status": "fail"
+        },
         "CC6.1": {
           "checks": [
             "NET-02",
             "CRY-01",
             "CRY-02",
             "CRY-03",
+            "SCP-01",
             "IAM-01",
             "IAM-02",
             "IAM-03",
@@ -275,7 +331,9 @@
             "NET-01",
             "NET-02",
             "NET-03",
-            "CRY-03"
+            "CRY-03",
+            "SCP-02",
+            "SCP-04"
           ],
           "status": "fail"
         },
@@ -284,7 +342,8 @@
             "CRY-02",
             "CRY-04",
             "CRY-05",
-            "CRY-06"
+            "CRY-06",
+            "CRY-07"
           ],
           "status": "fail"
         },
@@ -293,6 +352,12 @@
             "NET-04",
             "LOG-01",
             "LOG-02"
+          ],
+          "status": "fail"
+        },
+        "CC8.1": {
+          "checks": [
+            "SCP-03"
           ],
           "status": "fail"
         },
@@ -324,33 +389,43 @@
         "results": [
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group default (sg-1a67868d30d9c5e70)",
+            "resource": "security group default (sg-03eed37280dda1598)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group default (sg-d7a0ff9e8c6ef2641)",
+            "resource": "security group default (sg-5192d1cd9ce24f993)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-cde (sg-330537ca9f2172e83)",
+            "resource": "security group secuguard-cde (sg-d838dc5daaae75965)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-shared (sg-6511725fd7dcf3568)",
+            "resource": "security group secuguard-shared (sg-f0a5e2aa1c90e61af)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-corporate (sg-426cbf3e9a701f90c)",
+            "resource": "security group secuguard-corporate (sg-17e47c42b874f9dfb)",
             "status": "pass"
           },
           {
             "detail": "open to the whole internet: SSH (port 22)",
-            "resource": "security group secuguard-planted-open-admin (sg-f024da2b238e1dea1)",
+            "resource": "security group secuguard-planted-open-admin (sg-84b087b6d3dcf1fe2)",
             "status": "fail"
+          },
+          {
+            "detail": "no administrative port is open to the internet",
+            "resource": "security group secuguard-planted-analytics (sg-293317828131c3383)",
+            "status": "pass"
+          },
+          {
+            "detail": "no administrative port is open to the internet",
+            "resource": "security group secuguard-planted-unclassified (sg-535b7ec78d1809c8d)",
+            "status": "pass"
           }
         ],
         "severity": "high",
@@ -377,13 +452,13 @@
         "note": null,
         "results": [
           {
-            "detail": "accepts traffic only from groups tagged cde or connected",
-            "resource": "security group secuguard-cde (sg-330537ca9f2172e83)",
-            "status": "pass"
+            "detail": "accepts traffic from sg-293317828131c3383, tagged out-of-scope",
+            "resource": "security group secuguard-cde (sg-d838dc5daaae75965)",
+            "status": "fail"
           }
         ],
         "severity": "high",
-        "status": "pass",
+        "status": "fail",
         "title": "The card data zone accepts traffic only from in-scope systems",
         "why": "Anything allowed to reach the cardholder data environment falls under PCI DSS. Unplanned paths widen scope."
       },
@@ -404,12 +479,12 @@
         "results": [
           {
             "detail": "has no inbound rules",
-            "resource": "security group default (sg-1a67868d30d9c5e70)",
+            "resource": "security group default (sg-03eed37280dda1598)",
             "status": "pass"
           },
           {
             "detail": "has no inbound rules",
-            "resource": "security group default (sg-d7a0ff9e8c6ef2641)",
+            "resource": "security group default (sg-5192d1cd9ce24f993)",
             "status": "pass"
           }
         ],
@@ -435,12 +510,12 @@
         "results": [
           {
             "detail": "no flow logs, so network traffic is not recorded",
-            "resource": "VPC default (vpc-a61616ef3eb9d471c)",
+            "resource": "VPC default (vpc-25404d4a490a6eead)",
             "status": "fail"
           },
           {
             "detail": "no flow logs, so network traffic is not recorded",
-            "resource": "VPC secuguard-vpc (vpc-a11601c4d87d1bbf0)",
+            "resource": "VPC secuguard-vpc (vpc-8df6d067ee25fd22b)",
             "status": "fail"
           }
         ],
@@ -595,12 +670,12 @@
         "note": null,
         "results": [
           {
-            "detail": "expires in 19 days, inside the 30-day warning window",
+            "detail": "expires in 20 days, inside the 30-day warning window",
             "resource": "certificate legacy-api.secuguard.example",
             "status": "fail"
           },
           {
-            "detail": "valid for another 364 days",
+            "detail": "valid for another 365 days",
             "resource": "certificate portal.secuguard.example",
             "status": "pass"
           }
@@ -636,6 +711,266 @@
         "status": "fail",
         "title": "Connections require TLS 1.2 or newer",
         "why": "TLS 1.0 and 1.1 have known weaknesses and are not accepted as strong cryptography."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-SVC-VCM"
+          ],
+          "pci_dss_4_0_1": [
+            "4.2.1"
+          ],
+          "soc_2": [
+            "CC6.7"
+          ]
+        },
+        "id": "CRY-07",
+        "note": null,
+        "results": [
+          {
+            "detail": "self-signed, and in use by load balancer secuguard-portal. No certificate authority vouches for it.",
+            "resource": "certificate portal.secuguard.example",
+            "status": "fail"
+          }
+        ],
+        "severity": "medium",
+        "status": "fail",
+        "title": "Certificates in use are issued by a certificate authority",
+        "why": "A self-signed certificate has nobody vouching for it. Systems told to trust it can be fooled by a fake."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-PIY-GIV"
+          ],
+          "pci_dss_4_0_1": [
+            "12.5.2",
+            "1.2.3"
+          ],
+          "soc_2": [
+            "CC3.4",
+            "CC6.1"
+          ]
+        },
+        "id": "SCP-01",
+        "note": null,
+        "results": [
+          {
+            "detail": "declared cde",
+            "resource": "security group secuguard-cde",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope",
+            "resource": "security group secuguard-corporate",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope",
+            "resource": "security group secuguard-planted-analytics",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope",
+            "resource": "security group secuguard-planted-open-admin",
+            "status": "pass"
+          },
+          {
+            "detail": "has no PCI scope tag, so nobody has decided whether PCI DSS applies to it",
+            "resource": "security group secuguard-planted-unclassified",
+            "status": "fail"
+          },
+          {
+            "detail": "declared connected",
+            "resource": "security group secuguard-shared",
+            "status": "pass"
+          },
+          {
+            "detail": "declared cde",
+            "resource": "subnet secuguard-cde-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared cde",
+            "resource": "subnet secuguard-cde-b",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope",
+            "resource": "subnet secuguard-corporate-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope",
+            "resource": "subnet secuguard-corporate-b",
+            "status": "pass"
+          },
+          {
+            "detail": "declared connected",
+            "resource": "subnet secuguard-shared-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared connected",
+            "resource": "subnet secuguard-shared-b",
+            "status": "pass"
+          }
+        ],
+        "severity": "medium",
+        "status": "fail",
+        "title": "Every part of the network has a declared PCI scope",
+        "why": "Scope is the first thing a PCI assessor confirms. Anything unlabelled is a decision nobody made."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-CNA-ULN",
+            "KSI-CNA-EIS"
+          ],
+          "pci_dss_4_0_1": [
+            "12.5.2",
+            "1.3.1"
+          ],
+          "soc_2": [
+            "CC3.4",
+            "CC6.6"
+          ]
+        },
+        "id": "SCP-02",
+        "note": null,
+        "results": [
+          {
+            "detail": "declared cde, and the firewall rules agree",
+            "resource": "security group secuguard-cde",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope, and the firewall rules agree",
+            "resource": "security group secuguard-corporate",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope, but it can reach the card data zone (port 5432 on secuguard-cde), so PCI DSS applies to it",
+            "resource": "security group secuguard-planted-analytics",
+            "status": "fail"
+          },
+          {
+            "detail": "declared out-of-scope, and the firewall rules agree",
+            "resource": "security group secuguard-planted-open-admin",
+            "status": "pass"
+          },
+          {
+            "detail": "declared with no scope, and the firewall rules agree",
+            "resource": "security group secuguard-planted-unclassified",
+            "status": "pass"
+          },
+          {
+            "detail": "declared connected, and the firewall rules agree",
+            "resource": "security group secuguard-shared",
+            "status": "pass"
+          },
+          {
+            "detail": "declared cde, and the firewall rules agree",
+            "resource": "subnet secuguard-cde-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared cde, and the firewall rules agree",
+            "resource": "subnet secuguard-cde-b",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope, and the firewall rules agree",
+            "resource": "subnet secuguard-corporate-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared out-of-scope, and the firewall rules agree",
+            "resource": "subnet secuguard-corporate-b",
+            "status": "pass"
+          },
+          {
+            "detail": "declared connected, and the firewall rules agree",
+            "resource": "subnet secuguard-shared-a",
+            "status": "pass"
+          },
+          {
+            "detail": "declared connected, and the firewall rules agree",
+            "resource": "subnet secuguard-shared-b",
+            "status": "pass"
+          }
+        ],
+        "severity": "high",
+        "status": "fail",
+        "title": "Declared PCI scope matches the firewall rules",
+        "why": "A system labelled out of scope that can reach card data is in scope, and is not getting PCI controls."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-PIY-GIV",
+            "KSI-CMT-LMC"
+          ],
+          "pci_dss_4_0_1": [
+            "12.5.2",
+            "1.2.2"
+          ],
+          "soc_2": [
+            "CC3.4",
+            "CC8.1"
+          ]
+        },
+        "id": "SCP-03",
+        "note": null,
+        "results": [
+          {
+            "detail": "not in the approved baseline (declared out-of-scope)",
+            "resource": "security group secuguard-planted-analytics",
+            "status": "fail"
+          },
+          {
+            "detail": "not in the approved baseline (declared out-of-scope)",
+            "resource": "security group secuguard-planted-open-admin",
+            "status": "fail"
+          },
+          {
+            "detail": "not in the approved baseline (declared with no scope)",
+            "resource": "security group secuguard-planted-unclassified",
+            "status": "fail"
+          }
+        ],
+        "severity": "high",
+        "status": "fail",
+        "title": "The network matches the approved scope baseline",
+        "why": "Scope should change only when someone decides it should. Anything new or altered needs review."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-CNA-RNT",
+            "KSI-CNA-MAT"
+          ],
+          "pci_dss_4_0_1": [
+            "1.4.4",
+            "1.3.2"
+          ],
+          "soc_2": [
+            "CC6.6"
+          ]
+        },
+        "id": "SCP-04",
+        "note": null,
+        "results": [
+          {
+            "detail": "serves 2 card data subnets and has no route to the internet",
+            "resource": "route table secuguard-cde",
+            "status": "pass"
+          }
+        ],
+        "severity": "high",
+        "status": "pass",
+        "title": "The card data zone has no route to the internet",
+        "why": "Systems holding card data must not be directly reachable from, or able to reach, the internet."
       },
       {
         "frameworks": {
@@ -799,7 +1134,7 @@
         "results": [
           {
             "detail": "active but has never been used",
-            "resource": "user secuguard-svc-reports access key ending 7XN5",
+            "resource": "user secuguard-svc-reports access key ending X4OH",
             "status": "fail"
           }
         ],
@@ -894,18 +1229,143 @@
         "why": "Evidence an administrator can edit proves little. The store must refuse changes from everyone."
       }
     ],
-    "graded_as_of": "2026-11-12T21:34:14Z",
+    "graded_as_of": "2026-11-12T22:04:57Z",
+    "inventories": {
+      "certificates": [
+        {
+          "expires": "2026-12-02",
+          "in_use_by": [],
+          "issuer": "self-signed",
+          "key": "RSA 1024",
+          "name": "legacy-api.secuguard.example",
+          "signature": "SHA256"
+        },
+        {
+          "expires": "2027-11-12",
+          "in_use_by": [
+            "load balancer secuguard-portal"
+          ],
+          "issuer": "self-signed",
+          "key": "RSA 2048",
+          "name": "portal.secuguard.example",
+          "signature": "SHA256"
+        }
+      ],
+      "scope": [
+        {
+          "declared": "cde",
+          "effective": "cde",
+          "id": "sg-d838dc5daaae75965",
+          "kind": "security group",
+          "name": "secuguard-cde",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "out-of-scope",
+          "effective": "out-of-scope",
+          "id": "sg-17e47c42b874f9dfb",
+          "kind": "security group",
+          "name": "secuguard-corporate",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "out-of-scope",
+          "effective": "connected",
+          "id": "sg-293317828131c3383",
+          "kind": "security group",
+          "name": "secuguard-planted-analytics",
+          "reaches_cde_by": [
+            "port 5432 on secuguard-cde"
+          ]
+        },
+        {
+          "declared": "out-of-scope",
+          "effective": "out-of-scope",
+          "id": "sg-84b087b6d3dcf1fe2",
+          "kind": "security group",
+          "name": "secuguard-planted-open-admin",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": null,
+          "effective": "out-of-scope",
+          "id": "sg-535b7ec78d1809c8d",
+          "kind": "security group",
+          "name": "secuguard-planted-unclassified",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "connected",
+          "effective": "connected",
+          "id": "sg-f0a5e2aa1c90e61af",
+          "kind": "security group",
+          "name": "secuguard-shared",
+          "reaches_cde_by": [
+            "port 443 on secuguard-cde"
+          ]
+        },
+        {
+          "declared": "cde",
+          "effective": "cde",
+          "id": "subnet-a25bcf64ee5a846f9",
+          "kind": "subnet",
+          "name": "secuguard-cde-a",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "cde",
+          "effective": "cde",
+          "id": "subnet-42dc5397f1618277f",
+          "kind": "subnet",
+          "name": "secuguard-cde-b",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "out-of-scope",
+          "effective": "out-of-scope",
+          "id": "subnet-ef7d03d471a3dff7a",
+          "kind": "subnet",
+          "name": "secuguard-corporate-a",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "out-of-scope",
+          "effective": "out-of-scope",
+          "id": "subnet-c9e0c7bd2d0ab0869",
+          "kind": "subnet",
+          "name": "secuguard-corporate-b",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "connected",
+          "effective": "connected",
+          "id": "subnet-23ce3e6e50f107c4c",
+          "kind": "subnet",
+          "name": "secuguard-shared-a",
+          "reaches_cde_by": []
+        },
+        {
+          "declared": "connected",
+          "effective": "connected",
+          "id": "subnet-9a0819cd426d3b07e",
+          "kind": "subnet",
+          "name": "secuguard-shared-b",
+          "reaches_cde_by": []
+        }
+      ]
+    },
     "summary": {
       "error": 0,
-      "fail": 14,
+      "fail": 19,
       "not_applicable": 0,
       "pass": 5
     }
   },
-  "payload_sha256": "e93529042e3c2eece0c92274e6a8b1c2370d810eb984e185c95a72334431dc86",
+  "payload_sha256": "d3a3bff13998138aee3dca9d1030fb943d10b30b31819e7b42dc4d632feaf464",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-CMT-LMC",
+      "KSI-CNA-EIS",
       "KSI-CNA-MAT",
       "KSI-CNA-RNT",
       "KSI-CNA-ULN",
@@ -913,6 +1373,7 @@
       "KSI-IAM-ELP",
       "KSI-IAM-SNU",
       "KSI-MLA-LET",
+      "KSI-PIY-GIV",
       "KSI-SVC-ASM",
       "KSI-SVC-SIN",
       "KSI-SVC-VCM",
@@ -920,7 +1381,10 @@
     ],
     "pci_dss_4_0_1": [
       "1.2.1",
+      "1.2.2",
+      "1.2.3",
       "1.3.1",
+      "1.3.2",
       "1.4.1",
       "1.4.2",
       "1.4.4",
@@ -928,6 +1392,7 @@
       "10.3.2",
       "10.3.4",
       "10.5.1",
+      "12.5.2",
       "3.5.1",
       "3.6.1",
       "3.7.4",
@@ -944,16 +1409,18 @@
       "8.6.3"
     ],
     "soc_2": [
+      "CC3.4",
       "CC6.1",
       "CC6.2",
       "CC6.3",
       "CC6.6",
       "CC6.7",
       "CC7.2",
+      "CC8.1",
       "CC9.2"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

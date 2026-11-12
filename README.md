@@ -19,6 +19,8 @@ This project gathers evidence the way an engineer would:
 | Evidence sits in a shared drive anyone can edit | The copy of record is in S3 with Object Lock and cannot be changed or deleted |
 | One spreadsheet per framework | Each check is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x |
 | A tool that always says "compliant" | Deliberate weaknesses are planted, and tests prove each one is caught |
+| Scope confirmed once a year | PCI scope is worked out from the firewall rules on every run and compared with an approved baseline |
+| Problems found after they ship | A check reads each planned change and blocks the risky ones first |
 | Someone has to remember to do it | A scheduled job does it, with no stored AWS keys |
 
 ## How it works
@@ -29,7 +31,7 @@ flowchart LR
     AWS -->|read-only API calls| COL[Collectors]
     MOCK[Simulated AWS] -.->|practice mode| COL
     COL --> EV[Evidence files with SHA-256 hashes]
-    EV --> CHK[19 checks, reported against three frameworks]
+    EV --> CHK[24 checks, reported against three frameworks]
     CHK --> MAN[Run manifest, linked to the previous run]
     MAN --> S3[(Locked S3 evidence vault)]
     GH[GitHub Actions, daily] -->|short-lived credentials| COL
@@ -46,7 +48,7 @@ secuguard report
 secuguard verify
 ```
 
-`secuguard report` shows 19 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
+`secuguard report` shows 24 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x, plus the PCI scope of the network and a certificate inventory. `secuguard scope` shows what has drifted from the approved scope. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
 
 To look without installing anything, see [examples/sample-report.md](examples/sample-report.md) for the results and [examples/sample-run](examples/sample-run) for the evidence behind them.
 
@@ -65,16 +67,28 @@ To look without installing anything, see [examples/sample-report.md](examples/sa
 
 - Realistic resources with deliberate, harmless weaknesses: users, a service account, a vendor role, certificates, a load balancer, an encryption key, and a storage bucket
 - Eight collectors covering network, encryption keys, storage, sign-in settings, identities, certificates, load balancers, and logging
-- 19 checks, each written once and reported against all three frameworks
+- Checks for network, encryption, identity, and logging, each written once and reported against all three frameworks
 - Check results sealed and stored with the evidence they were graded from
 - `secuguard test-lock`, which proves the vault refuses deletion, and `secuguard verify --vault`, which verifies the copy of record
+
+**Stage 3, scope drift and prevention**
+
+- PCI scope worked out from the firewall rules and compared with each resource's label, so a system labelled out of scope that can reach card data is caught
+- An approved scope baseline under version control, and a check that reports anything added, changed, or removed since it was approved
+- `secuguard plan-check`, a preventive control that reads a Terraform plan and blocks changes that break a rule before anything reaches AWS
+- An exceptions register in which each accepted risk has a reason, an approver, and an expiry date
+- A certificate inventory in every report
+
+There are 24 checks and 8 plan rules in total.
 
 | Area | Example checks | PCI DSS 4.0.1 | SOC 2 | FedRAMP 20x |
 |---|---|---|---|---|
 | Network | No admin port open to the internet. The card data zone accepts only in-scope traffic. | 1.3.1, 1.4.1 | CC6.6 | KSI-CNA-RNT |
-| Encryption | Keys rotate. Certificates are strong and not expiring. TLS 1.2 or newer. | 3.7.4, 4.2.1 | CC6.7 | KSI-SVC-ASM, KSI-SVC-VCM |
+| PCI scope | Every resource has a declared scope. Labels match the firewall rules. Nothing has drifted from the approved baseline. | 12.5.2, 1.2.2 | CC3.4, CC8.1 | KSI-PIY-GIV, KSI-CNA-EIS |
+| Encryption | Keys rotate. Certificates are strong, trusted, and not expiring. TLS 1.2 or newer. | 3.7.4, 4.2.1 | CC6.7 | KSI-SVC-ASM, KSI-SVC-VCM |
 | Identity | MFA for everyone who can sign in. No direct admin rights. No unused keys. | 7.2.1, 8.4.2 | CC6.1, CC6.3 | KSI-IAM-APM, KSI-IAM-ELP |
 | Logging | Account activity is recorded. Evidence cannot be altered. | 10.2.1, 10.3.2 | CC7.2 | KSI-MLA-LET, KSI-SVC-VRI |
+| Change control | Planned changes are checked against rules before they are applied. | 1.2.2, 6.5.1 | CC8.1 | KSI-MLA-EVC, KSI-CMT-VTD |
 
 The mapping of checks to requirements is the author's reading of each framework. It is a starting point for discussion with an assessor, not an assessor's opinion.
 
@@ -82,7 +96,6 @@ The mapping of checks to requirements is the author's reading of each framework.
 
 | Stage | Adds |
 |---|---|
-| 3 | PCI scope drift detection and a preventive check on Terraform changes |
 | 4 | FedRAMP 20x Key Security Indicator validation, with AWS Config and Security Hub |
 | 5 | Readable report, diagrams, and video walkthrough |
 

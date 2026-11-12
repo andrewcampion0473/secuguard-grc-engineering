@@ -4,10 +4,10 @@
     "cloudtrail:GetTrailStatus",
     "ec2:DescribeFlowLogs"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "audit_logging",
   "description": "CloudTrail trails, which record who did what in the account, and VPC flow logs, which record network traffic. An empty list means that kind of logging is not set up.",
-  "evidence_id": "d2bc7f8c-601b-4d1d-8616-942e75af9550",
+  "evidence_id": "2783da62-d8dc-4235-909f-a0ea9908cb3b",
   "payload": {
     "flow_logs": [],
     "trails": []
@@ -26,7 +26,7 @@
       "CC7.2"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

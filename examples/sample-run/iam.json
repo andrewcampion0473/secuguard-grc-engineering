@@ -3,10 +3,10 @@
     "iam:GetAccountSummary",
     "iam:GetAccountPasswordPolicy"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "iam",
   "description": "Account-wide identity settings: whether the root user has MFA and access keys, how many users and roles exist, and the IAM password policy. A null password policy means none is set.",
-  "evidence_id": "677a6e3d-b0a4-46a3-90e5-792283004bb9",
+  "evidence_id": "a6d05024-5cb5-420f-a179-29aa296f871a",
   "payload": {
     "account_summary": {
       "AccessKeysPerUserQuota": 2,
@@ -69,7 +69,7 @@
       "CC6.1"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

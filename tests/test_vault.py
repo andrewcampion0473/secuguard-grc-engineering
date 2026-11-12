@@ -51,7 +51,8 @@ def test_report_command_runs_on_a_practice_collection(tmp_path, capsys):
     assert main(["collect", "--mock", "--output", str(tmp_path)]) == 0
     capsys.readouterr()
     assert main(["report", str(tmp_path)]) == 0
-    assert "By framework" in capsys.readouterr().out or True
+    out = capsys.readouterr().out
+    assert "PCI scope of the network" in out and "Certificate inventory" in out
     assert main(["report", str(tmp_path), "--markdown", "--regrade"]) == 0
     assert "| NET-01 |" in capsys.readouterr().out
     assert main(["report", str(tmp_path), "--fail-on-findings"]) == 1

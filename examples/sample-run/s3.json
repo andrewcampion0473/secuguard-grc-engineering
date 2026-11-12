@@ -6,19 +6,19 @@
     "s3:GetBucketPublicAccessBlock",
     "s3:GetBucketObjectLockConfiguration"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "s3",
   "description": "Every S3 bucket in the account with its encryption, versioning, public access block, and Object Lock settings. A null value means that protection is not configured.",
-  "evidence_id": "c2ded718-f059-4f34-acb8-641dd653a3cd",
+  "evidence_id": "17c26484-ea0e-42de-ac3f-bc0f7d8ac0a0",
   "payload": {
     "buckets": [
       {
-        "created": "2026-11-12T21:34:13Z",
+        "created": "2026-11-12T22:04:57Z",
         "encryption": {
           "Rules": [
             {
               "ApplyServerSideEncryptionByDefault": {
-                "KMSMasterKeyID": "def7f79a-3341-4930-9f1e-148c7f9372f2",
+                "KMSMasterKeyID": "a658b86f-0b18-4153-b053-9ed2bae2c9a4",
                 "SSEAlgorithm": "aws:kms"
               },
               "BucketKeyEnabled": true
@@ -47,7 +47,7 @@
         }
       },
       {
-        "created": "2026-11-12T21:34:13Z",
+        "created": "2026-11-12T22:04:57Z",
         "encryption": null,
         "name": "secuguard-legacy-exports-123456789012",
         "object_lock": null,
@@ -56,7 +56,7 @@
       }
     ]
   },
-  "payload_sha256": "a77d5ab5f2087f82572868a7fb8255906d9c3ae40a58581611721b58be6db5b1",
+  "payload_sha256": "839c0fc4c9a488716274f9baf47ba86ed39ab880ce998882f8b7cb673ce1e93d",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-SVC-SIN"
@@ -71,7 +71,7 @@
       "CC6.7"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

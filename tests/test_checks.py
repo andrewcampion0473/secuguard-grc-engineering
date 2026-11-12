@@ -2,6 +2,8 @@
 weakness must be found, and against hand-written evidence, where each rule is tried on a
 good case and a bad case."""
 
+from pathlib import Path
+
 import boto3
 import pytest
 from moto import mock_aws
@@ -12,6 +14,7 @@ from secuguard_grc.collectors.base import FRAMEWORKS
 from secuguard_grc.evidence import normalize
 from secuguard_grc.mock.environment import build_mock_environment
 from secuguard_grc.report import render_markdown, render_text
+from secuguard_grc.scope import load_baseline
 
 NOW = "2026-11-12T12:00:00Z"
 
@@ -22,6 +25,7 @@ def mock_results():
         session = boto3.Session(aws_access_key_id="mock", aws_secret_access_key="mock", region_name="us-east-1")
         build_mock_environment(session)
         evidence = {c.name: normalize(c.collect(session)) for c in COLLECTORS}
+    evidence["scope_baseline"] = load_baseline(Path(__file__).parent.parent / "scope-baseline.json")
     from secuguard_grc.evidence import utc_now
     results = run_checks(evidence, utc_now(), {"account_id": "123456789012"})
     return {c["id"]: c for c in results["checks"]}, results
@@ -34,6 +38,11 @@ def failed(check):
 # Every planted weakness, and the check that must catch it.
 PLANTED = [
     ("NET-01", "secuguard-planted-open-admin"),
+    ("NET-02", "secuguard-cde"),
+    ("SCP-01", "secuguard-planted-unclassified"),
+    ("SCP-02", "secuguard-planted-analytics"),
+    ("SCP-03", "secuguard-planted-analytics"),
+    ("CRY-07", "portal.secuguard.example"),
     ("CRY-01", "alias/secuguard-legacy-no-rotation"),
     ("CRY-02", "secuguard-legacy-exports-123456789012"),
     ("CRY-03", "secuguard-legacy-exports-123456789012"),
@@ -58,10 +67,11 @@ def test_healthy_resources_are_not_flagged(mock_results):
     flagged = " ".join(name for check in checks.values() for name in failed(check))
     assert "secuguard-evidence-" not in flagged          # the vault and its key
     assert "alias/secuguard-evidence" not in flagged
-    assert "portal.secuguard.example" not in flagged     # the healthy certificate
     assert "secuguard-audit-carol" not in flagged        # the well-behaved user
-    assert "secuguard-cde" not in flagged                # the card data zone firewall
-    assert checks["NET-02"]["status"] == "pass"
+    assert "secuguard-shared" not in flagged             # a correctly labelled zone
+    assert "secuguard-corporate" not in flagged
+    assert failed(checks["CRY-04"]) == ["certificate legacy-api.secuguard.example"]   # the 2048-bit one is fine
+    assert checks["SCP-04"]["status"] == "pass"
     assert checks["LOG-02"]["status"] == "pass"
 
 
@@ -151,7 +161,7 @@ def test_cde_traffic_rule():
     def status(rule):
         groups = [group("sg-cde", "cde", [rule]), group("sg-shared", "connected", []),
                   group("sg-office", "out-of-scope", [])]
-        return grade({"network": {"security_groups": groups, "vpcs": []}}, "NET-02")["status"]
+        return grade({"network": {"security_groups": groups, "vpcs": [], "subnets": []}}, "NET-02")["status"]
 
     assert status({"IpProtocol": "tcp", "UserIdGroupPairs": [{"GroupId": "sg-shared"}]}) == "pass"
     assert status({"IpProtocol": "tcp", "UserIdGroupPairs": [{"GroupId": "sg-office"}]}) == "fail"

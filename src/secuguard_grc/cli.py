@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -17,13 +18,15 @@ from .checks import run_checks
 from .evidence import MANIFEST_NAME, EvidenceRun, latest_manifest_sha256, list_runs, load_run
 from .evidence import utc_now, verify_chain, verify_run
 from .report import render_markdown, render_text
+from .scope import BASELINE_FILE, baseline_from_inventory, build_inventory, compare_to_baseline, load_baseline
 from .storage import download_runs, read_chain_head, test_lock, upload_run
 
 DEFAULT_REGION = "us-east-1"
 DEFAULT_OUTPUT = "evidence"
 
 
-def _run_collection(session, mode: str, output: Path, bucket: str | None) -> int:
+def _run_collection(session, mode: str, output: Path, bucket: str | None,
+                    baseline_path: str = BASELINE_FILE) -> int:
     identity = session.client("sts").get_caller_identity()
     source = {
         "mode": mode,
@@ -54,6 +57,17 @@ def _run_collection(session, mode: str, output: Path, bucket: str | None) -> int
             payload=payload,
         )
         print(f"  ok      {collector.name:<14}-> {path}")
+    baseline = load_baseline(baseline_path)
+    run.add(
+        collector="scope_baseline",
+        description=(
+            "The approved PCI scope baseline as it stood when this evidence was collected: who "
+            "approved it, when, and what it lists. Read from a file kept under version control."
+        ),
+        api_calls=[],
+        relevant_to={"pci_dss_4_0_1": ["12.5.2"], "soc_2": ["CC3.4"], "fedramp_20x": ["KSI-PIY-GIV"]},
+        payload=baseline,
+    )
     results = run_checks(run.payloads, utc_now(), source)
     path = run.add(
         collector="check-results",
@@ -94,7 +108,7 @@ def cmd_collect(args) -> int:
                 aws_access_key_id="mock", aws_secret_access_key="mock", region_name=args.region
             )
             mock_bucket = build_mock_environment(session)
-            return _run_collection(session, "mock", output, mock_bucket if args.upload else None)
+            return _run_collection(session, "mock", output, mock_bucket if args.upload else None, args.baseline)
 
     bucket = args.bucket or os.environ.get("SECUGUARD_EVIDENCE_BUCKET")
     if args.upload and not bucket:
@@ -102,7 +116,7 @@ def cmd_collect(args) -> int:
         return 2
     try:
         session = boto3.Session(profile_name=args.profile, region_name=args.region)
-        return _run_collection(session, "aws", output, bucket if args.upload else None)
+        return _run_collection(session, "aws", output, bucket if args.upload else None, args.baseline)
     except (ClientError, BotoCoreError) as error:
         print(f"Could not reach AWS: {error}", file=sys.stderr)
         print("If you use SSO, run 'aws sso login --profile <your profile>' and try again.", file=sys.stderr)
@@ -211,6 +225,99 @@ def cmd_collectors(_args) -> int:
     return 0
 
 
+def cmd_scope(args) -> int:
+    target = Path(args.path)
+    if not (target / MANIFEST_NAME).is_file():
+        runs = list_runs(target)
+        if not runs:
+            print(f"No evidence runs found in {target}. Run 'secuguard collect' first.", file=sys.stderr)
+            return 2
+        target = runs[-1]
+    manifest, payloads = load_run(target)
+    inventory = build_inventory(payloads.get("network") or {})
+    mismatched = [i for i in inventory["items"] if i["effective"] == "connected" and i["declared"] not in {"cde", "connected"}]
+    undeclared = [i for i in inventory["items"] if not i["declared"]]
+
+    if args.approve:
+        if not args.by:
+            print("--approve needs --by with the name of the person approving.", file=sys.stderr)
+            return 2
+        if mismatched or undeclared:
+            print("Not approved. A baseline should record a correct network, and this one has problems:")
+            for item in mismatched:
+                print(f"  {item['kind']} {item['name']}: declared {item['declared'] or 'with no scope'} but can reach the card data zone")
+            for item in undeclared:
+                print(f"  {item['kind']} {item['name']}: has no declared scope")
+            print("Fix these first, collect again, then approve.")
+            return 1
+        baseline = baseline_from_inventory(inventory, args.by, utc_now()[:10], args.note or "")
+        Path(args.baseline).write_text(json.dumps(baseline, indent=2) + "\n", encoding="utf-8")
+        print(f"Approved {len(baseline['items'])} items as the scope baseline, by {args.by}. Wrote {args.baseline}.")
+        print("Commit this file. Its history in Git is the record of who approved each change to scope.")
+        return 0
+
+    print(f"PCI scope of the network in run {manifest['run_id']}\n")
+    print(f"{'Kind':<16}{'Name':<34}{'Declared':<15}{'Actually':<15}")
+    print("-" * 80)
+    for item in inventory["items"]:
+        print(f"{item['kind']:<16}{item['name']:<34}{str(item['declared'] or 'not declared'):<15}{item['effective']:<15}"
+              + ("  <-- mismatch" if item in mismatched else ""))
+    record = load_baseline(args.baseline)
+    print()
+    if not record["found"]:
+        print(f"No approved baseline ({args.baseline}) exists yet.")
+        return 1
+    drift = compare_to_baseline(inventory, record["baseline"])
+    approved = record["baseline"]
+    print(f"Baseline approved by {approved.get('approved_by')} on {approved.get('approved_at')}.")
+    if not drift:
+        print("No drift. The network matches the approved baseline.")
+        return 0
+    print(f"DRIFT. {len(drift)} difference(s) from the approved baseline:")
+    for d in drift:
+        print(f"  {d['change']:<8}{d['item'].replace(':', ' ', 1)}: {d['detail']}")
+    return 1
+
+
+def cmd_plan_check(args) -> int:
+    import shutil
+    import subprocess
+
+    from .plan_check import evaluate, load_exceptions, render
+
+    saved_plan = Path(args.terraform_dir) / "tfplan"
+    if args.plan_json:
+        text = Path(args.plan_json).read_text(encoding="utf-8-sig")
+    else:
+        terraform = shutil.which("terraform")
+        if not terraform:
+            print("Terraform was not found. Install it, or pass --plan-json with a saved plan.", file=sys.stderr)
+            return 2
+        print("Asking Terraform what it would change...")
+        planned = subprocess.run(
+            [terraform, f"-chdir={args.terraform_dir}", "plan", "-input=false", "-no-color", "-out=tfplan"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if planned.returncode != 0:
+            print(planned.stdout[-3000:], planned.stderr[-3000:], sep="\n", file=sys.stderr)
+            return 2
+        summary = [line for line in planned.stdout.splitlines() if line.startswith(("Plan:", "No changes"))]
+        print(summary[-1] if summary else "Plan created.")
+        shown = subprocess.run([terraform, f"-chdir={args.terraform_dir}", "show", "-json", "tfplan"],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if shown.returncode != 0:
+            print(shown.stderr[-3000:], file=sys.stderr)
+            return 2
+        text = shown.stdout
+    outcome = evaluate(json.loads(text), load_exceptions(args.exceptions))
+    print(render(outcome))
+    if not outcome["allowed"]:
+        saved_plan.unlink(missing_ok=True)      # a blocked plan must not be left lying around to apply
+        return 1
+    if not args.plan_json:
+        print(f"\nTo apply exactly the plan that was checked:\n  terraform -chdir={args.terraform_dir} apply tfplan")
+    return 0
+
+
 def cmd_checks(_args) -> int:
     from .checks import CHECKS
 
@@ -238,6 +345,7 @@ def main(argv: list[str] | None = None) -> int:
     collect.add_argument("--output", default=DEFAULT_OUTPUT, help=f"Local evidence folder (default {DEFAULT_OUTPUT}/)")
     collect.add_argument("--upload", action="store_true", help="Also copy the run to the locked S3 evidence bucket")
     collect.add_argument("--bucket", help="Evidence bucket name (or set SECUGUARD_EVIDENCE_BUCKET)")
+    collect.add_argument("--baseline", default=BASELINE_FILE, help=f"Approved scope baseline (default {BASELINE_FILE})")
     collect.set_defaults(func=cmd_collect)
 
     verify = commands.add_parser("verify", help="Recompute hashes for one run folder or a whole evidence folder")
@@ -260,6 +368,20 @@ def main(argv: list[str] | None = None) -> int:
     lock.add_argument("--profile", help="AWS CLI profile name")
     lock.add_argument("--region", default=DEFAULT_REGION)
     lock.set_defaults(func=cmd_test_lock)
+
+    scope = commands.add_parser("scope", help="Show the PCI scope of the network and any drift from the approved baseline")
+    scope.add_argument("path", nargs="?", default=DEFAULT_OUTPUT, help="A run folder or an evidence folder")
+    scope.add_argument("--baseline", default=BASELINE_FILE)
+    scope.add_argument("--approve", action="store_true", help="Record the current network as the approved baseline")
+    scope.add_argument("--by", help="Name of the person approving")
+    scope.add_argument("--note", help="Why the baseline is changing")
+    scope.set_defaults(func=cmd_scope)
+
+    plan = commands.add_parser("plan-check", help="Judge a Terraform plan before it is applied, and block risky changes")
+    plan.add_argument("--terraform-dir", default="terraform")
+    plan.add_argument("--plan-json", help="Check a saved plan in JSON form instead of running Terraform")
+    plan.add_argument("--exceptions", default="policy/exceptions.json")
+    plan.set_defaults(func=cmd_plan_check)
 
     checks = commands.add_parser("checks", help="List every check and the requirements it reports against")
     checks.set_defaults(func=cmd_checks)

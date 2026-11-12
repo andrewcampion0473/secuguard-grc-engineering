@@ -5,21 +5,21 @@
     "kms:GetKeyRotationStatus",
     "kms:ListAliases"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "kms",
   "description": "Every KMS key in the region: who manages it, what algorithm it uses, whether it is enabled, and whether automatic rotation is on.",
-  "evidence_id": "df17b3e0-a181-4ba6-b408-f6c05ae8c502",
+  "evidence_id": "b9322190-42e8-4d47-8dca-925901ea33a7",
   "payload": {
     "aliases": [
       {
         "AliasArn": "arn:aws:kms:us-east-1:123456789012:alias/secuguard-evidence",
         "AliasName": "alias/secuguard-evidence",
-        "TargetKeyId": "def7f79a-3341-4930-9f1e-148c7f9372f2"
+        "TargetKeyId": "a658b86f-0b18-4153-b053-9ed2bae2c9a4"
       },
       {
         "AliasArn": "arn:aws:kms:us-east-1:123456789012:alias/secuguard-legacy-no-rotation",
         "AliasName": "alias/secuguard-legacy-no-rotation",
-        "TargetKeyId": "c85388e2-3a3b-4cc3-bc86-ebfb48362b5e"
+        "TargetKeyId": "5fa56821-241f-4cce-a980-ba630e205bd9"
       },
       {
         "AliasArn": "arn:aws:kms:us-east-1:123456789012:alias/aws/acm",
@@ -94,18 +94,18 @@
     ],
     "keys": [
       {
-        "key_id": "def7f79a-3341-4930-9f1e-148c7f9372f2",
+        "key_id": "a658b86f-0b18-4153-b053-9ed2bae2c9a4",
         "metadata": {
           "AWSAccountId": "123456789012",
-          "Arn": "arn:aws:kms:us-east-1:123456789012:key/def7f79a-3341-4930-9f1e-148c7f9372f2",
-          "CreationDate": "2026-11-12T21:34:13Z",
+          "Arn": "arn:aws:kms:us-east-1:123456789012:key/a658b86f-0b18-4153-b053-9ed2bae2c9a4",
+          "CreationDate": "2026-11-12T22:04:57Z",
           "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
           "Description": "SecuGuard evidence encryption key",
           "Enabled": true,
           "EncryptionAlgorithms": [
             "SYMMETRIC_DEFAULT"
           ],
-          "KeyId": "def7f79a-3341-4930-9f1e-148c7f9372f2",
+          "KeyId": "a658b86f-0b18-4153-b053-9ed2bae2c9a4",
           "KeyManager": "CUSTOMER",
           "KeySpec": "SYMMETRIC_DEFAULT",
           "KeyState": "Enabled",
@@ -117,18 +117,18 @@
         }
       },
       {
-        "key_id": "c85388e2-3a3b-4cc3-bc86-ebfb48362b5e",
+        "key_id": "5fa56821-241f-4cce-a980-ba630e205bd9",
         "metadata": {
           "AWSAccountId": "123456789012",
-          "Arn": "arn:aws:kms:us-east-1:123456789012:key/c85388e2-3a3b-4cc3-bc86-ebfb48362b5e",
-          "CreationDate": "2026-11-12T21:34:13Z",
+          "Arn": "arn:aws:kms:us-east-1:123456789012:key/5fa56821-241f-4cce-a980-ba630e205bd9",
+          "CreationDate": "2026-11-12T22:04:57Z",
           "CustomerMasterKeySpec": "SYMMETRIC_DEFAULT",
           "Description": "Planted finding: legacy key without rotation",
           "Enabled": true,
           "EncryptionAlgorithms": [
             "SYMMETRIC_DEFAULT"
           ],
-          "KeyId": "c85388e2-3a3b-4cc3-bc86-ebfb48362b5e",
+          "KeyId": "5fa56821-241f-4cce-a980-ba630e205bd9",
           "KeyManager": "CUSTOMER",
           "KeySpec": "SYMMETRIC_DEFAULT",
           "KeyState": "Enabled",
@@ -141,7 +141,7 @@
       }
     ]
   },
-  "payload_sha256": "efd6c0e156037dd5db627a7c1480ccd166a14d705e1b13e3f2f9672ac505c9b6",
+  "payload_sha256": "d92659d412aecbca68ddf625fce6b8fab51a807193b1ff089015ceb80309e862",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-SVC-ASM",
@@ -155,7 +155,7 @@
       "CC6.1"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

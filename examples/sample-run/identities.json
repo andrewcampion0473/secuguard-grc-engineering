@@ -11,14 +11,14 @@
     "iam:ListGroupsForUser",
     "iam:ListRoles"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "identities",
   "description": "Every IAM user with its console password status, MFA devices, access keys and when each was last used, attached permissions, and groups. Every role with the rule that says who may use it.",
-  "evidence_id": "05d05366-bf86-4891-823b-574afa5c1faf",
+  "evidence_id": "1d01dbdd-b5df-4541-99d5-9f4e19af2de6",
   "payload": {
     "roles": [
       {
-        "created": "2026-11-12T21:34:14Z",
+        "created": "2026-11-12T22:04:57Z",
         "name": "secuguard-legacy-vendor",
         "path": "/",
         "trust_policy": {
@@ -39,7 +39,7 @@
       {
         "access_keys": [],
         "attached_policies": [],
-        "created": "2026-11-12T21:34:14Z",
+        "created": "2026-11-12T22:04:57Z",
         "groups": [],
         "has_console_password": true,
         "inline_policies": [],
@@ -54,8 +54,8 @@
       {
         "access_keys": [
           {
-            "access_key_ending": "7XN5",
-            "created": "2026-11-12T21:34:14Z",
+            "access_key_ending": "X4OH",
+            "created": "2026-11-12T22:04:57Z",
             "last_used": null,
             "status": "Active"
           }
@@ -63,7 +63,7 @@
         "attached_policies": [
           "AdministratorAccess"
         ],
-        "created": "2026-11-12T21:34:14Z",
+        "created": "2026-11-12T22:04:57Z",
         "groups": [],
         "has_console_password": false,
         "inline_policies": [],
@@ -78,7 +78,7 @@
       {
         "access_keys": [],
         "attached_policies": [],
-        "created": "2026-11-12T21:34:14Z",
+        "created": "2026-11-12T22:04:57Z",
         "groups": [
           "secuguard-auditors"
         ],
@@ -92,7 +92,7 @@
       }
     ]
   },
-  "payload_sha256": "2160f6130fc77c1e397ee64af35c7441a43b721cef10a2153caa52458df76271",
+  "payload_sha256": "cecc690a69b21d02a9571473eb5c59015ba174c68968de067982d2f21829ac2f",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-IAM-APM",
@@ -111,7 +111,7 @@
       "CC6.3"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

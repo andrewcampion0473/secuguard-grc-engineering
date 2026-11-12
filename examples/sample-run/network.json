@@ -5,10 +5,10 @@
     "ec2:DescribeRouteTables",
     "ec2:DescribeSecurityGroups"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "network",
   "description": "Network segmentation as configured right now: every VPC, subnet, route table, and security group rule, with the tags that mark each one as in or out of PCI scope.",
-  "evidence_id": "1d66d455-2fb5-4a93-96b5-6f961d2d9b2c",
+  "evidence_id": "7640b683-ccc0-499c-95b6-6b896fd50720",
   "payload": {
     "route_tables": [
       {
@@ -18,12 +18,12 @@
               "State": "associated"
             },
             "Main": true,
-            "RouteTableAssociationId": "rtbassoc-200801e26190c7eac",
-            "RouteTableId": "rtb-c7630b6f51f14c784"
+            "RouteTableAssociationId": "rtbassoc-117433d7003ea5a7a",
+            "RouteTableId": "rtb-bbd84686f67a038d4"
           }
         ],
         "OwnerId": "123456789012",
-        "RouteTableId": "rtb-c7630b6f51f14c784",
+        "RouteTableId": "rtb-bbd84686f67a038d4",
         "Routes": [
           {
             "DestinationCidrBlock": "172.31.0.0/16",
@@ -33,7 +33,7 @@
           }
         ],
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "Associations": [
@@ -42,12 +42,12 @@
               "State": "associated"
             },
             "Main": true,
-            "RouteTableAssociationId": "rtbassoc-103b1c08073fbfe61",
-            "RouteTableId": "rtb-f9f1d274619e08cd9"
+            "RouteTableAssociationId": "rtbassoc-84b84b289fdc83efd",
+            "RouteTableId": "rtb-b420ac1d65c3b8ee6"
           }
         ],
         "OwnerId": "123456789012",
-        "RouteTableId": "rtb-f9f1d274619e08cd9",
+        "RouteTableId": "rtb-b420ac1d65c3b8ee6",
         "Routes": [
           {
             "DestinationCidrBlock": "10.20.0.0/16",
@@ -57,92 +57,39 @@
           }
         ],
         "Tags": [],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
-      }
-    ],
-    "security_groups": [
-      {
-        "Description": "default VPC security group",
-        "GroupId": "sg-1a67868d30d9c5e70",
-        "GroupName": "default",
-        "IpPermissions": [],
-        "IpPermissionsEgress": [
-          {
-            "IpProtocol": "-1",
-            "IpRanges": [
-              {
-                "CidrIp": "0.0.0.0/0"
-              }
-            ],
-            "Ipv6Ranges": [],
-            "PrefixListIds": [],
-            "UserIdGroupPairs": []
-          }
-        ],
-        "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-1a67868d30d9c5e70",
-        "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
-        "Description": "default VPC security group",
-        "GroupId": "sg-d7a0ff9e8c6ef2641",
-        "GroupName": "default",
-        "IpPermissions": [],
-        "IpPermissionsEgress": [
+        "Associations": [
           {
-            "IpProtocol": "-1",
-            "IpRanges": [
-              {
-                "CidrIp": "0.0.0.0/0"
-              }
-            ],
-            "Ipv6Ranges": [],
-            "PrefixListIds": [],
-            "UserIdGroupPairs": []
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-c8efa6867de7a5ef2",
+            "RouteTableId": "rtb-b66fbcd7b0551d07a",
+            "SubnetId": "subnet-a25bcf64ee5a846f9"
+          },
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-2999a2992230301a6",
+            "RouteTableId": "rtb-b66fbcd7b0551d07a",
+            "SubnetId": "subnet-42dc5397f1618277f"
           }
         ],
         "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-d7a0ff9e8c6ef2641",
-        "Tags": [],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
-      },
-      {
-        "Description": "SecuGuard cde tier",
-        "GroupId": "sg-330537ca9f2172e83",
-        "GroupName": "secuguard-cde",
-        "IpPermissions": [
+        "RouteTableId": "rtb-b66fbcd7b0551d07a",
+        "Routes": [
           {
-            "FromPort": 443,
-            "IpProtocol": "tcp",
-            "IpRanges": [],
-            "Ipv6Ranges": [],
-            "PrefixListIds": [],
-            "ToPort": 443,
-            "UserIdGroupPairs": [
-              {
-                "Description": "HTTPS from shared services",
-                "GroupId": "sg-6511725fd7dcf3568",
-                "UserId": "123456789012"
-              }
-            ]
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
           }
         ],
-        "IpPermissionsEgress": [
-          {
-            "IpProtocol": "-1",
-            "IpRanges": [
-              {
-                "CidrIp": "0.0.0.0/0"
-              }
-            ],
-            "Ipv6Ranges": [],
-            "PrefixListIds": [],
-            "UserIdGroupPairs": []
-          }
-        ],
-        "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-330537ca9f2172e83",
         "Tags": [
           {
             "Key": "Name",
@@ -157,12 +104,154 @@
             "Value": "cde"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
-        "Description": "SecuGuard shared tier",
-        "GroupId": "sg-6511725fd7dcf3568",
-        "GroupName": "secuguard-shared",
+        "Associations": [
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-0bee61ee386ce7d4f",
+            "RouteTableId": "rtb-b8c858d4ae7cfdcb4",
+            "SubnetId": "subnet-23ce3e6e50f107c4c"
+          },
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-299984f6c4622ebfc",
+            "RouteTableId": "rtb-b8c858d4ae7cfdcb4",
+            "SubnetId": "subnet-9a0819cd426d3b07e"
+          }
+        ],
+        "OwnerId": "123456789012",
+        "RouteTableId": "rtb-b8c858d4ae7cfdcb4",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-shared"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "connected"
+          }
+        ],
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      },
+      {
+        "Associations": [
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-eb8faff8ac558336b",
+            "RouteTableId": "rtb-99a68debb706e06cd",
+            "SubnetId": "subnet-ef7d03d471a3dff7a"
+          },
+          {
+            "AssociationState": {
+              "State": "associated"
+            },
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-047e8b20032e84ef5",
+            "RouteTableId": "rtb-99a68debb706e06cd",
+            "SubnetId": "subnet-c9e0c7bd2d0ab0869"
+          }
+        ],
+        "OwnerId": "123456789012",
+        "RouteTableId": "rtb-99a68debb706e06cd",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-corporate"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "out-of-scope"
+          }
+        ],
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      }
+    ],
+    "security_groups": [
+      {
+        "Description": "default VPC security group",
+        "GroupId": "sg-03eed37280dda1598",
+        "GroupName": "default",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-03eed37280dda1598",
+        "Tags": [],
+        "VpcId": "vpc-25404d4a490a6eead"
+      },
+      {
+        "Description": "default VPC security group",
+        "GroupId": "sg-5192d1cd9ce24f993",
+        "GroupName": "default",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-5192d1cd9ce24f993",
+        "Tags": [],
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      },
+      {
+        "Description": "SecuGuard cde tier",
+        "GroupId": "sg-d838dc5daaae75965",
+        "GroupName": "secuguard-cde",
         "IpPermissions": [
           {
             "FromPort": 443,
@@ -173,8 +262,23 @@
             "ToPort": 443,
             "UserIdGroupPairs": [
               {
-                "Description": "HTTPS from corporate",
-                "GroupId": "sg-426cbf3e9a701f90c",
+                "Description": "HTTPS from shared services",
+                "GroupId": "sg-f0a5e2aa1c90e61af",
+                "UserId": "123456789012"
+              }
+            ]
+          },
+          {
+            "FromPort": 5432,
+            "IpProtocol": "tcp",
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "ToPort": 5432,
+            "UserIdGroupPairs": [
+              {
+                "Description": "Analytics straight to the card database",
+                "GroupId": "sg-293317828131c3383",
                 "UserId": "123456789012"
               }
             ]
@@ -194,7 +298,59 @@
           }
         ],
         "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-6511725fd7dcf3568",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-d838dc5daaae75965",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-cde"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "cde"
+          }
+        ],
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      },
+      {
+        "Description": "SecuGuard shared tier",
+        "GroupId": "sg-f0a5e2aa1c90e61af",
+        "GroupName": "secuguard-shared",
+        "IpPermissions": [
+          {
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "ToPort": 443,
+            "UserIdGroupPairs": [
+              {
+                "Description": "HTTPS from corporate",
+                "GroupId": "sg-17e47c42b874f9dfb",
+                "UserId": "123456789012"
+              }
+            ]
+          }
+        ],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-f0a5e2aa1c90e61af",
         "Tags": [
           {
             "Key": "Name",
@@ -209,11 +365,11 @@
             "Value": "connected"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "Description": "SecuGuard corporate tier",
-        "GroupId": "sg-426cbf3e9a701f90c",
+        "GroupId": "sg-17e47c42b874f9dfb",
         "GroupName": "secuguard-corporate",
         "IpPermissions": [],
         "IpPermissionsEgress": [
@@ -230,7 +386,7 @@
           }
         ],
         "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-426cbf3e9a701f90c",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-17e47c42b874f9dfb",
         "Tags": [
           {
             "Key": "Name",
@@ -245,11 +401,11 @@
             "Value": "out-of-scope"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "Description": "Planted finding: SSH open to the internet",
-        "GroupId": "sg-f024da2b238e1dea1",
+        "GroupId": "sg-84b087b6d3dcf1fe2",
         "GroupName": "secuguard-planted-open-admin",
         "IpPermissions": [
           {
@@ -281,7 +437,7 @@
           }
         ],
         "OwnerId": "123456789012",
-        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-f024da2b238e1dea1",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-84b087b6d3dcf1fe2",
         "Tags": [
           {
             "Key": "Name",
@@ -300,7 +456,83 @@
             "Value": "true"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      },
+      {
+        "Description": "Planted finding: out of scope but allowed into the CDE",
+        "GroupId": "sg-293317828131c3383",
+        "GroupName": "secuguard-planted-analytics",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-293317828131c3383",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-planted-analytics"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:pci-scope",
+            "Value": "out-of-scope"
+          },
+          {
+            "Key": "secuguard:planted",
+            "Value": "true"
+          }
+        ],
+        "VpcId": "vpc-8df6d067ee25fd22b"
+      },
+      {
+        "Description": "Planted finding: no PCI scope declared",
+        "GroupId": "sg-535b7ec78d1809c8d",
+        "GroupName": "secuguard-planted-unclassified",
+        "IpPermissions": [],
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": [],
+            "UserIdGroupPairs": []
+          }
+        ],
+        "OwnerId": "123456789012",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:123456789012:security-group/sg-535b7ec78d1809c8d",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "secuguard-planted-unclassified"
+          },
+          {
+            "Key": "Project",
+            "Value": "secuguard-grc"
+          },
+          {
+            "Key": "secuguard:planted",
+            "Value": "true"
+          }
+        ],
+        "VpcId": "vpc-8df6d067ee25fd22b"
       }
     ],
     "subnets": [
@@ -321,10 +553,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-fda963d417cadc0af",
-        "SubnetId": "subnet-fda963d417cadc0af",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-4e244c88222991776",
+        "SubnetId": "subnet-4e244c88222991776",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -343,8 +575,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-3f3b8cd54a8b22399",
-        "SubnetId": "subnet-3f3b8cd54a8b22399",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-a25bcf64ee5a846f9",
+        "SubnetId": "subnet-a25bcf64ee5a846f9",
         "Tags": [
           {
             "Key": "Name",
@@ -359,7 +591,7 @@
             "Value": "cde"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -378,8 +610,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-ce76290597ebd99bc",
-        "SubnetId": "subnet-ce76290597ebd99bc",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-23ce3e6e50f107c4c",
+        "SubnetId": "subnet-23ce3e6e50f107c4c",
         "Tags": [
           {
             "Key": "Name",
@@ -394,7 +626,7 @@
             "Value": "connected"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -413,8 +645,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-bad769e170ab6bf4f",
-        "SubnetId": "subnet-bad769e170ab6bf4f",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-ef7d03d471a3dff7a",
+        "SubnetId": "subnet-ef7d03d471a3dff7a",
         "Tags": [
           {
             "Key": "Name",
@@ -429,7 +661,7 @@
             "Value": "out-of-scope"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -448,10 +680,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-40dd362bfd1556057",
-        "SubnetId": "subnet-40dd362bfd1556057",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-e42e5c52b6d97a630",
+        "SubnetId": "subnet-e42e5c52b6d97a630",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -470,8 +702,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-70d8b35b2bd6e0ad2",
-        "SubnetId": "subnet-70d8b35b2bd6e0ad2",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-42dc5397f1618277f",
+        "SubnetId": "subnet-42dc5397f1618277f",
         "Tags": [
           {
             "Key": "Name",
@@ -486,7 +718,7 @@
             "Value": "cde"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -505,8 +737,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-18e48efedebd35be4",
-        "SubnetId": "subnet-18e48efedebd35be4",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-9a0819cd426d3b07e",
+        "SubnetId": "subnet-9a0819cd426d3b07e",
         "Tags": [
           {
             "Key": "Name",
@@ -521,7 +753,7 @@
             "Value": "connected"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -540,8 +772,8 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-d67965c82df390c10",
-        "SubnetId": "subnet-d67965c82df390c10",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-c9e0c7bd2d0ab0869",
+        "SubnetId": "subnet-c9e0c7bd2d0ab0869",
         "Tags": [
           {
             "Key": "Name",
@@ -556,7 +788,7 @@
             "Value": "out-of-scope"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -575,10 +807,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-a2bb1b5df39d02de6",
-        "SubnetId": "subnet-a2bb1b5df39d02de6",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-2f8d047c73d77798d",
+        "SubnetId": "subnet-2f8d047c73d77798d",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -597,10 +829,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-ccf7040f08efb8a78",
-        "SubnetId": "subnet-ccf7040f08efb8a78",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-cabf1a40dd857ea76",
+        "SubnetId": "subnet-cabf1a40dd857ea76",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -619,10 +851,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-356f1484b37cad441",
-        "SubnetId": "subnet-356f1484b37cad441",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-55e2387fdf63d1c22",
+        "SubnetId": "subnet-55e2387fdf63d1c22",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "AssignIpv6AddressOnCreation": false,
@@ -641,10 +873,10 @@
           "HostnameType": "ip-name"
         },
         "State": "available",
-        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-e5ddcb7b8fd485340",
-        "SubnetId": "subnet-e5ddcb7b8fd485340",
+        "SubnetArn": "arn:aws:ec2:us-east-1:123456789012:subnet/subnet-e380b56645cf52d19",
+        "SubnetId": "subnet-e380b56645cf52d19",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       }
     ],
     "vpcs": [
@@ -652,7 +884,7 @@
         "CidrBlock": "172.31.0.0/16",
         "CidrBlockAssociationSet": [
           {
-            "AssociationId": "vpc-cidr-assoc-a11942a22ae8f7bfd",
+            "AssociationId": "vpc-cidr-assoc-34efa8660a5d705c4",
             "CidrBlock": "172.31.0.0/16",
             "CidrBlockState": {
               "State": "associated"
@@ -666,13 +898,13 @@
         "OwnerId": "123456789012",
         "State": "available",
         "Tags": [],
-        "VpcId": "vpc-a61616ef3eb9d471c"
+        "VpcId": "vpc-25404d4a490a6eead"
       },
       {
         "CidrBlock": "10.20.0.0/16",
         "CidrBlockAssociationSet": [
           {
-            "AssociationId": "vpc-cidr-assoc-05edc2abc2d0d6a50",
+            "AssociationId": "vpc-cidr-assoc-a59581755bc848d07",
             "CidrBlock": "10.20.0.0/16",
             "CidrBlockState": {
               "State": "associated"
@@ -695,11 +927,11 @@
             "Value": "secuguard-grc"
           }
         ],
-        "VpcId": "vpc-a11601c4d87d1bbf0"
+        "VpcId": "vpc-8df6d067ee25fd22b"
       }
     ]
   },
-  "payload_sha256": "255d959f58d4ff39cf47d7168c1cb7de5979c7421835c835a1df2be037afd6aa",
+  "payload_sha256": "82bbd0147b6d155e225c24788301df7db57aaa2a8b93e998fff13e046bc14856",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-CNA-RNT",
@@ -716,7 +948,7 @@
       "CC6.6"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

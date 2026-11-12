@@ -1,15 +1,15 @@
 # SecuGuard check results
 
-Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-12T21:34:14Z.
+Run `20261112T220457Z-560277-8fba`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-12T22:04:57Z.
 
-**5 passed, 14 failed, 0 could not be assessed, 0 not applicable.**
+**5 passed, 19 failed, 0 could not be assessed, 0 not applicable.**
 
 ## Checks
 
 | Check | Result | Severity | What was checked | PCI DSS | SOC 2 | FedRAMP 20x |
 |---|---|---|---|---|---|---|
 | NET-01 | FAIL | high | No administrative port is open to the internet | 1.3.1, 1.4.2 | CC6.6 | KSI-CNA-RNT, KSI-CNA-MAT |
-| NET-02 | PASS | high | The card data zone accepts traffic only from in-scope systems | 1.3.1, 1.4.1 | CC6.1, CC6.6 | KSI-CNA-ULN, KSI-CNA-RNT |
+| NET-02 | FAIL | high | The card data zone accepts traffic only from in-scope systems | 1.3.1, 1.4.1 | CC6.1, CC6.6 | KSI-CNA-ULN, KSI-CNA-RNT |
 | NET-03 | PASS | medium | Default security groups allow nothing | 1.2.1 | CC6.6 | KSI-CNA-MAT |
 | NET-04 | FAIL | medium | Network traffic is logged | 10.2.1 | CC7.2 | KSI-MLA-LET |
 | CRY-01 | FAIL | medium | Encryption keys rotate automatically | 3.7.4 | CC6.1 | KSI-SVC-ASM |
@@ -18,6 +18,11 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 | CRY-04 | FAIL | high | Certificates use strong keys and signatures | 4.2.1 | CC6.7 | KSI-SVC-SIN, KSI-SVC-VCM |
 | CRY-05 | FAIL | high | No certificate is expired or about to expire | 4.2.1, 4.2.1.1 | CC6.7 | KSI-SVC-ASM |
 | CRY-06 | FAIL | high | Connections require TLS 1.2 or newer | 4.2.1 | CC6.7 | KSI-SVC-VCM, KSI-SVC-SIN |
+| CRY-07 | FAIL | medium | Certificates in use are issued by a certificate authority | 4.2.1 | CC6.7 | KSI-SVC-VCM |
+| SCP-01 | FAIL | medium | Every part of the network has a declared PCI scope | 12.5.2, 1.2.3 | CC3.4, CC6.1 | KSI-PIY-GIV |
+| SCP-02 | FAIL | high | Declared PCI scope matches the firewall rules | 12.5.2, 1.3.1 | CC3.4, CC6.6 | KSI-CNA-ULN, KSI-CNA-EIS |
+| SCP-03 | FAIL | high | The network matches the approved scope baseline | 12.5.2, 1.2.2 | CC3.4, CC8.1 | KSI-PIY-GIV, KSI-CMT-LMC |
+| SCP-04 | PASS | high | The card data zone has no route to the internet | 1.4.4, 1.3.2 | CC6.6 | KSI-CNA-RNT, KSI-CNA-MAT |
 | IAM-01 | FAIL | high | The root user has MFA | 8.4.1 | CC6.1 | KSI-IAM-APM |
 | IAM-02 | PASS | high | The root user has no access keys | 8.2.2 | CC6.1, CC6.3 | KSI-IAM-ELP |
 | IAM-03 | PASS | medium | A strong password policy is set | 8.3.6 | CC6.1 | KSI-IAM-APM |
@@ -32,12 +37,16 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 
 **NET-01: No administrative port is open to the internet.** SSH and Remote Desktop open to everyone is one of the most common ways attackers get in.
 
-- security group secuguard-planted-open-admin (sg-f024da2b238e1dea1): open to the whole internet: SSH (port 22)
+- security group secuguard-planted-open-admin (sg-84b087b6d3dcf1fe2): open to the whole internet: SSH (port 22)
+
+**NET-02: The card data zone accepts traffic only from in-scope systems.** Anything allowed to reach the cardholder data environment falls under PCI DSS. Unplanned paths widen scope.
+
+- security group secuguard-cde (sg-d838dc5daaae75965): accepts traffic from sg-293317828131c3383, tagged out-of-scope
 
 **NET-04: Network traffic is logged.** Without flow logs there is no record of who connected to what when investigating an incident.
 
-- VPC default (vpc-a61616ef3eb9d471c): no flow logs, so network traffic is not recorded
-- VPC secuguard-vpc (vpc-a11601c4d87d1bbf0): no flow logs, so network traffic is not recorded
+- VPC default (vpc-25404d4a490a6eead): no flow logs, so network traffic is not recorded
+- VPC secuguard-vpc (vpc-8df6d067ee25fd22b): no flow logs, so network traffic is not recorded
 
 **CRY-01: Encryption keys rotate automatically.** A key that never changes protects more and more data with one secret. Rotation limits the damage if it leaks.
 
@@ -57,11 +66,29 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 
 **CRY-05: No certificate is expired or about to expire.** An expired certificate causes an outage, and pushes people to click through security warnings.
 
-- certificate legacy-api.secuguard.example: expires in 19 days, inside the 30-day warning window
+- certificate legacy-api.secuguard.example: expires in 20 days, inside the 30-day warning window
 
 **CRY-06: Connections require TLS 1.2 or newer.** TLS 1.0 and 1.1 have known weaknesses and are not accepted as strong cryptography.
 
 - load balancer secuguard-portal port 443: TLS policy ELBSecurityPolicy-2016-08 still allows TLS 1.0 or 1.1
+
+**CRY-07: Certificates in use are issued by a certificate authority.** A self-signed certificate has nobody vouching for it. Systems told to trust it can be fooled by a fake.
+
+- certificate portal.secuguard.example: self-signed, and in use by load balancer secuguard-portal. No certificate authority vouches for it.
+
+**SCP-01: Every part of the network has a declared PCI scope.** Scope is the first thing a PCI assessor confirms. Anything unlabelled is a decision nobody made.
+
+- security group secuguard-planted-unclassified: has no PCI scope tag, so nobody has decided whether PCI DSS applies to it
+
+**SCP-02: Declared PCI scope matches the firewall rules.** A system labelled out of scope that can reach card data is in scope, and is not getting PCI controls.
+
+- security group secuguard-planted-analytics: declared out-of-scope, but it can reach the card data zone (port 5432 on secuguard-cde), so PCI DSS applies to it
+
+**SCP-03: The network matches the approved scope baseline.** Scope should change only when someone decides it should. Anything new or altered needs review.
+
+- security group secuguard-planted-analytics: not in the approved baseline (declared out-of-scope)
+- security group secuguard-planted-open-admin: not in the approved baseline (declared out-of-scope)
+- security group secuguard-planted-unclassified: not in the approved baseline (declared with no scope)
 
 **IAM-01: The root user has MFA.** The root user can do anything, including closing the account. A password alone is not enough protection.
 
@@ -77,7 +104,7 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 
 **IAM-06: Access keys are in use and not stale.** Unused and old keys are credentials nobody is watching. They should be removed or replaced.
 
-- user secuguard-svc-reports access key ending 7XN5: active but has never been used
+- user secuguard-svc-reports access key ending X4OH: active but has never been used
 
 **IAM-07: Outside accounts need an external ID to use a role.** Without an external ID, a vendor's other customers could trick the vendor into using this role.
 
@@ -87,23 +114,51 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 
 - account: no CloudTrail trail exists, so account activity is not being kept
 
+## PCI scope of the network
+
+What each part of the network is declared to be, and what the firewall rules make it.
+
+| Kind | Name | Declared | Actually | Reaches the card data zone by |
+|---|---|---|---|---|
+| security group | secuguard-cde | cde | cde |  |
+| security group | secuguard-corporate | out-of-scope | out-of-scope |  |
+| security group | secuguard-planted-analytics | out-of-scope | connected | port 5432 on secuguard-cde |
+| security group | secuguard-planted-open-admin | out-of-scope | out-of-scope |  |
+| security group | secuguard-planted-unclassified | not declared | out-of-scope |  |
+| security group | secuguard-shared | connected | connected | port 443 on secuguard-cde |
+| subnet | secuguard-cde-a | cde | cde |  |
+| subnet | secuguard-cde-b | cde | cde |  |
+| subnet | secuguard-corporate-a | out-of-scope | out-of-scope |  |
+| subnet | secuguard-corporate-b | out-of-scope | out-of-scope |  |
+| subnet | secuguard-shared-a | connected | connected |  |
+| subnet | secuguard-shared-b | connected | connected |  |
+
+## Certificate inventory
+
+| Name | Issuer | Key | Signature | Expires | In use by |
+|---|---|---|---|---|---|
+| legacy-api.secuguard.example | self-signed | RSA 1024 | SHA256 | 2026-12-02 | nothing |
+| portal.secuguard.example | self-signed | RSA 2048 | SHA256 | 2027-11-12 | load balancer secuguard-portal |
+
 ## By framework
 
 ### FedRAMP 20x
 
 | Requirement | Result | Checks |
 |---|---|---|
-| KSI-CMT-LMC | FAIL | LOG-01 |
-| KSI-CNA-MAT | FAIL | NET-01, NET-03, CRY-03 |
-| KSI-CNA-RNT | FAIL | NET-01, NET-02 |
-| KSI-CNA-ULN | PASS | NET-02 |
+| KSI-CMT-LMC | FAIL | SCP-03, LOG-01 |
+| KSI-CNA-EIS | FAIL | SCP-02 |
+| KSI-CNA-MAT | FAIL | NET-01, NET-03, CRY-03, SCP-04 |
+| KSI-CNA-RNT | FAIL | NET-01, NET-02, SCP-04 |
+| KSI-CNA-ULN | FAIL | NET-02, SCP-02 |
 | KSI-IAM-APM | FAIL | IAM-01, IAM-03, IAM-04 |
 | KSI-IAM-ELP | FAIL | IAM-02, IAM-05, IAM-07 |
 | KSI-IAM-SNU | FAIL | IAM-06, IAM-07 |
 | KSI-MLA-LET | FAIL | NET-04, LOG-01 |
+| KSI-PIY-GIV | FAIL | SCP-01, SCP-03 |
 | KSI-SVC-ASM | FAIL | CRY-01, CRY-05, IAM-06 |
 | KSI-SVC-SIN | FAIL | CRY-02, CRY-03, CRY-04, CRY-06, LOG-02 |
-| KSI-SVC-VCM | FAIL | CRY-04, CRY-06 |
+| KSI-SVC-VCM | FAIL | CRY-04, CRY-06, CRY-07 |
 | KSI-SVC-VRI | PASS | LOG-02 |
 
 ### PCI DSS 4.0.1
@@ -111,18 +166,22 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 | Requirement | Result | Checks |
 |---|---|---|
 | 1.2.1 | PASS | NET-03 |
-| 1.3.1 | FAIL | NET-01, NET-02 |
-| 1.4.1 | PASS | NET-02 |
+| 1.2.2 | FAIL | SCP-03 |
+| 1.2.3 | FAIL | SCP-01 |
+| 1.3.1 | FAIL | NET-01, NET-02, SCP-02 |
+| 1.3.2 | PASS | SCP-04 |
+| 1.4.1 | FAIL | NET-02 |
 | 1.4.2 | FAIL | NET-01 |
-| 1.4.4 | FAIL | CRY-03 |
+| 1.4.4 | FAIL | CRY-03, SCP-04 |
 | 10.2.1 | FAIL | NET-04, LOG-01 |
 | 10.3.2 | PASS | LOG-02 |
 | 10.3.4 | FAIL | LOG-01 |
 | 10.5.1 | PASS | LOG-02 |
+| 12.5.2 | FAIL | SCP-01, SCP-02, SCP-03 |
 | 3.5.1 | FAIL | CRY-02 |
 | 3.6.1 | FAIL | CRY-02 |
 | 3.7.4 | FAIL | CRY-01 |
-| 4.2.1 | FAIL | CRY-04, CRY-05, CRY-06 |
+| 4.2.1 | FAIL | CRY-04, CRY-05, CRY-06, CRY-07 |
 | 4.2.1.1 | FAIL | CRY-05 |
 | 7.2.1 | FAIL | IAM-05, IAM-07 |
 | 7.2.2 | FAIL | IAM-05 |
@@ -138,11 +197,13 @@ Run `20261112T213414Z-079046-3212`. Account `123456789012` in `us-east-1` (mock 
 
 | Requirement | Result | Checks |
 |---|---|---|
-| CC6.1 | FAIL | NET-02, CRY-01, CRY-02, CRY-03, IAM-01, IAM-02, IAM-03, IAM-04, IAM-07 |
+| CC3.4 | FAIL | SCP-01, SCP-02, SCP-03 |
+| CC6.1 | FAIL | NET-02, CRY-01, CRY-02, CRY-03, SCP-01, IAM-01, IAM-02, IAM-03, IAM-04, IAM-07 |
 | CC6.2 | FAIL | IAM-06 |
 | CC6.3 | FAIL | IAM-02, IAM-05, IAM-06 |
-| CC6.6 | FAIL | NET-01, NET-02, NET-03, CRY-03 |
-| CC6.7 | FAIL | CRY-02, CRY-04, CRY-05, CRY-06 |
+| CC6.6 | FAIL | NET-01, NET-02, NET-03, CRY-03, SCP-02, SCP-04 |
+| CC6.7 | FAIL | CRY-02, CRY-04, CRY-05, CRY-06, CRY-07 |
 | CC7.2 | FAIL | NET-04, LOG-01, LOG-02 |
+| CC8.1 | FAIL | SCP-03 |
 | CC9.2 | FAIL | IAM-07 |
 

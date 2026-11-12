@@ -4,7 +4,7 @@ This manual takes you from a Windows computer with nothing installed to a workin
 
 SecuGuard is a fictional company invented for this project. It is not a real business, and nothing here describes a real company's systems.
 
-**This manual covers stages 1 and 2 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. New parts are added as each later stage is built.
+**This manual covers stages 1 to 3 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. New parts are added as each later stage is built.
 
 ## Contents
 
@@ -20,11 +20,13 @@ SecuGuard is a fictional company invented for this project. It is not a real bus
 - [Part 10: Stage 2: Give the checks something to find](#part-10-stage-2-give-the-checks-something-to-find)
 - [Part 11: Read the check results](#part-11-read-the-check-results)
 - [Part 12: Prove the vault from the command line](#part-12-prove-the-vault-from-the-command-line)
-- [Part 13: Costs and shutting down](#part-13-costs-and-shutting-down)
-- [Part 14: Daily use](#part-14-daily-use)
-- [Part 15: When something goes wrong](#part-15-when-something-goes-wrong)
-- [Part 16: Glossary](#part-16-glossary)
-- [Part 17: What each file in the project does](#part-17-what-each-file-in-the-project-does)
+- [Part 13: Stage 3: Catch scope drift](#part-13-stage-3-catch-scope-drift)
+- [Part 14: Block risky changes before they are made](#part-14-block-risky-changes-before-they-are-made)
+- [Part 15: Costs and shutting down](#part-15-costs-and-shutting-down)
+- [Part 16: Daily use](#part-16-daily-use)
+- [Part 17: When something goes wrong](#part-17-when-something-goes-wrong)
+- [Part 18: Glossary](#part-18-glossary)
+- [Part 19: What each file in the project does](#part-19-what-each-file-in-the-project-does)
 
 ---
 
@@ -77,14 +79,27 @@ Stage 2 grades the evidence. Parts 10 to 12 cover it.
 
 - **Realistic resources with deliberate weaknesses**: users, a service account, a vendor role, certificates, a load balancer, an old encryption key, and a storage bucket
 - **Four more collectors**, for identities, certificates, load balancers, and logging
-- **19 checks** across network, encryption, identity, and logging. Each is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x.
+- **Checks** across network, encryption, identity, and logging. There are 24 once stage 3 is included. Each is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x.
 - **A report** showing results by check and by framework
 - **Two commands that prove the vault**: one tests the lock, one verifies the copy of record
+
+### What stage 3 adds
+
+Stage 3 watches PCI scope and stops risky changes. Parts 13 and 14 cover it.
+
+- **Scope drift detection**: the project works out from the firewall rules what can really reach the card data zone, compares that with each label, and compares the whole network with a baseline a person approved
+- **A preventive check**, `secuguard plan-check`, which reads a planned change and blocks it if it breaks a rule, before anything reaches AWS
+- **An exceptions register** recording each accepted risk with a reason, an approver, and an expiry date
+- **A certificate inventory** in the report, and a check for certificates no authority has issued
 
 ### What comes later
 
 | Stage | What it adds |
 |---|---|
+| 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
+| 5 | A readable report, diagrams, and the video walkthrough |
+
+---|---|
 | 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made |
 | 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
 | 5 | A readable report, diagrams, and the video walkthrough |
@@ -115,6 +130,10 @@ You only need eight ideas to follow the rest of this manual. Each one comes with
 **Service account.** An identity used by a program instead of a person.
 
 **Terraform.** Terraform is a tool that builds cloud environments from written instructions. Think of a blueprint. You hand Terraform the blueprint and it builds exactly that. Hand it the same blueprint tomorrow and it changes nothing. Tell it to tear down and it removes everything it built. The blueprint for this project is in the `terraform` folder.
+
+**Detective control.** A safeguard that finds a problem after it exists. The checks are detective controls.
+
+**Drift.** A difference between how something was approved to be and how it is now.
 
 **Evidence.** Evidence is a saved answer to the question "how is this configured right now?" In this project every piece of evidence is a text file that records what was asked, which account was asked, when, and what AWS answered.
 
@@ -180,7 +199,7 @@ terraform -version
 aws --version
 ```
 
-**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 15](#part-15-when-something-goes-wrong).
+**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 17](#part-17-when-something-goes-wrong).
 
 ### Step 5: Allow PowerShell to run setup scripts
 
@@ -290,8 +309,8 @@ Run 20261110T150035Z-482913-a67f  (mock mode, account 123456789012, us-east-1)
   ok      certificates  -> evidence\20261110T150035Z-482913-a67f\certificates.json
   ok      loadbalancers -> evidence\20261110T150035Z-482913-a67f\loadbalancers.json
   ok      audit_logging -> evidence\20261110T150035Z-482913-a67f\audit_logging.json
-  graded  19 checks -> evidence\20261110T150035Z-482913-a67f\check-results.json
-          5 passed, 14 failed, 0 could not be assessed
+  graded  24 checks -> evidence\20261110T150035Z-482913-a67f\check-results.json
+          5 passed, 19 failed, 0 could not be assessed
 Manifest evidence\20261110T150035Z-482913-a67f\manifest.json
   sha256   8ae916fbe7992ae1...
   previous none (first run in this chain)
@@ -383,7 +402,7 @@ Remove-Item -Recurse evidence
 pytest
 ```
 
-**What you should see:** a row of dots and `39 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
+**What you should see:** a row of dots and `59 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
 
 ---
 
@@ -521,7 +540,7 @@ aws sso login --profile secuguard
 
 **What you will do:** have Terraform build the network and the evidence vault in your AWS account.
 **Time:** about 15 minutes.
-**Cost:** about $20 a month while it exists. Nearly all of that is one load balancer, which [Part 13](#part-13-costs-and-shutting-down) shows how to pause.
+**Cost:** about $20 a month while it exists. Nearly all of that is one load balancer, which [Part 15](#part-15-costs-and-shutting-down) shows how to pause.
 
 ### What gets built
 
@@ -575,9 +594,9 @@ terraform plan
 
 Terraform lists everything it intends to create and changes nothing. Read through it. Each block starting with `+` is one thing to be created.
 
-**What you should see:** the last line reads `Plan: 55 to add, 0 to change, 0 to destroy.`
+**What you should see:** the last line reads `Plan: 58 to add, 0 to change, 0 to destroy.`
 
-Of those 55, 30 are the foundation described above. The other 25 are deliberate, harmless weaknesses for the checks to find later. [Part 10](#part-10-stage-2-give-the-checks-something-to-find) explains each one and why it is safe.
+Of those 58, 30 are the foundation described above. The other 28 are deliberate, harmless weaknesses for the checks to find later. [Part 10](#part-10-stage-2-give-the-checks-something-to-find) and [Part 13](#part-13-stage-3-catch-scope-drift) explain each one and why it is safe.
 
 ### Step 5: Build it
 
@@ -589,7 +608,7 @@ Terraform shows the plan again and asks for confirmation. Type `yes` and press E
 
 The load balancer takes two to three minutes to create, so expect a wait near the end.
 
-**What you should see:** `Apply complete! Resources: 55 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
+**What you should see:** `Apply complete! Resources: 58 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
 
 ```
 evidence_bucket = "secuguard-evidence-123456789012"
@@ -638,10 +657,10 @@ secuguard collect --profile secuguard --upload --bucket $bucket
 **What you should see:** the same kind of output as practice mode, with three differences. It says `aws mode`. The account number is your own. And a final line reads:
 
 ```
-Uploaded 11 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
+Uploaded 12 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
 ```
 
-The eleven files are eight evidence files, the check results, the manifest, and the manifest's fingerprint.
+The twelve files are eight evidence files, a copy of the approved scope baseline, the check results, the manifest, and the manifest's fingerprint.
 
 The collectors only read. They ask AWS how things are configured and cannot change anything in your environment.
 
@@ -799,7 +818,7 @@ Neither value is a secret. They are names, not keys. Knowing them does not let a
 3. Click **Run workflow**, then the green **Run workflow** button.
 4. Wait about a minute and refresh the page.
 
-**What you should see:** a green check mark. Click the run, then **collect**, then **Collect, grade, and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 11 files`.
+**What you should see:** a green check mark. Click the run, then **collect**, then **Collect, grade, and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 12 files`.
 
 From now on this runs by itself every day at 11:17 UTC. Each run links to the one before it, so the vault holds an unbroken daily record of how SecuGuard's environment was configured.
 
@@ -809,7 +828,7 @@ From now on this runs by itself every day at 11:17 UTC. Each run links to the on
 
 **What you will do:** update the project, add realistic resources with deliberate weaknesses to SecuGuard's AWS environment, and collect evidence about them.
 **Time:** about 30 minutes.
-**Cost:** about $18 a month more while the load balancer exists. See [Part 13](#part-13-costs-and-shutting-down).
+**Cost:** about $18 a month more while the load balancer exists. See [Part 15](#part-15-costs-and-shutting-down).
 
 Stage 1 collected evidence and stopped there. Stage 2 adds **checks**. A check is a rule that reads the evidence and answers pass or fail, for example "every encryption key rotates automatically."
 
@@ -865,7 +884,7 @@ Use your own folder if the project is somewhere else.
 pytest
 ```
 
-**What you should see:** `39 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
+**What you should see:** `59 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
 
 ### Step 4: Try it in practice mode first
 
@@ -874,7 +893,7 @@ secuguard collect --mock
 secuguard report
 ```
 
-**What you should see:** the first command prints eight `ok` lines, then a line like `graded 19 checks` followed by how many passed and failed. The second prints a table of every check, then the same results grouped by framework. [Part 11](#part-11-read-the-check-results) explains how to read it.
+**What you should see:** the first command prints eight `ok` lines, then a line like `graded 24 checks` followed by how many passed and failed. The second prints a table of every check, then the same results grouped by framework. [Part 11](#part-11-read-the-check-results) explains how to read it.
 
 Then delete the practice evidence so it does not mix with real evidence:
 
@@ -906,7 +925,7 @@ If you have real evidence in that folder that you want to keep, skip the delete.
    terraform -chdir=terraform plan
    ```
 
-   **What you should see:** the last line reads `Plan: 25 to add, 1 to change, 0 to destroy.` The one change gives the GitHub collector permission to read the new kinds of resources.
+   **What you should see:** the last line reads `Plan: 28 to add, 1 to change, 0 to destroy.` Of the 28, 25 belong to this part and 3 to [Part 13](#part-13-stage-3-catch-scope-drift). The one change gives the GitHub collector permission to read the new kinds of resources.
 
    If you set the project up for the first time with this version of the manual, Part 7 already built these resources. Terraform then says `No changes`, and you can skip to step 6.
 
@@ -918,7 +937,7 @@ If you have real evidence in that folder that you want to keep, skip the delete.
 
    Type `yes` when asked. The load balancer takes two to three minutes to create, so this apply is slower than the first one.
 
-   **What you should see:** `Apply complete! Resources: 25 added, 1 changed, 0 destroyed.`
+   **What you should see:** `Apply complete! Resources: 28 added, 1 changed, 0 destroyed.`
 
 ### Step 6: Collect evidence about the new resources
 
@@ -927,7 +946,7 @@ $bucket = terraform -chdir=terraform output -raw evidence_bucket
 secuguard collect --profile secuguard --upload --bucket $bucket
 ```
 
-**What you should see:** eight `ok` lines, a `graded 19 checks` line with pass and fail counts, and `Uploaded 11 files`. The eleven files are eight evidence files, the check results, the manifest, and the manifest's fingerprint.
+**What you should see:** eight `ok` lines, a `graded 24 checks` line with pass and fail counts, and `Uploaded 12 files`. The twelve files are eight evidence files, a copy of the approved scope baseline, the check results, the manifest, and the manifest's fingerprint.
 
 The check results are sealed and stored in the vault with the evidence they were graded from. Nobody can quietly change a "fail" to a "pass" afterward.
 
@@ -989,7 +1008,9 @@ Your exact counts depend on your account. Expect most checks to fail, which is t
 | Check | Expected | Why |
 |---|---|---|
 | NET-01, CRY-01 to CRY-06, IAM-04 to IAM-07 | FAIL | The planted weaknesses from Part 10 |
-| NET-02, LOG-02 | PASS | The card data zone and the evidence vault are built correctly |
+| NET-02, SCP-01 to SCP-03 | FAIL | The planted scope drift, explained in Part 13 |
+| CRY-07 | FAIL | Real finding: the certificate on the load balancer was not issued by a certificate authority |
+| LOG-02, SCP-04 | PASS | The evidence vault is built correctly, and the card data zone has no route to the internet |
 | IAM-01, IAM-02 | PASS | You protected the root user in Part 6 |
 | IAM-03 | FAIL | Real finding: no password policy has been set |
 | NET-03 | FAIL | Real finding: AWS's own default network in your account has a permissive default firewall group |
@@ -1002,7 +1023,7 @@ Your exact counts depend on your account. Expect most checks to fail, which is t
 secuguard checks
 ```
 
-This lists all 19 checks. Each one shows a plain-language reason it matters and the requirements it reports against in each framework.
+This lists all 24 checks. Each one shows a plain-language reason it matters and the requirements it reports against in each framework.
 
 ### Step 3: Fix a real finding and watch it change
 
@@ -1032,13 +1053,18 @@ IAM-03 fails because your account has no password policy. Fix it for real.
 
 You now have two sealed runs in the vault: one from before the fix showing FAIL, and one from after showing PASS. That pair is what an auditor asks for when they want proof that a finding was fixed.
 
-### Step 4: Save a copy of the report to share
+### Step 4: Save a copy of the report and open it
 
 ```powershell
 secuguard report --markdown | Out-File -Encoding utf8 report.md
+code report.md
 ```
 
-This writes `report.md`, a formatted version with a Findings section that explains each failure. Open it in Visual Studio Code and press Ctrl+Shift+V to see it formatted.
+The first line writes `report.md`, a formatted version with a Findings section that explains each failure. The second line opens it in Visual Studio Code.
+
+Once it is open, press Ctrl+Shift+V to see it formatted with tables and headings. Press Ctrl+K, then V, to show the formatted view beside the text.
+
+`report.md` is kept out of GitHub, because it names your AWS account.
 
 ### Grading old evidence again
 
@@ -1077,7 +1103,7 @@ Tried to delete that stored version permanently, asking AWS to bypass the lock.
 REFUSED (AccessDenied). The vault would not delete a locked file, even on request to bypass.
 ```
 
-If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 15](#part-15-when-something-goes-wrong).
+If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 17](#part-17-when-something-goes-wrong).
 
 ### Step 2: Verify the copy of record
 
@@ -1107,7 +1133,278 @@ The daily **Collect evidence** job does the same with real results. Run it once 
 
 ---
 
-## Part 13: Costs and shutting down
+## Part 13: Stage 3: Catch scope drift
+
+**What you will do:** add three resources that quietly change what PCI DSS applies to, and watch the project notice.
+**Time:** about 25 minutes.
+**Cost:** nothing extra. Firewall rule groups are free.
+
+### What scope drift is
+
+PCI DSS applies to the card data zone and to anything that can connect to it. That set of systems is the **scope**. Keeping scope small is how a company keeps PCI DSS manageable, and confirming scope is the first thing an assessor does.
+
+Scope is usually written down once: a diagram, a spreadsheet, a set of labels. Then the network keeps changing. Someone adds a firewall rule so a reporting tool can query the card database. Nobody updates the diagram. The reporting tool is now in scope, with none of the PCI controls applied to it, and nobody knows until the next assessment. That is scope drift.
+
+Stage 3 catches it three ways.
+
+| Question | How it is answered | Check |
+|---|---|---|
+| Has every part of the network been given a scope? | Look for the `secuguard:pci-scope` tag | SCP-01 |
+| Is each label true? | Work out from the firewall rules what can really reach the card data zone, and compare | SCP-02 |
+| Has anything changed since a person last approved the scope? | Compare the network with an approved list, the baseline | SCP-03 |
+
+A fourth check, SCP-04, confirms the card data zone has no route to the internet.
+
+### What gets added
+
+| What is created | The problem | Checks that catch it |
+|---|---|---|
+| A firewall group named `secuguard-planted-analytics`, labelled out of scope | It is allowed straight into the card data zone on the database port. The label says PCI DSS does not apply. The rule says it does. | NET-02, SCP-02, SCP-03 |
+| A firewall group named `secuguard-planted-unclassified` | It has no scope label at all | SCP-01, SCP-03 |
+
+Both are attached to nothing, so no system gains any access.
+
+Stage 3 also adds check CRY-07, which reports certificates in use that no certificate authority has issued, and a certificate inventory in the report.
+
+### Step 1: Update the project
+
+1. Download the newest `secuguard-grc-engineering.zip` and unzip it over your project folder, replacing files.
+2. In PowerShell, in the project folder with the workspace on:
+
+   ```powershell
+   pip install -e ".[dev]"
+   pytest
+   ```
+
+**What you should see:** `59 passed`.
+
+### Step 2: See drift in practice mode
+
+```powershell
+secuguard collect --mock
+secuguard scope
+```
+
+**What you should see:** a table of the network, then the drift.
+
+```
+Kind            Name                              Declared       Actually
+--------------------------------------------------------------------------------
+security group  secuguard-cde                     cde            cde
+security group  secuguard-corporate               out-of-scope   out-of-scope
+security group  secuguard-planted-analytics       out-of-scope   connected        <-- mismatch
+security group  secuguard-planted-unclassified    not declared   out-of-scope
+security group  secuguard-shared                  connected      connected
+
+Baseline approved by SecuGuard security lead (fictional) on 2026-11-10.
+DRIFT. 3 difference(s) from the approved baseline:
+  added   security group secuguard-planted-analytics: not in the approved baseline (declared out-of-scope)
+```
+
+**Declared** is the label. **Actually** is what the firewall rules make it. The line marked `mismatch` is a system someone labelled out of scope that can reach card data.
+
+Delete the practice evidence afterward if you do not want it mixed with real runs. Find the newest folder in `evidence` whose files say `mock` and remove it, or leave it. Practice runs are clearly labelled.
+
+### Step 3: Add the drift to your real network
+
+1. Sign in if needed:
+
+   ```powershell
+   aws sso login --profile secuguard
+   ```
+
+2. Preview and build:
+
+   ```powershell
+   terraform -chdir=terraform plan
+   terraform -chdir=terraform apply
+   ```
+
+   Type `yes` when asked.
+
+**What you should see:** `Plan: 3 to add, 0 to change, 0 to destroy.` and then `Apply complete! Resources: 3 added, 0 changed, 0 destroyed.`
+
+### Step 4: Collect and look
+
+```powershell
+$bucket = terraform -chdir=terraform output -raw evidence_bucket
+secuguard collect --profile secuguard --upload --bucket $bucket
+secuguard scope
+```
+
+**What you should see:** `graded 24 checks`, `Uploaded 12 files`, and then the same mismatch and drift you saw in practice mode, now from your real network.
+
+The twelfth file is new. It is a copy of the approved baseline as it stood at the moment of collection, sealed with the rest. That way the record shows what was approved at the time, even if the baseline changes later.
+
+Now show the full report:
+
+```powershell
+secuguard report
+```
+
+**What you should see:** five new checks, CRY-07 and SCP-01 to SCP-04. NET-02, which passed before, now fails, because the card data zone accepts traffic from a group labelled out of scope. Below the checks are two new sections: the PCI scope of the network, and a certificate inventory listing each certificate with its issuer, key, expiry date, and what is using it.
+
+### Step 5: Try to approve the drift
+
+The baseline is the file `scope-baseline.json` in the project folder. It lists each part of the network and its approved scope, with who approved it and when. To accept the current network as the new baseline, a person runs an approval:
+
+```powershell
+secuguard scope --approve --by "Your Name"
+```
+
+**What you should see:**
+
+```
+Not approved. A baseline should record a correct network, and this one has problems:
+  security group secuguard-planted-analytics: declared out-of-scope but can reach the card data zone
+  security group secuguard-planted-unclassified: has no declared scope
+Fix these first, collect again, then approve.
+```
+
+The project refuses. Approval is for recording a correct network, not for making a finding go away. In this project the two planted groups stay as findings, so the baseline stays as it is.
+
+When an approval is accepted, it rewrites `scope-baseline.json`. That file is tracked by Git, so its history is a permanent record of who approved each change to scope and when.
+
+---
+
+## Part 14: Block risky changes before they are made
+
+**What you will do:** run a check on a planned change before it reaches AWS, and watch a risky change get refused.
+**Time:** about 20 minutes.
+
+Everything so far finds a problem after it exists. That is a **detective** control. This part adds a **preventive** control: it reads what Terraform is about to do and refuses changes that break a rule, so the problem never reaches AWS.
+
+### How it works
+
+Before Terraform changes anything, it produces a plan: an exact list of what it would create, change, or delete. `secuguard plan-check` asks Terraform for that plan and tests each planned change against eight rules.
+
+| Rule | What it blocks |
+|---|---|
+| PLAN-01 | Opening SSH or Remote Desktop to the whole internet |
+| PLAN-02 | Letting anything into the card data zone except a named, in-scope group |
+| PLAN-03 | Creating a network resource with no PCI scope label |
+| PLAN-04 | Creating an encryption key with rotation off |
+| PLAN-05 | Switching off a storage bucket's public access protections |
+| PLAN-06 | A listener that accepts unencrypted traffic or outdated TLS |
+| PLAN-07 | Weakening or removing the evidence vault |
+| PLAN-08 | Attaching administrator rights directly to a user |
+
+### Step 1: Check a plan with nothing in it
+
+```powershell
+secuguard plan-check
+```
+
+**What you should see:**
+
+```
+Asking Terraform what it would change...
+No changes. Your infrastructure matches the configuration.
+Examined 0 planned changes against 8 rules.
+
+ALLOWED. No planned change breaks a rule.
+```
+
+### Step 2: Propose a risky change
+
+The project includes a sample change that looks reasonable. The reporting team wants to query the card database from the office network, and wants an encryption key for its exports.
+
+1. Copy the sample into the Terraform folder:
+
+   ```powershell
+   Copy-Item examples\risky-change.tf.example terraform\risky-change.tf
+   ```
+
+2. Check it:
+
+   ```powershell
+   secuguard plan-check
+   ```
+
+**What you should see:**
+
+```
+Asking Terraform what it would change...
+Plan: 2 to add, 0 to change, 0 to destroy.
+Examined 2 planned changes against 8 rules.
+
+BLOCKED. 2 change(s) break a rule:
+  PLAN-04  Encryption keys are created with rotation on
+           aws_kms_key.risky_reports
+           creates an encryption key with rotation off
+  PLAN-02  Only in-scope groups are let into the card data zone
+           aws_vpc_security_group_ingress_rule.risky_office_to_card_database
+           lets address range 10.20.30.0/24 into the card data zone. Only named in-scope groups may be let in.
+
+Nothing was applied. Fix the change, or record an approved exception, and run this again.
+```
+
+Nothing was created in AWS. The second finding is scope drift, caught before it happened instead of the day after.
+
+### Step 3: Withdraw the change
+
+```powershell
+Remove-Item terraform\risky-change.tf
+secuguard plan-check
+```
+
+**What you should see:** `No changes` and `ALLOWED` again.
+
+Do not skip this step. If the file stays in the `terraform` folder, a plain `terraform apply` would build it.
+
+### Step 4: Read the exceptions register
+
+Some rule-breaking changes are accepted on purpose. In this project those are the planted weaknesses. They are recorded in `policy\exceptions.json`. Open it:
+
+```powershell
+code policy\exceptions.json
+```
+
+Each entry has five parts.
+
+| Field | Meaning |
+|---|---|
+| `address` | The one resource the exception covers |
+| `rule` | The one rule it is excused from |
+| `reason` | Why the risk is accepted |
+| `approved_by` | Who accepted it |
+| `expires` | The date the approval ends |
+
+An exception past its `expires` date stops counting, and the change is blocked again. Accepted risks get reviewed instead of living forever. The file is tracked by Git, so every exception has a history.
+
+When the planted resources appear in a plan, `plan-check` lists them under **Accepted exceptions** with the reason and expiry date, and still allows the plan.
+
+### The habit to adopt
+
+From now on, make changes to AWS this way:
+
+1. Edit the Terraform files.
+2. Run `secuguard plan-check`.
+3. If it says ALLOWED and you agree with the plan, run the command it prints:
+
+   ```powershell
+   terraform -chdir=terraform apply tfplan
+   ```
+
+That applies exactly the plan that was checked. If the plan is blocked, `plan-check` deletes the saved plan so it cannot be applied by mistake.
+
+### What this is and is not
+
+On your computer, `plan-check` is a step you choose to run. Anyone with access could still run `terraform apply` directly. In a team, the same check would run automatically on every proposed change, and a blocked change could not be merged. That needs a way for the check to read the live AWS account from a proposed change, which this project leaves for a later stage. The rules and the exceptions register would not change.
+
+### Step 5: Publish stage 3
+
+```powershell
+git add .
+git commit -m "Stage 3: PCI scope drift detection and a preventive plan check"
+git push
+```
+
+**What you should see:** the **Tests** job on GitHub goes green. Its Summary page now shows the scope table and the certificate inventory. Run **Collect evidence** once by hand and open its Summary to see the same for your real account.
+
+---
+
+## Part 15: Costs and shutting down
 
 ### What it costs
 
@@ -1164,7 +1461,7 @@ Destroying the environment does not close your AWS account. If you want to close
 
 ---
 
-## Part 14: Daily use
+## Part 16: Daily use
 
 Once everything is set up, a working session looks like this.
 
@@ -1182,7 +1479,10 @@ Then use whichever command you need.
 | Collect in practice mode | `secuguard collect --mock` |
 | Collect from AWS and store in the vault | `secuguard collect --profile secuguard --upload --bucket $bucket` |
 | Show check results by check and by framework | `secuguard report` |
-| Save the report as a file to share | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` |
+| Show the PCI scope of the network and any drift | `secuguard scope` |
+| Check a planned change before applying it | `secuguard plan-check` |
+| Apply exactly the plan that was checked | `terraform -chdir=terraform apply tfplan` |
+| Save the report as a file and open it | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` then `code report.md` |
 | List the checks and what each reports against | `secuguard checks` |
 | Check that local evidence has not been altered | `secuguard verify` |
 | Check the copy of record in the vault | `secuguard verify --vault --profile secuguard --bucket $bucket` |
@@ -1195,7 +1495,7 @@ Then use whichever command you need.
 
 ---
 
-## Part 15: When something goes wrong
+## Part 17: When something goes wrong
 
 **The AWS Console has no region name in the top bar, or says a service "is not available to your project."**
 The account was created with AWS's simplified sign-up. Do not choose **Activate advanced features**, because that cannot be undone. Create a new account with the advanced sign-up link in Part 6, step 1, and use that account for this project. The simplified account costs nothing while it sits unused, and you can close it later.
@@ -1268,18 +1568,32 @@ The vault is not in compliance mode. Check that `terraform\terraform.tfvars` doe
 **`secuguard report` says no evidence runs were found.**
 Run it from the project folder, and collect at least once first.
 
+**`secuguard plan-check` says Terraform was not found, or fails while asking Terraform for a plan.**
+Run it from the project folder, with the workspace on, after signing in with `aws sso login --profile secuguard`. The text it prints is Terraform's own error. Run `terraform -chdir=terraform plan` to see it in full.
+
+**`secuguard plan-check` blocks a change you believe is acceptable.**
+Either fix the change so it meets the rule, or record an exception in `policy\exceptions.json` with a reason, an approver, and an expiry date. Use the planted entries in that file as a pattern.
+
+**`secuguard plan-check` blocks a planted resource and says its exception expired.**
+The approvals in `policy\exceptions.json` have an end date. Review whether each planted weakness is still wanted, then move its `expires` date forward.
+
+**`secuguard scope` or the report shows drift you did not expect.**
+Something in the network differs from `scope-baseline.json`. That is the check doing its job. Look at the item named, decide whether the change is correct, and either undo it or, once the network is right, approve a new baseline as shown in Part 13.
+
 **Something else.**
 Copy the full error text. Most of the time the last two or three lines say what is wrong. Search for that text along with the name of the tool that printed it.
 
 ---
 
-## Part 16: Glossary
+## Part 18: Glossary
 
 **Access portal.** The web page where you sign in to AWS with your everyday user.
 
 **API call.** A question or instruction sent from one program to another. The collectors make API calls to AWS to ask how things are configured.
 
 **AWS.** Amazon Web Services, the cloud provider this project uses.
+
+**Baseline.** A list of what the network should look like, approved by a named person on a date. The project compares the real network against it.
 
 **Bucket.** AWS's name for a storage container in its S3 storage service.
 
@@ -1298,6 +1612,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **Commit.** A saved snapshot of the project in Git, with a description of what changed.
 
 **Evidence.** A saved, sealed record of how something was configured at a specific time.
+
+**Exception.** A recorded decision to accept a rule being broken, with a reason, an approver, and an end date.
 
 **FedRAMP.** The U.S. government program that sets security requirements for cloud services sold to federal agencies. FedRAMP 20x is its newer approach, built around automated proof.
 
@@ -1333,6 +1649,10 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 **PCI DSS.** Payment Card Industry Data Security Standard. The security rules for anyone handling payment card data.
 
+**Plan.** Terraform's exact list of what it would create, change, or delete, produced before it does anything.
+
+**Preventive control.** A safeguard that stops a problem before it happens. `secuguard plan-check` is a preventive control.
+
 **Profile.** A saved AWS sign-in on your computer. This project's profile is named `secuguard`.
 
 **Region.** The geographic location of the AWS data centers you are using. This project uses `us-east-1`, in Northern Virginia.
@@ -1359,7 +1679,7 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 ---
 
-## Part 17: What each file in the project does
+## Part 19: What each file in the project does
 
 | File or folder | What it is |
 |---|---|
@@ -1373,7 +1693,12 @@ Copy the full error text. Most of the time the last two or three lines say what 
 | `terraform/outputs.tf` | The values Terraform prints after building |
 | `terraform/terraform.tfvars.example` | A template for your personal settings file |
 | `src/secuguard_grc/collectors/` | The eight collectors: network, encryption keys, storage, sign-in settings, identities, certificates, load balancers, and logging |
-| `src/secuguard_grc/checks.py` | The 19 checks, each with its reason and the requirements it reports against |
+| `src/secuguard_grc/checks.py` | The 24 checks, each with its reason and the requirements it reports against |
+| `src/secuguard_grc/scope.py` | Works out the real PCI scope of the network and compares it with the labels and the baseline |
+| `src/secuguard_grc/plan_check.py` | The eight rules that judge a Terraform plan before it is applied |
+| `scope-baseline.json` | The approved PCI scope of the network, with who approved it and when |
+| `policy/exceptions.json` | The register of accepted rule-breaking changes, each with a reason and an expiry date |
+| `examples/risky-change.tf.example` | A sample risky change for trying the plan check |
 | `src/secuguard_grc/report.py` | Turns check results into the terminal table and the Markdown report |
 | `src/secuguard_grc/evidence.py` | The sealing system: fingerprints, manifests, the chain, and verification |
 | `src/secuguard_grc/storage.py` | Copies each run into the vault, reads runs back for verification, and runs the lock test |

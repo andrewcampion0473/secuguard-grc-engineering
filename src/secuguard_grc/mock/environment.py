@@ -43,8 +43,13 @@ def build_mock_environment(session) -> str:
     zones = [z["ZoneName"] for z in ec2.describe_availability_zones()["AvailabilityZones"]][:2]
     groups = {}
     for tier, (scope, octet) in TIERS.items():
+        # One route table per tier with no route beyond the network itself, as in Terraform.
+        table = ec2.create_route_table(
+            VpcId=vpc_id,
+            TagSpecifications=[{"ResourceType": "route-table", "Tags": _tags(f"secuguard-{tier}", scope)}],
+        )["RouteTable"]["RouteTableId"]
         for index, zone in enumerate(zones):
-            ec2.create_subnet(
+            subnet_id = ec2.create_subnet(
                 VpcId=vpc_id,
                 CidrBlock=f"10.20.{octet + index}.0/24",
                 AvailabilityZone=zone,
@@ -52,7 +57,8 @@ def build_mock_environment(session) -> str:
                     "ResourceType": "subnet",
                     "Tags": _tags(f"secuguard-{tier}-{zone[-1]}", scope),
                 }],
-            )
+            )["Subnet"]["SubnetId"]
+            ec2.associate_route_table(RouteTableId=table, SubnetId=subnet_id)
         groups[tier] = ec2.create_security_group(
             GroupName=f"secuguard-{tier}",
             Description=f"SecuGuard {tier} tier",
@@ -171,6 +177,23 @@ def _plant_findings(session, vpc_id: str, groups: dict, good_key_id: str, accoun
     ec2.authorize_security_group_ingress(GroupId=open_admin, IpPermissions=[{
         "IpProtocol": "tcp", "FromPort": 22, "ToPort": 22,
         "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "SSH from anywhere"}]}])
+
+    # Scope drift: a group labelled out of scope that is let straight into the card data zone,
+    # and a group nobody gave a scope to.
+    analytics = ec2.create_security_group(
+        GroupName="secuguard-planted-analytics", Description="Planted finding: out of scope but allowed into the CDE",
+        VpcId=vpc_id,
+        TagSpecifications=[{"ResourceType": "security-group",
+                            "Tags": _tags("secuguard-planted-analytics", "out-of-scope") + planted}],
+    )["GroupId"]
+    ec2.authorize_security_group_ingress(GroupId=groups["cde"], IpPermissions=[{
+        "IpProtocol": "tcp", "FromPort": 5432, "ToPort": 5432,
+        "UserIdGroupPairs": [{"GroupId": analytics, "Description": "Analytics straight to the card database"}]}])
+    ec2.create_security_group(
+        GroupName="secuguard-planted-unclassified", Description="Planted finding: no PCI scope declared",
+        VpcId=vpc_id,
+        TagSpecifications=[{"ResourceType": "security-group",
+                            "Tags": _tags("secuguard-planted-unclassified") + planted}])
 
     # Encryption: a key that never rotates, and a bucket with no key of its own and no public access block.
     legacy_key = kms.create_key(Description="Planted finding: legacy key without rotation")["KeyMetadata"]["KeyId"]

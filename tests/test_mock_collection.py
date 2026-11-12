@@ -26,7 +26,7 @@ def test_mock_collect_end_to_end(tmp_path):
     assert manifest["collector_errors"] == []
     assert {f["collector"] for f in manifest["files"]} == {
         "network", "kms", "s3", "iam", "identities", "certificates", "loadbalancers", "audit_logging",
-        "check-results"}
+        "scope_baseline", "check-results"}
 
     network = load(run, "network")
     assert network["source"]["mode"] == "mock"

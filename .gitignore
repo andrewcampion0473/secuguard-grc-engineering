@@ -22,3 +22,6 @@ Thumbs.db
 
 # A report saved with 'secuguard report --markdown'. It names your account.
 /report.md
+
+# A saved Terraform plan. It can contain secrets.
+terraform/tfplan

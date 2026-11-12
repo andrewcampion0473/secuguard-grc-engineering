@@ -1,0 +1,54 @@
+{
+  "about": "Planned changes that break a rule in src/secuguard_grc/plan_check.py and have been accepted anyway. Each entry names one resource and one rule, says why, who approved it, and when the approval ends. An expired exception stops counting, and the change is blocked again.",
+  "exceptions": [
+    {
+      "address": "aws_vpc_security_group_ingress_rule.planted_ssh_from_anywhere*",
+      "rule": "PLAN-01",
+      "reason": "Deliberate weakness for check NET-01 to find. The group is attached to nothing and the network has no internet gateway.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.planted_cde_from_analytics*",
+      "rule": "PLAN-02",
+      "reason": "Deliberate weakness for checks NET-02 and SCP-02 to find. The analytics group is attached to nothing.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_security_group.planted_unclassified*",
+      "rule": "PLAN-03",
+      "reason": "Deliberate weakness for check SCP-01 to find. The group has no rules and is attached to nothing.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_kms_key.planted_no_rotation*",
+      "rule": "PLAN-04",
+      "reason": "Deliberate weakness for check CRY-01 to find. The key protects no data.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_s3_bucket_public_access_block.planted_legacy_exports*",
+      "rule": "PLAN-05",
+      "reason": "Deliberate weakness for check CRY-03 to find. The bucket is empty and has no policy or ACL making it public.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_lb_listener.planted_portal_https*",
+      "rule": "PLAN-06",
+      "reason": "Deliberate weakness for check CRY-06 to find. The load balancer is internal and has nothing behind it.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    },
+    {
+      "address": "aws_iam_user_policy_attachment.planted_reports_admin*",
+      "rule": "PLAN-08",
+      "reason": "Deliberate weakness for check IAM-05 to find. A permissions boundary on the user denies every action.",
+      "approved_by": "SecuGuard security lead (fictional)",
+      "expires": "2027-01-31"
+    }
+  ]
+}

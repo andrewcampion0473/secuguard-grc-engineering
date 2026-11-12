@@ -19,6 +19,8 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Callable
 
+from . import scope as scope_rules
+
 ADMIN_PORTS = {22: "SSH", 3389: "Remote Desktop"}
 ANYWHERE = {"0.0.0.0/0", "::/0"}
 SCOPE_TAG = "secuguard:pci-scope"
@@ -60,7 +62,9 @@ def _need(evidence: dict, collector: str, key: str):
     payload = evidence.get(collector)
     if payload is None:
         raise MissingEvidence(f"no evidence from the {collector} collector")
-    value = payload.get(key)
+    if key not in payload:
+        raise MissingEvidence(f"the {collector} evidence has no {key} section")
+    value = payload[key]
     if isinstance(value, dict) and "collection_error" in value:
         raise MissingEvidence(f"{collector}.{key} could not be collected: {value['collection_error']}")
     return value
@@ -248,6 +252,83 @@ def cry_tls_policy(evidence, as_of):
     return results
 
 
+def cry_cert_trust(evidence, as_of):
+    results = []
+    for cert in _certificates(evidence):
+        if not cert.get("in_use_by"):
+            continue  # not serving anything, so nobody is being asked to trust it
+        users = ", ".join(scope_rules.resource_name(arn) for arn in cert["in_use_by"])
+        self_signed = cert["parsed"]["self_signed"]
+        results.append(_result(
+            f"certificate {cert.get('domain_name')}", not self_signed,
+            f"self-signed, and in use by {users}. No certificate authority vouches for it." if self_signed
+            else f"issued by {cert['parsed']['issuer']}, in use by {users}"))
+    return results
+
+
+# ---------------------------------------------------------------- PCI scope
+
+def _inventory(evidence):
+    return scope_rules.build_inventory({
+        "security_groups": _need(evidence, "network", "security_groups"),
+        "subnets": _need(evidence, "network", "subnets"),
+    })
+
+
+def scp_classified(evidence, as_of):
+    return [
+        _result(f"{item['kind']} {item['name']}", item["declared"] in scope_rules.VALID_SCOPES,
+                f"declared {item['declared']}" if item["declared"] in scope_rules.VALID_SCOPES
+                else "has no PCI scope tag, so nobody has decided whether PCI DSS applies to it")
+        for item in _inventory(evidence)["items"]
+    ]
+
+
+def scp_matches_reality(evidence, as_of):
+    results = []
+    for item in _inventory(evidence)["items"]:
+        wrong = item["effective"] == "connected" and item["declared"] not in {"cde", "connected"}
+        if wrong:
+            detail = (f"declared {item['declared'] or 'with no scope'}, but it can reach the card data zone "
+                      f"({'; '.join(item['reaches_cde_by'])}), so PCI DSS applies to it")
+        else:
+            detail = f"declared {item['declared'] or 'with no scope'}, and the firewall rules agree"
+        results.append(_result(f"{item['kind']} {item['name']}", not wrong, detail))
+    return results
+
+
+def scp_baseline(evidence, as_of):
+    record = evidence.get("scope_baseline")
+    if record is None:
+        raise MissingEvidence("the approved scope baseline was not read during this run")
+    if not record.get("found"):
+        return [_result("scope baseline", False, f"no approved baseline file ({record.get('file')}) exists")]
+    baseline = record["baseline"]
+    drift = scope_rules.compare_to_baseline(_inventory(evidence), baseline)
+    if not drift:
+        return [_result("scope baseline", True,
+                        f"the network matches the baseline approved by {baseline.get('approved_by')} "
+                        f"on {baseline.get('approved_at')}")]
+    return [_result(d["item"].replace(":", " ", 1), False, d["detail"]) for d in drift]
+
+
+def scp_cde_no_internet(evidence, as_of):
+    subnets = {s["SubnetId"]: s for s in _need(evidence, "network", "subnets")
+               if _tags(s).get(SCOPE_TAG) == "cde"}
+    results = []
+    for table in _need(evidence, "network", "route_tables"):
+        attached = [a.get("SubnetId") for a in table.get("Associations", []) if a.get("SubnetId") in subnets]
+        if not attached:
+            continue
+        ways_out = [r.get("GatewayId") or r.get("NatGatewayId") for r in table.get("Routes", [])
+                    if str(r.get("GatewayId", "")).startswith("igw-") or r.get("NatGatewayId")]
+        results.append(_result(
+            f"route table {_tags(table).get('Name', table['RouteTableId'])}", not ways_out,
+            f"has a route to the internet through {', '.join(ways_out)}" if ways_out
+            else f"serves {len(attached)} card data subnets and has no route to the internet"))
+    return results
+
+
 # ---------------------------------------------------------------- identity
 
 def iam_root_mfa(evidence, as_of):
@@ -412,6 +493,21 @@ CHECKS: list[Check] = [
     Check("CRY-06", "Connections require TLS 1.2 or newer",
           "TLS 1.0 and 1.1 have known weaknesses and are not accepted as strong cryptography.",
           "high", _fw(["4.2.1"], ["CC6.7"], ["KSI-SVC-VCM", "KSI-SVC-SIN"]), cry_tls_policy),
+    Check("CRY-07", "Certificates in use are issued by a certificate authority",
+          "A self-signed certificate has nobody vouching for it. Systems told to trust it can be fooled by a fake.",
+          "medium", _fw(["4.2.1"], ["CC6.7"], ["KSI-SVC-VCM"]), cry_cert_trust),
+    Check("SCP-01", "Every part of the network has a declared PCI scope",
+          "Scope is the first thing a PCI assessor confirms. Anything unlabelled is a decision nobody made.",
+          "medium", _fw(["12.5.2", "1.2.3"], ["CC3.4", "CC6.1"], ["KSI-PIY-GIV"]), scp_classified),
+    Check("SCP-02", "Declared PCI scope matches the firewall rules",
+          "A system labelled out of scope that can reach card data is in scope, and is not getting PCI controls.",
+          "high", _fw(["12.5.2", "1.3.1"], ["CC3.4", "CC6.6"], ["KSI-CNA-ULN", "KSI-CNA-EIS"]), scp_matches_reality),
+    Check("SCP-03", "The network matches the approved scope baseline",
+          "Scope should change only when someone decides it should. Anything new or altered needs review.",
+          "high", _fw(["12.5.2", "1.2.2"], ["CC3.4", "CC8.1"], ["KSI-PIY-GIV", "KSI-CMT-LMC"]), scp_baseline),
+    Check("SCP-04", "The card data zone has no route to the internet",
+          "Systems holding card data must not be directly reachable from, or able to reach, the internet.",
+          "high", _fw(["1.4.4", "1.3.2"], ["CC6.6"], ["KSI-CNA-RNT", "KSI-CNA-MAT"]), scp_cde_no_internet),
     Check("IAM-01", "The root user has MFA",
           "The root user can do anything, including closing the account. A password alone is not enough protection.",
           "high", _fw(["8.4.1"], ["CC6.1"], ["KSI-IAM-APM"]), iam_root_mfa),
@@ -465,7 +561,26 @@ def run_checks(evidence: dict, collected_at: str, source: dict | None = None) ->
         })
     counts = {s: sum(1 for c in checks if c["status"] == s) for s in ("pass", "fail", "error", "not_applicable")}
     return {"graded_as_of": collected_at, "summary": counts, "checks": checks,
-            "by_framework": by_framework(checks)}
+            "by_framework": by_framework(checks), "inventories": inventories(evidence)}
+
+
+def inventories(evidence: dict) -> dict:
+    """Lists a reviewer wants alongside the results: every certificate, and the PCI scope of the network."""
+    out = {"certificates": [], "scope": []}
+    for cert in (evidence.get("certificates") or {}).get("certificates", []):
+        parsed = cert.get("parsed") or {}
+        out["certificates"].append({
+            "name": cert.get("domain_name"),
+            "issuer": "self-signed" if parsed.get("self_signed") else parsed.get("issuer"),
+            "key": f"{parsed.get('key_type')} {parsed.get('key_bits')}",
+            "signature": str(parsed.get("signature_hash") or "").upper(),
+            "expires": (parsed.get("not_after") or "")[:10],
+            "in_use_by": [scope_rules.resource_name(arn) for arn in cert.get("in_use_by", [])],
+        })
+    network = evidence.get("network") or {}
+    if isinstance(network.get("security_groups"), list) and isinstance(network.get("subnets"), list):
+        out["scope"] = scope_rules.build_inventory(network)["items"]
+    return out
 
 
 def by_framework(checks: list[dict]) -> dict:

@@ -3,18 +3,18 @@
     "elasticloadbalancing:DescribeLoadBalancers",
     "elasticloadbalancing:DescribeListeners"
   ],
-  "collected_at": "2026-11-12T21:34:14Z",
+  "collected_at": "2026-11-12T22:04:57Z",
   "collector": "loadbalancers",
   "description": "Every load balancer and, for each listener, the protocol, the TLS policy that decides which protocol versions and ciphers are allowed, and the certificate it presents.",
-  "evidence_id": "b137b00f-922c-486f-bb16-4054b572c9af",
+  "evidence_id": "6b78e71f-79a3-40dc-9ea0-e9ebe4e8266d",
   "payload": {
     "load_balancers": [
       {
-        "arn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/secuguard-portal/94f69b4b7e0841ae",
+        "arn": "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/secuguard-portal/09c5f5887e959e46",
         "listeners": [
           {
             "certificates": [
-              "arn:aws:acm:us-east-1:123456789012:certificate/f4323237-0c70-4a74-bed5-87f8f3846415"
+              "arn:aws:acm:us-east-1:123456789012:certificate/253eb3f3-cf94-4885-9c8c-6d13c9b2f294"
             ],
             "port": 443,
             "protocol": "HTTPS",
@@ -24,14 +24,14 @@
         "name": "secuguard-portal",
         "scheme": "internal",
         "security_groups": [
-          "sg-6511725fd7dcf3568"
+          "sg-f0a5e2aa1c90e61af"
         ],
         "type": "application",
-        "vpc_id": "vpc-a11601c4d87d1bbf0"
+        "vpc_id": "vpc-8df6d067ee25fd22b"
       }
     ]
   },
-  "payload_sha256": "9f939953e6447f6f01848fc6c0251332233531fd7b612a82879ccd1230553785",
+  "payload_sha256": "be5a3c5ea2cabbf40f0cb39573df620ae9ec08fe3c58fb1f45c2381ae91bb0dd",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-SVC-SIN",
@@ -44,7 +44,7 @@
       "CC6.7"
     ]
   },
-  "run_id": "20261112T213414Z-079046-3212",
+  "run_id": "20261112T220457Z-560277-8fba",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",

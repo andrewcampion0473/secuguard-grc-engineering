@@ -1,0 +1,16 @@
+{
+  "approved_by": "SecuGuard security lead (fictional)",
+  "approved_at": "2026-11-10",
+  "note": "The network as designed: three zones, each with one security group and two subnets.",
+  "items": {
+    "security group:secuguard-cde": "cde",
+    "security group:secuguard-corporate": "out-of-scope",
+    "security group:secuguard-shared": "connected",
+    "subnet:secuguard-cde-a": "cde",
+    "subnet:secuguard-cde-b": "cde",
+    "subnet:secuguard-corporate-a": "out-of-scope",
+    "subnet:secuguard-corporate-b": "out-of-scope",
+    "subnet:secuguard-shared-a": "connected",
+    "subnet:secuguard-shared-b": "connected"
+  }
+}
