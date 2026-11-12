@@ -25,3 +25,8 @@ output "github_actions_role_arn" {
   description = "Role for GitHub Actions. Empty until github_repository is set."
   value       = local.github_enabled ? aws_iam_role.evidence_collector[0].arn : ""
 }
+
+output "github_actions_subject" {
+  description = "The exact identity AWS will accept from GitHub Actions. Empty until github_repository is set."
+  value       = local.github_enabled ? local.github_subject : ""
+}

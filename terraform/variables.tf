@@ -46,3 +46,25 @@ variable "github_repository" {
   type        = string
   default     = ""
 }
+
+variable "github_owner_id" {
+  description = <<-EOT
+    The numeric ID of the GitHub account that owns the repository. Repositories created
+    after July 15, 2026 identify themselves to AWS with this number as well as the name,
+    so that a deleted and re-registered name cannot inherit access. Leave empty only for
+    a repository created before that date. MANUAL.md, Part 9, step 3 shows how to find it.
+  EOT
+  type        = string
+  default     = ""
+}
+
+variable "github_repository_id" {
+  description = "The numeric ID of the GitHub repository. See github_owner_id."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = (var.github_repository_id == "") == (var.github_owner_id == "")
+    error_message = "Set both github_owner_id and github_repository_id, or neither."
+  }
+}

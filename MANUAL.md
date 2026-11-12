@@ -669,13 +669,13 @@ A repository is a project's home on GitHub.
 
 ### Step 2: Send the project to GitHub
 
-In PowerShell, in the project folder, run these one at a time. Replace `YOUR-USERNAME` with your GitHub username.
+In PowerShell, in the project folder, run these one at a time. The address in the fourth line uses the GitHub username `andrewcampion0473`. If you are setting up your own copy of this project, put your own username there.
 
 ```powershell
 git init -b main
 git add .
 git commit -m "Stage 1: evidence pipeline, Terraform baseline, and practice mode"
-git remote add origin https://github.com/YOUR-USERNAME/secuguard-grc-engineering.git
+git remote add origin https://github.com/andrewcampion0473/secuguard-grc-engineering.git
 git push -u origin main
 ```
 
@@ -697,20 +697,39 @@ Some files are deliberately left out of GitHub: your `evidence` folder, your `te
 
 The daily collection runs on GitHub's computers, so GitHub needs permission to read your AWS account. The safe way to do this involves no stored password or key at all. GitHub proves to AWS which repository is asking, and AWS hands back a pass that expires in one hour. The pass can read configuration and add new files to the evidence vault. It cannot delete evidence or change anything else.
 
-1. Open the settings file:
+AWS needs to know exactly which repository to trust. GitHub identifies a repository by its name and by two permanent numbers: one for your account and one for the repository. The numbers matter because a name can be given up and registered by someone else, but the numbers never change hands.
+
+1. Look up the two numbers. In PowerShell, run:
+
+   ```powershell
+   $repo = Invoke-RestMethod https://api.github.com/repos/andrewcampion0473/secuguard-grc-engineering
+   "github_owner_id      = `"$($repo.owner.id)`""
+   "github_repository_id = `"$($repo.id)`""
+   ```
+
+   If you are setting up your own copy, use your own username in the address. This prints two lines, ready to paste, that look like this with your own numbers:
+
+   ```
+   github_owner_id      = "12345678"
+   github_repository_id = "987654321"
+   ```
+
+2. Open the settings file:
 
    ```powershell
    code terraform\terraform.tfvars
    ```
 
-2. Find the line that starts with `# github_repository`. Delete the `#` and the space after it, and replace `your-github-username` with your GitHub username. The line should look like this:
+3. Add these three lines at the bottom. Use the two lines PowerShell just printed for the second and third:
 
    ```
-   github_repository = "YOUR-USERNAME/secuguard-grc-engineering"
+   github_repository    = "andrewcampion0473/secuguard-grc-engineering"
+   github_owner_id      = "12345678"
+   github_repository_id = "987654321"
    ```
 
-3. Save the file with Ctrl+S.
-4. Apply the change:
+4. Save the file with Ctrl+S.
+5. Apply the change:
 
    ```powershell
    terraform -chdir=terraform apply
@@ -718,21 +737,36 @@ The daily collection runs on GitHub's computers, so GitHub needs permission to r
 
    Type `yes` when asked.
 
-**What you should see:** `Apply complete! Resources: 4 added, 0 changed, 0 destroyed.` and a new output line that starts with `github_actions_role_arn = "arn:aws:iam::`.
+**What you should see:** `Apply complete! Resources: 4 added, 0 changed, 0 destroyed.` Among the outputs are a line that starts with `github_actions_role_arn = "arn:aws:iam::` and a line like this:
+
+```
+github_actions_subject = "repo:andrewcampion0473@12345678/secuguard-grc-engineering@987654321:ref:refs/heads/main"
+```
+
+That last line is the exact identity AWS will accept. Only a job running from the main branch of that one repository matches it.
 
 ### Step 4: Give GitHub the two values it needs
 
-1. Print the two values:
+1. Print what Terraform built:
 
    ```powershell
-   terraform -chdir=terraform output -raw github_actions_role_arn
-   terraform -chdir=terraform output -raw evidence_bucket
+   terraform -chdir=terraform output
    ```
 
+   Among the lines it prints, find these two:
+
+   ```
+   evidence_bucket = "secuguard-evidence-123456789012"
+   github_actions_role_arn = "arn:aws:iam::123456789012:role/secuguard-evidence-collector"
+   ```
+
+   Yours will show your own twelve-digit account number. The values you need are the text between the quotation marks, without the quotation marks.
+
+   If `github_actions_role_arn` shows empty quotation marks, step 3 has not been applied yet. Go back and finish it.
 2. On GitHub, open your repository, then **Settings**, then **Secrets and variables**, then **Actions**.
 3. Click the **Variables** tab.
-4. Choose **New repository variable**. Name it `AWS_ROLE_ARN` and paste the first value. Save.
-5. Choose **New repository variable** again. Name it `EVIDENCE_BUCKET` and paste the second value. Save.
+4. Choose **New repository variable**. In **Name**, type `AWS_ROLE_ARN`. In **Value**, paste the `github_actions_role_arn` value. It starts with `arn:aws:iam::` and ends with `secuguard-evidence-collector`. Save.
+5. Choose **New repository variable** again. In **Name**, type `EVIDENCE_BUCKET`. In **Value**, paste the `evidence_bucket` value. It starts with `secuguard-evidence-`. Save.
 
 Neither value is a secret. They are names, not keys. Knowing them does not let anyone into your account.
 
@@ -850,8 +884,16 @@ Your AWS account already has a GitHub connection from an earlier project. This i
 **The Collect evidence job on GitHub is skipped.**
 The `AWS_ROLE_ARN` variable is missing. Check Part 9, step 4, and make sure you added it under the **Variables** tab, not the **Secrets** tab.
 
-**The Collect evidence job fails at "Get short-lived AWS credentials."**
-The repository name in `terraform.tfvars` does not exactly match your GitHub repository, including capital letters, or the workflow ran from a branch other than `main`. Fix the name, run `terraform -chdir=terraform apply`, and run the job again.
+**The Collect evidence job fails with "Not authorized to perform sts:AssumeRoleWithWebIdentity."**
+AWS did not recognize the repository. Check these in order:
+
+1. `terraform.tfvars` has all three lines from Part 9, step 3: `github_repository`, `github_owner_id`, and `github_repository_id`. Repositories created after July 15, 2026 need the two numbers. Without them, AWS is waiting for an older style of identity that GitHub no longer sends for new repositories.
+2. The repository name matches GitHub exactly, including capital letters.
+3. You ran `terraform -chdir=terraform apply` after saving the file.
+4. The job ran from the `main` branch.
+5. The `AWS_ROLE_ARN` variable on GitHub matches the `github_actions_role_arn` output exactly.
+
+Then run the job again.
 
 **`secuguard verify` reports a run that "does not link" to the one before it.**
 Runs collected by GitHub link to each other inside the vault. Runs you collect on your computer with `--upload` join that same chain. If your local `evidence` folder is missing some of those runs, the local folder shows a gap even though the vault's chain is whole. This is expected when you mix the two. The vault is the copy of record.
