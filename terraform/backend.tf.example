@@ -1,0 +1,13 @@
+# Tells Terraform to keep its state in the S3 bucket built by state.tf, not on this computer.
+#
+# This file is an example on purpose. Someone setting the project up for the first time
+# has no bucket yet, so Terraform starts with its state on their computer. Part 17 of
+# MANUAL.md copies this file to backend.tf once the bucket exists, and moves the state.
+#
+# The bucket name and other settings are supplied separately, because they differ for
+# every AWS account. On your computer they come from backend.hcl. On GitHub they come
+# from the workflow.
+
+terraform {
+  backend "s3" {}
+}

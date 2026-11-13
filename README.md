@@ -20,7 +20,7 @@ This project gathers evidence the way an engineer would:
 | One spreadsheet per framework | Each check is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x |
 | A tool that always says "compliant" | Deliberate weaknesses are planted, and tests prove each one is caught |
 | Scope confirmed once a year | PCI scope is worked out from the firewall rules on every run and compared with an approved baseline |
-| Problems found after they ship | A check reads each planned change and blocks the risky ones first |
+| Problems found after they ship | Every proposed change is checked on GitHub, and a risky one cannot be merged |
 | Someone has to remember to do it | A scheduled job does it, with no stored AWS keys |
 
 ## How it works
@@ -86,6 +86,8 @@ To look without installing anything, see [examples/sample-report.md](examples/sa
 - A FedRAMP 20x validation that states, for each of FedRAMP's 46 Key Security Indicators, whether it is validated, failing, or not covered, in FedRAMP's own wording
 - For every indicator addressed, a plain statement of what the evidence establishes and what it does not
 - A machine-readable copy of the validation sealed into every run, listing the evidence files it rests on and their hashes
+- The plan check enforced on GitHub: every pull request is planned against the real AWS account with a read-only role, and a ruleset on main refuses to merge one that breaks a rule
+- Terraform state kept in an encrypted, versioned S3 bucket
 
 There are 26 checks and 8 plan rules in total. They speak to 16 of the 46 indicators. The other 30 are listed as not covered.
 
@@ -105,9 +107,8 @@ The mapping of checks to requirements is the author's reading of each framework.
 
 | Stage | Adds |
 |---|---|
-| 4, second part | The plan check enforced on GitHub for every proposed change |
 | 5 | Readable report, diagrams, and video walkthrough |
 
 ## Cost
 
-About $25 a month in AWS, most of it one load balancer that can be paused with a single setting. `terraform destroy` removes everything.
+About $26 a month in AWS, most of it one load balancer that can be paused with a single setting. `terraform destroy` removes everything.

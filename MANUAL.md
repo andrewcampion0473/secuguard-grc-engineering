@@ -4,7 +4,7 @@ This manual takes you from a Windows computer with nothing installed to a workin
 
 SecuGuard is a fictional company invented for this project. It is not a real business, and nothing here describes a real company's systems.
 
-**This manual covers stages 1 to 4 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. Parts 15 and 16 add stage 4, monitoring and FedRAMP 20x validation. New parts are added as each later stage is built.
+**This manual covers stages 1 to 4 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. Parts 15 to 17 add stage 4: monitoring, FedRAMP 20x validation, and the plan check enforced on GitHub. New parts are added as each later stage is built.
 
 ## Contents
 
@@ -24,11 +24,12 @@ SecuGuard is a fictional company invented for this project. It is not a real bus
 - [Part 14: Block risky changes before they are made](#part-14-block-risky-changes-before-they-are-made)
 - [Part 15: Stage 4: Switch on monitoring and fix real findings](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings)
 - [Part 16: Validate against FedRAMP 20x](#part-16-validate-against-fedramp-20x)
-- [Part 17: Costs and shutting down](#part-17-costs-and-shutting-down)
-- [Part 18: Daily use](#part-18-daily-use)
-- [Part 19: When something goes wrong](#part-19-when-something-goes-wrong)
-- [Part 20: Glossary](#part-20-glossary)
-- [Part 21: What each file in the project does](#part-21-what-each-file-in-the-project-does)
+- [Part 17: Enforce the plan check on GitHub](#part-17-enforce-the-plan-check-on-github)
+- [Part 18: Costs and shutting down](#part-18-costs-and-shutting-down)
+- [Part 19: Daily use](#part-19-daily-use)
+- [Part 20: When something goes wrong](#part-20-when-something-goes-wrong)
+- [Part 21: Glossary](#part-21-glossary)
+- [Part 22: What each file in the project does](#part-22-what-each-file-in-the-project-does)
 
 ---
 
@@ -96,16 +97,16 @@ Stage 3 watches PCI scope and stops risky changes. Parts 13 and 14 cover it.
 
 ### What stage 4 adds
 
-Stage 4 switches on monitoring and reports against FedRAMP 20x. Parts 15 and 16 cover it.
+Stage 4 switches on monitoring, reports against FedRAMP 20x, and turns the plan check into a gate. Parts 15 to 17 cover it.
 
 - **Four monitoring services**: CloudTrail, network flow logs, AWS Config, and Security Hub, which fix real findings the earlier stages reported
 - **A FedRAMP 20x validation**: a statement about each of FedRAMP's 46 Key Security Indicators, saying which are validated, which are failing, and which this project does not cover, with the evidence each rests on
+- **An enforced gate on GitHub**: every proposed change is judged against the real AWS account, and one that breaks a rule cannot be merged
 
 ### What comes later
 
 | Stage | What it adds |
 |---|---|
-| 4, second part | The plan check enforced on GitHub, so a risky change cannot be merged |
 | 5 | A readable report, diagrams, and the video walkthrough |
 
 ---|---|
@@ -214,7 +215,7 @@ terraform -version
 aws --version
 ```
 
-**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 19](#part-19-when-something-goes-wrong).
+**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 20](#part-20-when-something-goes-wrong).
 
 ### Step 5: Allow PowerShell to run setup scripts
 
@@ -557,7 +558,7 @@ aws sso login --profile secuguard
 
 **What you will do:** have Terraform build the network and the evidence vault in your AWS account.
 **Time:** about 15 minutes.
-**Cost:** about $25 a month while it exists. Most of that is one load balancer, which [Part 17](#part-17-costs-and-shutting-down) shows how to pause.
+**Cost:** about $25 a month while it exists. Most of that is one load balancer, which [Part 18](#part-18-costs-and-shutting-down) shows how to pause.
 
 ### What gets built
 
@@ -611,9 +612,9 @@ terraform plan
 
 Terraform lists everything it intends to create and changes nothing. Read through it. Each block starting with `+` is one thing to be created.
 
-**What you should see:** the last line reads `Plan: 74 to add, 0 to change, 0 to destroy.`
+**What you should see:** the last line reads `Plan: 81 to add, 0 to change, 0 to destroy.`
 
-Of those 74, 30 are the foundation described above. Another 28 are deliberate, harmless weaknesses for the checks to find later, explained in [Part 10](#part-10-stage-2-give-the-checks-something-to-find) and [Part 13](#part-13-stage-3-catch-scope-drift). The last 16 are monitoring services, explained in [Part 15](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings).
+Of those 81, 30 are the foundation described above. Another 28 are deliberate, harmless weaknesses for the checks to find later, explained in [Part 10](#part-10-stage-2-give-the-checks-something-to-find) and [Part 13](#part-13-stage-3-catch-scope-drift). Another 16 are monitoring services, explained in [Part 15](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings). The last 7 are a bucket for Terraform's own records, explained in [Part 17](#part-17-enforce-the-plan-check-on-github).
 
 ### Step 5: Build it
 
@@ -625,7 +626,7 @@ Terraform shows the plan again and asks for confirmation. Type `yes` and press E
 
 The load balancer takes two to three minutes to create, so expect a wait near the end.
 
-**What you should see:** `Apply complete! Resources: 74 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
+**What you should see:** `Apply complete! Resources: 81 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
 
 ```
 evidence_bucket = "secuguard-evidence-123456789012"
@@ -845,7 +846,7 @@ From now on this runs by itself every day at 11:17 UTC. Each run links to the on
 
 **What you will do:** update the project, add realistic resources with deliberate weaknesses to SecuGuard's AWS environment, and collect evidence about them.
 **Time:** about 30 minutes.
-**Cost:** about $18 a month more while the load balancer exists. See [Part 17](#part-17-costs-and-shutting-down).
+**Cost:** about $18 a month more while the load balancer exists. See [Part 18](#part-18-costs-and-shutting-down).
 
 Stage 1 collected evidence and stopped there. Stage 2 adds **checks**. A check is a rule that reads the evidence and answers pass or fail, for example "every encryption key rotates automatically."
 
@@ -1120,7 +1121,7 @@ Tried to delete that stored version permanently, asking AWS to bypass the lock.
 REFUSED (AccessDenied). The vault would not delete a locked file, even on request to bypass.
 ```
 
-If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 19](#part-19-when-something-goes-wrong).
+If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 20](#part-20-when-something-goes-wrong).
 
 ### Step 2: Verify the copy of record
 
@@ -1407,7 +1408,7 @@ That applies exactly the plan that was checked. If the plan is blocked, `plan-ch
 
 ### What this is and is not
 
-On your computer, `plan-check` is a step you choose to run. Anyone with access could still run `terraform apply` directly. In a team, the same check would run automatically on every proposed change, and a blocked change could not be merged. That needs a way for the check to read the live AWS account from a proposed change, which this project leaves for a later stage. The rules and the exceptions register would not change.
+On your computer, `plan-check` is a step you choose to run. Anyone with access could still run `terraform apply` directly. [Part 17](#part-17-enforce-the-plan-check-on-github) turns it into a gate: GitHub runs the same check on every proposed change and refuses to merge one that is blocked. The rules and the exceptions register do not change.
 
 ### Step 5: Publish stage 3
 
@@ -1425,7 +1426,7 @@ git push
 
 **What you will do:** turn on four AWS services that watch the account, and see three failing checks turn to PASS.
 **Time:** about 25 minutes.
-**Cost:** a few dollars a month. See [Part 17](#part-17-costs-and-shutting-down).
+**Cost:** a few dollars a month. See [Part 18](#part-18-costs-and-shutting-down).
 
 Since stage 2, the report has shown real findings about your account that nothing planted caused. Nobody was recording who did what, nobody was recording network traffic, and nothing was keeping a history of changes. Stage 4 fixes them.
 
@@ -1611,7 +1612,240 @@ git push
 
 ---
 
-## Part 17: Costs and shutting down
+## Part 17: Enforce the plan check on GitHub
+
+**What you will do:** move Terraform's records into AWS, let GitHub judge every proposed change, and add a rule so a change that breaks a rule cannot be merged.
+**Time:** about 45 minutes.
+**Cost:** about $1 a month more, for one encryption key.
+
+In Part 14 the plan check was a step you chose to run. This part makes it a gate. Three pieces make that work.
+
+| Piece | Why it is needed |
+|---|---|
+| Terraform's state kept in AWS | Terraform's record of what it has built is called its **state**. Until now it was a file on your computer, so GitHub could not tell what exists. In a bucket in AWS, GitHub can read it. |
+| A second role for GitHub | The evidence collector's role works only from the main branch. A proposed change is not on main yet. This new role works only for proposed changes, and it is read-only. |
+| A rule on the main branch | GitHub refuses to merge a proposed change unless the plan check passed. |
+
+A proposed change on GitHub is called a **pull request**. It is a set of changes on a side copy of the project, called a **branch**, offered for merging into main.
+
+### Step 1: Update the project
+
+1. Download the newest `secuguard-grc-engineering.zip` and unzip it over your project folder, replacing files.
+2. In PowerShell, in the project folder with the workspace on:
+
+   ```powershell
+   pip install -e ".[dev]"
+   pytest
+   ```
+
+**What you should see:** `67 passed`.
+
+### Step 2: Build the state bucket and the new role
+
+```powershell
+aws sso login --profile secuguard
+secuguard plan-check
+```
+
+**What you should see:** `Plan: 10 to add, 0 to change, 0 to destroy.` and `ALLOWED`.
+
+```powershell
+terraform -chdir=terraform apply tfplan
+```
+
+**What you should see:** `Apply complete! Resources: 10 added, 0 changed, 0 destroyed.`
+
+### Step 3: Back up the state
+
+The next steps move the state file. Make a copy first.
+
+```powershell
+Copy-Item terraform\terraform.tfstate terraform\terraform.tfstate.before-move
+```
+
+This copy holds secret values, like the state itself. It is kept out of GitHub automatically. Delete it in a week, once you are sure everything works.
+
+### Step 4: Write down where the state will live
+
+```powershell
+$state = terraform -chdir=terraform output -raw terraform_state_bucket
+Set-Content -Encoding ascii terraform\backend.hcl @("bucket       = `"$state`"", 'key          = "secuguard/terraform.tfstate"', 'region       = "us-east-1"', 'profile      = "secuguard"', 'use_lockfile = true')
+Get-Content terraform\backend.hcl
+```
+
+**What you should see:** five lines, the first naming your state bucket.
+
+```
+bucket       = "secuguard-tfstate-123456789012"
+key          = "secuguard/terraform.tfstate"
+region       = "us-east-1"
+profile      = "secuguard"
+use_lockfile = true
+```
+
+Run these three lines before step 5. Once the switch in step 5 is made, Terraform cannot answer the first line until the move is finished.
+
+### Step 5: Tell Terraform to keep its state in AWS
+
+```powershell
+Copy-Item terraform\backend.tf.example terraform\backend.tf
+```
+
+### Step 6: Move the state
+
+```powershell
+terraform -chdir=terraform init -migrate-state -backend-config=backend.hcl
+```
+
+Terraform asks: `Do you want to copy existing state to the new backend?` Type `yes` and press Enter.
+
+**What you should see:** `Successfully configured the backend "s3"!`
+
+If this step fails, Terraform says so and leaves the state on your computer unchanged. To go back to how things were, run `Remove-Item terraform\backend.tf` and then `terraform -chdir=terraform init`. Then send the error text so it can be fixed.
+
+### Step 7: Confirm the move
+
+```powershell
+secuguard plan-check
+aws s3 ls s3://$state/secuguard/ --profile secuguard
+```
+
+**What you should see:** `No changes` and `ALLOWED` from the first command, which proves Terraform can read everything it built from the new location. The second command lists one file, `terraform.tfstate`.
+
+The state now lives in AWS, encrypted with its own key, with every earlier version kept.
+
+### Step 8: Give GitHub two more values
+
+1. Print them:
+
+   ```powershell
+   terraform -chdir=terraform output
+   ```
+
+   Find the lines starting `plan_checker_role_arn` and `terraform_state_bucket`.
+2. On GitHub, open your repository, then **Settings**, then **Secrets and variables**, then **Actions**, then the **Variables** tab.
+3. Add a variable named `PLAN_ROLE_ARN` with the `plan_checker_role_arn` value. It ends in `secuguard-plan-checker`.
+4. Add a variable named `TF_STATE_BUCKET` with the `terraform_state_bucket` value. It starts with `secuguard-tfstate-`.
+
+### Step 9: Publish this stage
+
+This is the last time you push straight to main.
+
+```powershell
+git add .
+git commit -m "Stage 4: plan check enforced on GitHub, with Terraform state in AWS"
+git push
+```
+
+### Step 10: Propose a risky change
+
+Use the same sample change as Part 14, this time as a pull request.
+
+1. Create a branch and add the change to it:
+
+   ```powershell
+   git checkout -b risky-change
+   Copy-Item examples\risky-change.tf.example terraform\risky-change.tf
+   git add terraform\risky-change.tf
+   git commit -m "Let the reporting team query the card database"
+   git push -u origin risky-change
+   ```
+
+2. Open your repository on GitHub. A yellow banner mentions `risky-change`. Choose **Compare & pull request**, then **Create pull request**.
+3. Wait about two minutes and watch the checks at the bottom of the pull request.
+
+**What you should see:** **Tests** passes with a green check. **Plan check** fails with a red X. Click **Details** beside it, then **Summary**, to read why:
+
+```
+Plan: 2 to add, 0 to change, 0 to destroy.
+Examined 2 planned changes against 8 rules.
+
+BLOCKED. 2 change(s) break a rule:
+  PLAN-04  Encryption keys are created with rotation on
+  PLAN-02  Only in-scope groups are let into the card data zone
+```
+
+GitHub worked that out by reading your real AWS account with a role that cannot change anything.
+
+Notice that the **Merge pull request** button still works. The check objected, but nothing stops the merge yet. Do not merge. The next step closes that gap.
+
+If **Plan check** fails for a different reason, such as not being able to sign in to AWS or to read the state, that is a setup problem and not a blocked plan. Copy the error from the job's log so it can be fixed.
+
+### Step 11: Add the rule that makes it a gate
+
+1. On GitHub, open your repository, then **Settings**, then **Rules**, then **Rulesets**.
+2. Choose **New ruleset**, then **New branch ruleset**.
+3. Name it `Protect main`.
+4. Set **Enforcement status** to **Active**.
+5. Under **Target branches**, choose **Add target**, then **Include default branch**.
+6. Under the rules, tick these four:
+   - **Restrict deletions**
+   - **Require a pull request before merging**. Leave required approvals at 0, since you are working alone.
+   - **Require status checks to pass**. Choose **Add checks**, then add `plan-check` and `test`.
+   - **Block force pushes**
+7. Choose **Create**.
+
+Leave the bypass list empty. With nobody on it, the rule applies to you as well.
+
+GitHub rearranges its settings pages from time to time. If a name here does not match what you see, look for the closest match.
+
+### Step 12: Watch the gate hold
+
+Go back to the pull request and refresh the page.
+
+**What you should see:** the merge button is now disabled, with a message that a required check has failed or that merging is blocked.
+
+A change that would have let the office network into the card database cannot reach main. Take a screenshot. This is the preventive control, enforced.
+
+### Step 13: Withdraw the change
+
+1. On the pull request, choose **Close pull request**, then **Delete branch**.
+2. On your computer:
+
+   ```powershell
+   git checkout main
+   git branch -D risky-change
+   ```
+
+Switching back to main removes `risky-change.tf` from the `terraform` folder, because that file existed only on the branch. Confirm with `secuguard plan-check`, which should say `No changes`.
+
+### How to make changes from now on
+
+Main only accepts pull requests now. Each change follows the same path.
+
+1. Start a branch: `git checkout -b short-name-for-the-change`
+2. Edit files.
+3. Save and send the branch:
+
+   ```powershell
+   git add .
+   git commit -m "What changed"
+   git push -u origin short-name-for-the-change
+   ```
+
+4. On GitHub, open a pull request and wait for **Tests** and **Plan check** to pass.
+5. Choose **Merge pull request**, then **Delete branch**.
+6. Bring your computer up to date:
+
+   ```powershell
+   git checkout main
+   git pull
+   ```
+
+7. If the change touched Terraform, apply it: run `secuguard plan-check`, then the `terraform apply tfplan` command it prints.
+
+GitHub keeps every pull request, with its checks and who merged it. That history is the change record an auditor asks for.
+
+### What this is and is not
+
+- **GitHub decides what may be merged. Applying is still done by you.** After a merge, you run the apply from your computer. A team would usually have GitHub apply merged changes as well.
+- **An administrator can still go around it.** You could apply an unmerged change from your computer, or edit the rule. Both leave a trace: CloudTrail records the apply, and GitHub records every change to a ruleset. The control makes the approved path the easy one and the other path visible.
+- **The plan role can read the state, which holds secret values.** In this project those belong to the planted users, which can do nothing. In a real environment, who may open a pull request would be controlled just as carefully.
+- **Settings in your `terraform.tfvars` are not on GitHub.** That file stays on your computer. If you change a setting there, such as pausing the load balancer, GitHub's plan will show a difference until the same value is given to the workflow.
+
+---
+
+## Part 18: Costs and shutting down
 
 ### What it costs
 
@@ -1627,8 +1861,9 @@ git push
 | Log encryption key | 4 | About $1 a month |
 | AWS Config and Security Hub | 4 | A few dollars a month in an account this small. Security Hub is free for its first 30 days. |
 | CloudTrail, flow logs, log storage | 4 | Cents |
+| Terraform state encryption key | 4 | About $1 a month |
 
-Together that is roughly $25 a month. The load balancer is most of it. AWS Config and Security Hub charge by how much they record and evaluate, so their cost cannot be stated exactly in advance. Your budget alert from Part 6 will tell you if the total heads past what you set.
+Together that is roughly $26 a month. The load balancer is most of it. AWS Config and Security Hub charge by how much they record and evaluate, so their cost cannot be stated exactly in advance. Your budget alert from Part 6 will tell you if the total heads past what you set.
 
 ### How to pause the monitoring services
 
@@ -1660,6 +1895,15 @@ Only do this when you are completely finished, or if you want to start over.
 
 Evidence in the vault is locked for one day and cannot be removed early by anyone. So shutting down takes two sittings, a day apart.
 
+**First, if you did Part 17, bring the state back to your computer.** Terraform cannot delete the bucket that holds its own records while it is using it.
+
+```powershell
+Remove-Item terraform\backend.tf
+terraform -chdir=terraform init -migrate-state
+```
+
+Type `yes` when Terraform asks whether to copy the state. On GitHub, also set the `Protect main` ruleset to **Disabled** under **Settings**, **Rules**, **Rulesets**, if you want to push without pull requests again.
+
 **Day 1: stop collecting.**
 
 1. On GitHub, open **Actions**, click **Collect evidence**, click the **...** button, and choose **Disable workflow**.
@@ -1681,7 +1925,7 @@ Destroying the environment does not close your AWS account. If you want to close
 
 ---
 
-## Part 18: Daily use
+## Part 19: Daily use
 
 Once everything is set up, a working session looks like this.
 
@@ -1703,6 +1947,8 @@ Then use whichever command you need.
 | Show the FedRAMP 20x indicator validation | `secuguard ksi` |
 | Save the FedRAMP 20x report and open it | `secuguard ksi --markdown \| Out-File -Encoding utf8 ksi-report.md` then `code ksi-report.md` |
 | Check a planned change before applying it | `secuguard plan-check` |
+| Start a change on its own branch | `git checkout -b short-name` |
+| Return to main and bring it up to date | `git checkout main` then `git pull` |
 | Apply exactly the plan that was checked | `terraform -chdir=terraform apply tfplan` |
 | Save the report as a file and open it | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` then `code report.md` |
 | List the checks and what each reports against | `secuguard checks` |
@@ -1713,11 +1959,11 @@ Then use whichever command you need.
 | Run the project's self-tests | `pytest` |
 | Preview changes to the cloud environment | `terraform -chdir=terraform plan` |
 | Apply changes to the cloud environment | `terraform -chdir=terraform apply` |
-| Save and publish changes to GitHub | `git add .` then `git commit -m "what changed"` then `git push` |
+| Save and send a branch to GitHub | `git add .` then `git commit -m "what changed"` then `git push -u origin short-name`, then open a pull request |
 
 ---
 
-## Part 19: When something goes wrong
+## Part 20: When something goes wrong
 
 **The AWS Console has no region name in the top bar, or says a service "is not available to your project."**
 The account was created with AWS's simplified sign-up. Do not choose **Activate advanced features**, because that cannot be undone. Create a new account with the advanced sign-up link in Part 6, step 1, and use that account for this project. The simplified account costs nothing while it sits unused, and you can close it later.
@@ -1829,12 +2075,30 @@ The service was switched on in this account before, outside this project. Switch
 **MON-02 fails right after Security Hub is switched on.**
 The standard can take a few minutes to register. Collect again after ten minutes.
 
+**`git push` is rejected with a message about a protected branch or a ruleset.**
+Main only accepts pull requests after Part 17. Move your work to a branch and propose it: `git checkout -b short-name`, then `git push -u origin short-name`, then open a pull request on GitHub.
+
+**The Plan check job on GitHub fails at "Get short-lived, read-only AWS credentials."**
+AWS did not recognize the pull request. Check that the `PLAN_ROLE_ARN` variable on GitHub matches the `plan_checker_role_arn` output exactly, and that `terraform.tfvars` still holds the three `github_` lines from Part 9. Pull requests opened from a copy of the repository under another account are refused on purpose.
+
+**The Plan check job fails while Terraform is starting up or reading the state.**
+Check that the `TF_STATE_BUCKET` variable on GitHub matches the `terraform_state_bucket` output, and that Part 17, step 6 finished with `Successfully configured the backend`. If the error mentions a permission, copy it so the role can be corrected.
+
+**The Plan check job reports changes you did not make.**
+Your `terraform.tfvars` holds a setting that GitHub does not have, so its plan differs from yours. Compare the plan in the job's log with `secuguard plan-check` on your computer.
+
+**Terraform says "Backend initialization required" or "Backend configuration changed."**
+Run `terraform -chdir=terraform init -backend-config=backend.hcl`. This happens after unzipping an update, because the update does not include your `backend.tf`. If `terraform\backend.tf` is missing, copy it again with `Copy-Item terraform\backend.tf.example terraform\backend.tf` first.
+
+**Terraform says the state is locked.**
+A previous run was interrupted. Read the lock ID in the message, then run `terraform -chdir=terraform force-unlock` followed by that ID. Only do this when you are sure no other Terraform run is in progress.
+
 **Something else.**
 Copy the full error text. Most of the time the last two or three lines say what is wrong. Search for that text along with the name of the tool that printed it.
 
 ---
 
-## Part 20: Glossary
+## Part 21: Glossary
 
 **Access portal.** The web page where you sign in to AWS with your everyday user.
 
@@ -1845,6 +2109,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **Baseline.** A list of what the network should look like, approved by a named person on a date. The project compares the real network against it.
 
 **AWS Config.** The AWS service that records every change to every resource and keeps a live inventory.
+
+**Branch.** A side copy of the project in Git where a change is made without touching main.
 
 **Bucket.** AWS's name for a storage container in its S3 storage service.
 
@@ -1908,6 +2174,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 **Profile.** A saved AWS sign-in on your computer. This project's profile is named `secuguard`.
 
+**Pull request.** A set of changes on a branch, offered for merging into main. GitHub runs checks on it first.
+
 **Region.** The geographic location of the AWS data centers you are using. This project uses `us-east-1`, in Northern Virginia.
 
 **Repository.** A project stored in Git or on GitHub.
@@ -1919,6 +2187,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **Security group.** AWS's name for a set of firewall rules that control which traffic can reach a group of systems.
 
 **SOC 2.** An independent audit report on a company's security controls, widely requested by business customers.
+
+**State.** Terraform's record of what it has built. Without it, Terraform cannot tell which resources it owns.
 
 **Subnet.** A section of a network.
 
@@ -1932,7 +2202,7 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 ---
 
-## Part 21: What each file in the project does
+## Part 22: What each file in the project does
 
 | File or folder | What it is |
 |---|---|
@@ -1940,6 +2210,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 | `README.md` | The short introduction people see first on GitHub |
 | `terraform/network.tf` | The blueprint for the network, its three zones, and the firewall rules |
 | `terraform/monitoring.tf` | The blueprint for CloudTrail, flow logs, AWS Config, Security Hub, and the log bucket |
+| `terraform/state.tf` | The blueprint for the bucket that holds Terraform's state, and the read-only role GitHub uses to plan proposed changes |
+| `terraform/backend.tf.example` | The switch that moves Terraform's state into AWS, copied into place in Part 17 |
 | `terraform/planted.tf` | The blueprint for the deliberate, harmless weaknesses the checks are meant to find |
 | `terraform/evidence.tf` | The blueprint for the evidence vault and its encryption key |
 | `terraform/github_oidc.tf` | The blueprint for GitHub's password-free, read-only access |
@@ -1965,6 +2237,7 @@ Copy the full error text. Most of the time the last two or three lines say what 
 | `examples/sample-report.md` | The check results from one practice-mode run, as a formatted report |
 | `examples/sample-run/` | One practice-mode run, so readers can see evidence without installing anything |
 | `.github/workflows/ci.yml` | Tells GitHub to run the self-tests on every change |
+| `.github/workflows/plan-check.yml` | Tells GitHub to judge every pull request against the plan rules |
 | `.github/workflows/collect-evidence.yml` | Tells GitHub to collect evidence every day |
 | `.gitignore` | Lists files that must never be sent to GitHub |
 | `pyproject.toml` | Lists the libraries the project depends on |

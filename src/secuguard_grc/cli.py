@@ -311,7 +311,8 @@ def cmd_plan_check(args) -> int:
             return 2
         print("Asking Terraform what it would change...")
         planned = subprocess.run(
-            [terraform, f"-chdir={args.terraform_dir}", "plan", "-input=false", "-no-color", "-out=tfplan"],
+            [terraform, f"-chdir={args.terraform_dir}", "plan", "-input=false", "-no-color", "-out=tfplan"]
+            + (["-lock=false"] if args.no_lock else []),
             capture_output=True, text=True, encoding="utf-8", errors="replace")
         if planned.returncode != 0:
             print(planned.stdout[-3000:], planned.stderr[-3000:], sep="\n", file=sys.stderr)
@@ -329,7 +330,7 @@ def cmd_plan_check(args) -> int:
     if not outcome["allowed"]:
         saved_plan.unlink(missing_ok=True)      # a blocked plan must not be left lying around to apply
         return 1
-    if not args.plan_json:
+    if not args.plan_json and not args.no_lock:
         print(f"\nTo apply exactly the plan that was checked:\n  terraform -chdir={args.terraform_dir} apply tfplan")
     return 0
 
@@ -419,6 +420,8 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--terraform-dir", default="terraform")
     plan.add_argument("--plan-json", help="Check a saved plan in JSON form instead of running Terraform")
     plan.add_argument("--exceptions", default="policy/exceptions.json")
+    plan.add_argument("--no-lock", action="store_true",
+                      help="Do not lock the Terraform state. For read-only use, such as the check GitHub runs.")
     plan.set_defaults(func=cmd_plan_check)
 
     indicators = commands.add_parser("ksi", help="Show FedRAMP 20x Key Security Indicator validation for a run")

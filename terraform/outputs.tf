@@ -30,3 +30,13 @@ output "github_actions_subject" {
   description = "The exact identity AWS will accept from GitHub Actions. Empty until github_repository is set."
   value       = local.github_enabled ? local.github_subject : ""
 }
+
+output "terraform_state_bucket" {
+  description = "The bucket that holds Terraform's state once it has been moved into AWS."
+  value       = aws_s3_bucket.tfstate.bucket
+}
+
+output "plan_checker_role_arn" {
+  description = "Role GitHub uses to work out a plan for a proposed change. Empty until github_repository is set."
+  value       = local.github_enabled ? aws_iam_role.plan_checker[0].arn : ""
+}

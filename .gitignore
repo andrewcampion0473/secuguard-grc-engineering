@@ -26,3 +26,8 @@ Thumbs.db
 # A saved Terraform plan. It can contain secrets.
 terraform/tfplan
 /ksi-report.md
+
+# Where this computer finds the Terraform state bucket, and the backend switch itself.
+# Both are specific to one AWS account. See Part 17 of MANUAL.md.
+terraform/backend.tf
+terraform/backend.hcl
