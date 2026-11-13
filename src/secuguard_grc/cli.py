@@ -14,6 +14,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 from . import __version__
 from .collectors import COLLECTORS
 from .collectors.base import FRAMEWORKS
+from . import ksi
 from .checks import run_checks
 from .evidence import MANIFEST_NAME, EvidenceRun, latest_manifest_sha256, list_runs, load_run
 from .evidence import utc_now, verify_chain, verify_run
@@ -79,9 +80,23 @@ def _run_collection(session, mode: str, output: Path, bucket: str | None,
         relevant_to={fw: sorted(rows) for fw, rows in results["by_framework"].items()},
         payload=results,
     )
+    validation = ksi.validate(results, [{"path": f["path"], "sha256": f["sha256"]} for f in run.files])
+    run.add(
+        collector="ksi-validation",
+        description=(
+            "FedRAMP 20x Key Security Indicators lined up with this run's check results: which are "
+            "validated, which are failing, and which this project does not cover. It lists the "
+            "evidence files it rests on, each with its fingerprint."
+        ),
+        api_calls=[],
+        relevant_to={"fedramp_20x": [i["id"] for i in validation["indicators"] if i["status"] != "not_covered"]},
+        payload=validation,
+    )
     summary = results["summary"]
     print(f"  graded  {len(results['checks'])} checks -> {path}")
     print(f"          {summary['pass']} passed, {summary['fail']} failed, {summary['error']} could not be assessed")
+    print(f"          FedRAMP 20x: {validation['summary']['pass']} indicators validated, "
+          f"{validation['summary']['fail']} failing, {validation['summary']['not_covered']} not covered")
     run.finalize()
     print(f"Manifest {run.run_dir / MANIFEST_NAME}")
     print(f"  sha256   {run.manifest_sha256}")
@@ -140,6 +155,7 @@ def cmd_report(args) -> int:
             return 2
         target = runs[-1]
     manifest, payloads = load_run(target)
+    payloads.pop("ksi-validation", None)
     results = payloads.pop("check-results", None)
     if results is None or args.regrade:
         # Older runs, or a request to grade again with the current checks.
@@ -318,6 +334,28 @@ def cmd_plan_check(args) -> int:
     return 0
 
 
+def cmd_ksi(args) -> int:
+    target = Path(args.path)
+    if not (target / MANIFEST_NAME).is_file():
+        runs = list_runs(target)
+        if not runs:
+            print(f"No evidence runs found in {target}. Run 'secuguard collect' first.", file=sys.stderr)
+            return 2
+        target = runs[-1]
+    manifest, payloads = load_run(target)
+    validation = payloads.get("ksi-validation")
+    if validation is None:
+        results = payloads.get("check-results") or run_checks(payloads, manifest["started_at"], manifest["source"])
+        validation = ksi.validate(results, [{"path": f["path"], "sha256": f["sha256"]} for f in manifest["files"]])
+    if args.json:
+        print(json.dumps(validation, indent=2))
+    elif args.markdown:
+        print(ksi.render_markdown(validation))
+    else:
+        print(ksi.render_text(validation))
+    return 0
+
+
 def cmd_checks(_args) -> int:
     from .checks import CHECKS
 
@@ -382,6 +420,12 @@ def main(argv: list[str] | None = None) -> int:
     plan.add_argument("--plan-json", help="Check a saved plan in JSON form instead of running Terraform")
     plan.add_argument("--exceptions", default="policy/exceptions.json")
     plan.set_defaults(func=cmd_plan_check)
+
+    indicators = commands.add_parser("ksi", help="Show FedRAMP 20x Key Security Indicator validation for a run")
+    indicators.add_argument("path", nargs="?", default=DEFAULT_OUTPUT, help="A run folder or an evidence folder")
+    indicators.add_argument("--markdown", action="store_true", help="Print a formatted report with FedRAMP's statements")
+    indicators.add_argument("--json", action="store_true", help="Print the machine-readable validation")
+    indicators.set_defaults(func=cmd_ksi)
 
     checks = commands.add_parser("checks", help="List every check and the requirements it reports against")
     checks.set_defaults(func=cmd_checks)

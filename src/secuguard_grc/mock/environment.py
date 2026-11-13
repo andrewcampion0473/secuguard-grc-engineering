@@ -139,6 +139,7 @@ def build_mock_environment(session) -> str:
         MaxPasswordAge=90, PasswordReusePrevention=24,
     )
     _plant_findings(session, vpc_id, groups, key_id, account_id)
+    _monitoring(session, vpc_id, account_id)
     return bucket
 
 
@@ -253,3 +254,43 @@ def _plant_findings(session, vpc_id: str, groups: dict, good_key_id: str, accoun
         Description="Planted finding: trusts an outside account with no external ID",
         AssumeRolePolicyDocument=json.dumps({"Version": "2012-10-17", "Statement": [{
             "Effect": "Allow", "Principal": {"AWS": "arn:aws:iam::127311923021:root"}, "Action": "sts:AssumeRole"}]}))
+
+
+def _monitoring(session, vpc_id: str, account_id: str) -> None:
+    """The monitoring that terraform/monitoring.tf switches on: CloudTrail, flow logs, and AWS Config.
+
+    Security Hub is left off here. The simulator cannot list which standards are enabled,
+    so in practice mode check MON-02 reports that Security Hub is not switched on.
+    """
+    region = session.region_name
+    kms, s3 = session.client("kms"), session.client("s3")
+    logs_key = kms.create_key(Description="SecuGuard log encryption key")["KeyMetadata"]["KeyId"]
+    kms.enable_key_rotation(KeyId=logs_key)
+    kms.create_alias(AliasName="alias/secuguard-logs", TargetKeyId=logs_key)
+
+    bucket = f"secuguard-logs-{account_id}"
+    args = {"Bucket": bucket}
+    if region != "us-east-1":
+        args["CreateBucketConfiguration"] = {"LocationConstraint": region}
+    s3.create_bucket(**args)
+    s3.put_bucket_versioning(Bucket=bucket, VersioningConfiguration={"Status": "Enabled"})
+    s3.put_bucket_encryption(Bucket=bucket, ServerSideEncryptionConfiguration={"Rules": [{
+        "ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "aws:kms", "KMSMasterKeyID": logs_key}}]})
+    s3.put_public_access_block(Bucket=bucket, PublicAccessBlockConfiguration={
+        "BlockPublicAcls": True, "IgnorePublicAcls": True, "BlockPublicPolicy": True, "RestrictPublicBuckets": True})
+
+    cloudtrail = session.client("cloudtrail")
+    cloudtrail.create_trail(Name="secuguard-trail", S3BucketName=bucket, S3KeyPrefix="cloudtrail",
+                            IsMultiRegionTrail=True, EnableLogFileValidation=True, IncludeGlobalServiceEvents=True)
+    cloudtrail.start_logging(Name="secuguard-trail")
+
+    session.client("ec2").create_flow_logs(
+        ResourceIds=[vpc_id], ResourceType="VPC", TrafficType="ALL",
+        LogDestinationType="s3", LogDestination=f"arn:aws:s3:::{bucket}")
+
+    config = session.client("config")
+    config.put_configuration_recorder(ConfigurationRecorder={
+        "name": "secuguard", "roleARN": f"arn:aws:iam::{account_id}:role/secuguard-config-recorder",
+        "recordingGroup": {"allSupported": True, "includeGlobalResourceTypes": True}})
+    config.put_delivery_channel(DeliveryChannel={"name": "secuguard", "s3BucketName": bucket, "s3KeyPrefix": "config"})
+    config.start_configuration_recorder(ConfigurationRecorderName="secuguard")

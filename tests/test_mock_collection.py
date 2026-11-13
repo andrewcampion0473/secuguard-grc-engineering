@@ -26,7 +26,7 @@ def test_mock_collect_end_to_end(tmp_path):
     assert manifest["collector_errors"] == []
     assert {f["collector"] for f in manifest["files"]} == {
         "network", "kms", "s3", "iam", "identities", "certificates", "loadbalancers", "audit_logging",
-        "scope_baseline", "check-results"}
+        "monitoring", "scope_baseline", "check-results", "ksi-validation"}
 
     network = load(run, "network")
     assert network["source"]["mode"] == "mock"
@@ -39,10 +39,10 @@ def test_mock_collect_end_to_end(tmp_path):
     assert scopes == ["cde", "cde", "connected", "connected", "out-of-scope", "out-of-scope"]
 
     keys = load(run, "kms")["payload"]["keys"]
-    assert sorted(k["rotation"]["KeyRotationEnabled"] for k in keys) == [False, True]
+    assert sorted(k["rotation"]["KeyRotationEnabled"] for k in keys) == [False, True, True]
 
     buckets = {b["name"]: b for b in load(run, "s3")["payload"]["buckets"]}
-    assert len(buckets) == 2
+    assert len(buckets) == 3
     bucket = buckets["secuguard-evidence-123456789012"]
     assert bucket["object_lock"]["ObjectLockEnabled"] == "Enabled"
     assert bucket["versioning"]["Status"] == "Enabled"

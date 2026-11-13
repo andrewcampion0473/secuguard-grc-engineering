@@ -15,3 +15,11 @@ aws_profile = "secuguard"
 # The load balancer is the only one with a real cost, about $17 a month.
 # planted_findings      = true
 # planted_load_balancer = true
+
+# Stage 4 switches on monitoring: CloudTrail, flow logs, AWS Config, and Security Hub.
+# Each can be switched off on its own. See monitoring.tf.
+# monitoring              = true
+# monitoring_cloudtrail   = true
+# monitoring_flow_logs    = true
+# monitoring_config       = true
+# monitoring_security_hub = true

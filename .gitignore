@@ -25,3 +25,4 @@ Thumbs.db
 
 # A saved Terraform plan. It can contain secrets.
 terraform/tfplan
+/ksi-report.md

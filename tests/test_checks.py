@@ -71,8 +71,11 @@ def test_healthy_resources_are_not_flagged(mock_results):
     assert "secuguard-shared" not in flagged             # a correctly labelled zone
     assert "secuguard-corporate" not in flagged
     assert failed(checks["CRY-04"]) == ["certificate legacy-api.secuguard.example"]   # the 2048-bit one is fine
-    assert checks["SCP-04"]["status"] == "pass"
-    assert checks["LOG-02"]["status"] == "pass"
+    assert "secuguard-logs-" not in flagged              # the log bucket and its key
+    assert "alias/secuguard-logs" not in flagged
+    for passing in ("SCP-04", "LOG-01", "LOG-02", "MON-01"):
+        assert checks[passing]["status"] == "pass", passing
+    assert failed(checks["NET-04"]) == [name for name in failed(checks["NET-04"]) if "default" in name]
 
 
 def test_no_check_errors_on_complete_evidence(mock_results):
@@ -184,3 +187,28 @@ def test_reports_render(mock_results):
     assert "| NET-01 | FAIL |" in markdown and "### FedRAMP 20x" in markdown
     rows = list(results["by_framework"]["pci_dss_4_0_1"])
     assert rows.index("3.5.1") < rows.index("10.2.1")     # numeric order, not alphabetical
+
+
+def test_monitoring_rules():
+    def config(recorders, recording=True):
+        status = [{"name": r["name"], "recording": recording} for r in recorders]
+        return grade({"monitoring": {"config_recorders": recorders, "config_recorder_status": status,
+                                     "security_hub": {"enabled": False}, "security_hub_standards": None}}, "MON-01")["status"]
+
+    everything = {"name": "r", "recordingGroup": {"allSupported": True}}
+    assert config([everything]) == "pass"
+    assert config([everything], recording=False) == "fail"
+    assert config([{"name": "r", "recordingGroup": {"allSupported": False}}]) == "fail"
+    assert config([]) == "fail"
+
+    def hub(security_hub, standards):
+        return grade({"monitoring": {"config_recorders": [], "config_recorder_status": [],
+                                     "security_hub": security_hub, "security_hub_standards": standards}}, "MON-02")["status"]
+
+    ready = [{"standard": "arn:aws:securityhub:us-east-1::standards/aws-foundational-security-best-practices/v/1.0.0",
+              "status": "READY"}]
+    assert hub({"enabled": True}, ready) == "pass"
+    assert hub({"enabled": True}, []) == "fail"
+    assert hub({"enabled": False}, None) == "fail"
+    assert hub({"collection_error": "AccessDeniedException"}, None) == "error"          # unreadable is not a fail
+    assert hub({"enabled": True}, {"collection_error": "AccessDeniedException"}) == "error"

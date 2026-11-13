@@ -5,73 +5,85 @@
       "bytes": 28701,
       "collector": "network",
       "path": "network.json",
-      "sha256": "58f5c0f11195768a2de574caf64ce7f5668b433ae907389a95f7dcf5f8191756"
+      "sha256": "d115517fc1d511d104764af1082c09db10357f50558c51d51ec78beb284e0391"
     },
     {
-      "bytes": 5830,
+      "bytes": 6854,
       "collector": "kms",
       "path": "kms.json",
-      "sha256": "b8b3523f3158478e24daabd28b91aaaec7fe42a8dae904fc5258ccf2ec60233b"
+      "sha256": "32fc3f79ae646072047dc0031aecbdd43a03c4b7e8e53016438152b5a4742007"
     },
     {
-      "bytes": 2252,
+      "bytes": 2967,
       "collector": "s3",
       "path": "s3.json",
-      "sha256": "22d10260b7e17c9c1292759bb902ed723a0c35aff4fd9b8a61e57e7dce367fbe"
+      "sha256": "2e6f95959c9af480b53ad44ac08e4256ea1a2da4c74dbf8ed9b92f3b18bfe63a"
     },
     {
       "bytes": 2413,
       "collector": "iam",
       "path": "iam.json",
-      "sha256": "f4d86ded83e1bbd347031e217652395a8fef6af5e9c9acb48afce5e43a887ad1"
+      "sha256": "7230a8dfb5d09dfe00de27c95ae1b583d80356cfd4163e39e2f61352e6e54397"
     },
     {
       "bytes": 3199,
       "collector": "identities",
       "path": "identities.json",
-      "sha256": "cbc2d5bbf1c6648dbe8553cf99f3da3a22de1a7a94e834eb9a1a3169fafb21e6"
+      "sha256": "d28d216bde0b6e8601b3b62968b84887956cf57bc694c542922ed9f8d7459caa"
     },
     {
       "bytes": 2641,
       "collector": "certificates",
       "path": "certificates.json",
-      "sha256": "431e987272d95e3c106d7e154717c350ffb59c75a2d3347f92cf6e777761c5b5"
+      "sha256": "7c36788a6a9c095ed8f7a801016bfa2c9bdf84ac07a000091f619e0e6fece3ac"
     },
     {
       "bytes": 1669,
       "collector": "loadbalancers",
       "path": "loadbalancers.json",
-      "sha256": "5919ea978824063e0c7577392e00f8b2fc1f60010924824b2c3f533cf48ad84d"
+      "sha256": "b34c951a6e361d549050051be3533ab3435092b64afb85b4db6dcb1f7966f1d7"
     },
     {
-      "bytes": 1024,
+      "bytes": 1604,
       "collector": "audit_logging",
       "path": "audit_logging.json",
-      "sha256": "ddf5f71ebd861252cbd2293e3ac2d1357be0753d897af973773d566f761a7c41"
+      "sha256": "04906fff86146906050621a854cb30bb82e26a81c0ff4cea1cd3726d3f90a9e5"
+    },
+    {
+      "bytes": 2159,
+      "collector": "monitoring",
+      "path": "monitoring.json",
+      "sha256": "78bd85d1d9762830103f305fd8b0668bb42631f42245d2f1830ec314ada3ccf9"
     },
     {
       "bytes": 1696,
       "collector": "scope_baseline",
       "path": "scope_baseline.json",
-      "sha256": "9b75e650f786da65e2488481e4bd7ff8eedd62e6a3fc5d83f7777762b0161300"
+      "sha256": "43dfde74e6d83bee65457892bd220c789ecd6f3d4bc7c14e0ba2e7c392c13419"
     },
     {
-      "bytes": 38155,
+      "bytes": 41053,
       "collector": "check-results",
       "path": "check-results.json",
-      "sha256": "a2e3b6eaab82c975f4369a420bf1cc8ced7249490f1481379ba3b2d9c890b4dd"
+      "sha256": "b7b65a33fd804ebb802de4fdb4d7723bbc01f34e57e99e10f709077c32691e6b"
+    },
+    {
+      "bytes": 39764,
+      "collector": "ksi-validation",
+      "path": "ksi-validation.json",
+      "sha256": "7f26126449925b99a6e7798f78fc264475c2d177c81f2e2e38e06a41750f5652"
     }
   ],
-  "finished_at": "2026-11-12T22:04:57Z",
+  "finished_at": "2026-11-12T22:50:56Z",
   "previous_manifest_sha256": null,
-  "run_id": "20261112T220457Z-560277-8fba",
+  "run_id": "20261112T225055Z-752165-66fc",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",
     "collected_by": "arn:aws:sts::123456789012:user/moto",
     "mode": "mock",
     "region": "us-east-1",
-    "tool_version": "0.2.0"
+    "tool_version": "0.4.0"
   },
-  "started_at": "2026-11-12T22:04:57Z"
+  "started_at": "2026-11-12T22:50:55Z"
 }

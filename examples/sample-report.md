@@ -1,8 +1,8 @@
 # SecuGuard check results
 
-Run `20261112T220457Z-560277-8fba`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-12T22:04:57Z.
+Run `20261112T225055Z-752165-66fc`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-12T22:50:56Z.
 
-**5 passed, 19 failed, 0 could not be assessed, 0 not applicable.**
+**7 passed, 19 failed, 0 could not be assessed, 0 not applicable.**
 
 ## Checks
 
@@ -30,23 +30,24 @@ Run `20261112T220457Z-560277-8fba`. Account `123456789012` in `us-east-1` (mock 
 | IAM-05 | FAIL | high | No user holds administrator rights directly | 7.2.1, 7.2.2 | CC6.3 | KSI-IAM-ELP |
 | IAM-06 | FAIL | medium | Access keys are in use and not stale | 8.2.6, 8.6.3 | CC6.2, CC6.3 | KSI-IAM-SNU, KSI-SVC-ASM |
 | IAM-07 | FAIL | medium | Outside accounts need an external ID to use a role | 7.2.1, 8.2.7 | CC6.1, CC9.2 | KSI-IAM-ELP, KSI-IAM-SNU |
-| LOG-01 | FAIL | high | Account activity is recorded and the record is protected | 10.2.1, 10.3.4 | CC7.2 | KSI-MLA-LET, KSI-CMT-LMC |
+| LOG-01 | PASS | high | Account activity is recorded and the record is protected | 10.2.1, 10.3.4 | CC7.2 | KSI-MLA-LET, KSI-CMT-LMC |
+| MON-01 | PASS | high | Every change to the account's resources is recorded | 2.2.1, 12.5.1 | CC7.1 | KSI-CMT-LMC, KSI-PIY-GIV |
+| MON-02 | FAIL | medium | The account is evaluated continuously against a security standard | 2.2.1 | CC4.1, CC7.1 | KSI-MLA-EVC, KSI-CNA-EIS |
 | LOG-02 | PASS | high | Compliance evidence cannot be altered or deleted | 10.3.2, 10.5.1 | CC7.2 | KSI-SVC-VRI, KSI-SVC-SIN |
 
 ## Findings
 
 **NET-01: No administrative port is open to the internet.** SSH and Remote Desktop open to everyone is one of the most common ways attackers get in.
 
-- security group secuguard-planted-open-admin (sg-84b087b6d3dcf1fe2): open to the whole internet: SSH (port 22)
+- security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)
 
 **NET-02: The card data zone accepts traffic only from in-scope systems.** Anything allowed to reach the cardholder data environment falls under PCI DSS. Unplanned paths widen scope.
 
-- security group secuguard-cde (sg-d838dc5daaae75965): accepts traffic from sg-293317828131c3383, tagged out-of-scope
+- security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope
 
 **NET-04: Network traffic is logged.** Without flow logs there is no record of who connected to what when investigating an incident.
 
-- VPC default (vpc-25404d4a490a6eead): no flow logs, so network traffic is not recorded
-- VPC secuguard-vpc (vpc-8df6d067ee25fd22b): no flow logs, so network traffic is not recorded
+- VPC default (vpc-434d96aa41c404b26): no flow logs, so network traffic is not recorded
 
 **CRY-01: Encryption keys rotate automatically.** A key that never changes protects more and more data with one secret. Rotation limits the damage if it leaks.
 
@@ -66,7 +67,7 @@ Run `20261112T220457Z-560277-8fba`. Account `123456789012` in `us-east-1` (mock 
 
 **CRY-05: No certificate is expired or about to expire.** An expired certificate causes an outage, and pushes people to click through security warnings.
 
-- certificate legacy-api.secuguard.example: expires in 20 days, inside the 30-day warning window
+- certificate legacy-api.secuguard.example: expires in 19 days, inside the 30-day warning window
 
 **CRY-06: Connections require TLS 1.2 or newer.** TLS 1.0 and 1.1 have known weaknesses and are not accepted as strong cryptography.
 
@@ -104,15 +105,15 @@ Run `20261112T220457Z-560277-8fba`. Account `123456789012` in `us-east-1` (mock 
 
 **IAM-06: Access keys are in use and not stale.** Unused and old keys are credentials nobody is watching. They should be removed or replaced.
 
-- user secuguard-svc-reports access key ending X4OH: active but has never been used
+- user secuguard-svc-reports access key ending YL67: active but has never been used
 
 **IAM-07: Outside accounts need an external ID to use a role.** Without an external ID, a vendor's other customers could trick the vendor into using this role.
 
 - role secuguard-legacy-vendor: trusts outside account 127311923021 with no external ID
 
-**LOG-01: Account activity is recorded and the record is protected.** CloudTrail is the record of who did what. Without it, changes cannot be traced after the fact.
+**MON-02: The account is evaluated continuously against a security standard.** A standard that is checked automatically every day catches misconfigurations that an annual review misses.
 
-- account: no CloudTrail trail exists, so account activity is not being kept
+- account: Security Hub is not switched on, so nothing is evaluating the account against a standard
 
 ## PCI scope of the network
 
@@ -146,16 +147,17 @@ What each part of the network is declared to be, and what the firewall rules mak
 
 | Requirement | Result | Checks |
 |---|---|---|
-| KSI-CMT-LMC | FAIL | SCP-03, LOG-01 |
-| KSI-CNA-EIS | FAIL | SCP-02 |
+| KSI-CMT-LMC | FAIL | SCP-03, LOG-01, MON-01 |
+| KSI-CNA-EIS | FAIL | SCP-02, MON-02 |
 | KSI-CNA-MAT | FAIL | NET-01, NET-03, CRY-03, SCP-04 |
 | KSI-CNA-RNT | FAIL | NET-01, NET-02, SCP-04 |
 | KSI-CNA-ULN | FAIL | NET-02, SCP-02 |
 | KSI-IAM-APM | FAIL | IAM-01, IAM-03, IAM-04 |
 | KSI-IAM-ELP | FAIL | IAM-02, IAM-05, IAM-07 |
 | KSI-IAM-SNU | FAIL | IAM-06, IAM-07 |
+| KSI-MLA-EVC | FAIL | MON-02 |
 | KSI-MLA-LET | FAIL | NET-04, LOG-01 |
-| KSI-PIY-GIV | FAIL | SCP-01, SCP-03 |
+| KSI-PIY-GIV | FAIL | SCP-01, SCP-03, MON-01 |
 | KSI-SVC-ASM | FAIL | CRY-01, CRY-05, IAM-06 |
 | KSI-SVC-SIN | FAIL | CRY-02, CRY-03, CRY-04, CRY-06, LOG-02 |
 | KSI-SVC-VCM | FAIL | CRY-04, CRY-06, CRY-07 |
@@ -173,11 +175,7 @@ What each part of the network is declared to be, and what the firewall rules mak
 | 1.4.1 | FAIL | NET-02 |
 | 1.4.2 | FAIL | NET-01 |
 | 1.4.4 | FAIL | CRY-03, SCP-04 |
-| 10.2.1 | FAIL | NET-04, LOG-01 |
-| 10.3.2 | PASS | LOG-02 |
-| 10.3.4 | FAIL | LOG-01 |
-| 10.5.1 | PASS | LOG-02 |
-| 12.5.2 | FAIL | SCP-01, SCP-02, SCP-03 |
+| 2.2.1 | FAIL | MON-01, MON-02 |
 | 3.5.1 | FAIL | CRY-02 |
 | 3.6.1 | FAIL | CRY-02 |
 | 3.7.4 | FAIL | CRY-01 |
@@ -192,17 +190,25 @@ What each part of the network is declared to be, and what the firewall rules mak
 | 8.4.1 | FAIL | IAM-01 |
 | 8.4.2 | FAIL | IAM-04 |
 | 8.6.3 | FAIL | IAM-06 |
+| 10.2.1 | FAIL | NET-04, LOG-01 |
+| 10.3.2 | PASS | LOG-02 |
+| 10.3.4 | PASS | LOG-01 |
+| 10.5.1 | PASS | LOG-02 |
+| 12.5.1 | PASS | MON-01 |
+| 12.5.2 | FAIL | SCP-01, SCP-02, SCP-03 |
 
 ### SOC 2
 
 | Requirement | Result | Checks |
 |---|---|---|
 | CC3.4 | FAIL | SCP-01, SCP-02, SCP-03 |
+| CC4.1 | FAIL | MON-02 |
 | CC6.1 | FAIL | NET-02, CRY-01, CRY-02, CRY-03, SCP-01, IAM-01, IAM-02, IAM-03, IAM-04, IAM-07 |
 | CC6.2 | FAIL | IAM-06 |
 | CC6.3 | FAIL | IAM-02, IAM-05, IAM-06 |
 | CC6.6 | FAIL | NET-01, NET-02, NET-03, CRY-03, SCP-02, SCP-04 |
 | CC6.7 | FAIL | CRY-02, CRY-04, CRY-05, CRY-06, CRY-07 |
+| CC7.1 | FAIL | MON-01, MON-02 |
 | CC7.2 | FAIL | NET-04, LOG-01, LOG-02 |
 | CC8.1 | FAIL | SCP-03 |
 | CC9.2 | FAIL | IAM-07 |

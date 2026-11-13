@@ -27,3 +27,5 @@ jobs:
         run: secuguard verify
       - name: Publish the check results from the simulated environment
         run: secuguard report --markdown >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish the FedRAMP 20x validation
+        run: secuguard ksi --markdown >> "$GITHUB_STEP_SUMMARY"

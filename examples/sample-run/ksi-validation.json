@@ -1,0 +1,941 @@
+{
+  "api_calls": [],
+  "collected_at": "2026-11-12T22:50:56Z",
+  "collector": "ksi-validation",
+  "description": "FedRAMP 20x Key Security Indicators lined up with this run's check results: which are validated, which are failing, and which this project does not cover. It lists the evidence files it rests on, each with its fingerprint.",
+  "evidence_id": "0ab8ac17-a9bf-42ed-83c4-29bcedc086db",
+  "payload": {
+    "evidence_files": [
+      {
+        "path": "network.json",
+        "sha256": "d115517fc1d511d104764af1082c09db10357f50558c51d51ec78beb284e0391"
+      },
+      {
+        "path": "kms.json",
+        "sha256": "32fc3f79ae646072047dc0031aecbdd43a03c4b7e8e53016438152b5a4742007"
+      },
+      {
+        "path": "s3.json",
+        "sha256": "2e6f95959c9af480b53ad44ac08e4256ea1a2da4c74dbf8ed9b92f3b18bfe63a"
+      },
+      {
+        "path": "iam.json",
+        "sha256": "7230a8dfb5d09dfe00de27c95ae1b583d80356cfd4163e39e2f61352e6e54397"
+      },
+      {
+        "path": "identities.json",
+        "sha256": "d28d216bde0b6e8601b3b62968b84887956cf57bc694c542922ed9f8d7459caa"
+      },
+      {
+        "path": "certificates.json",
+        "sha256": "7c36788a6a9c095ed8f7a801016bfa2c9bdf84ac07a000091f619e0e6fece3ac"
+      },
+      {
+        "path": "loadbalancers.json",
+        "sha256": "b34c951a6e361d549050051be3533ab3435092b64afb85b4db6dcb1f7966f1d7"
+      },
+      {
+        "path": "audit_logging.json",
+        "sha256": "04906fff86146906050621a854cb30bb82e26a81c0ff4cea1cd3726d3f90a9e5"
+      },
+      {
+        "path": "monitoring.json",
+        "sha256": "78bd85d1d9762830103f305fd8b0668bb42631f42245d2f1830ec314ada3ccf9"
+      },
+      {
+        "path": "scope_baseline.json",
+        "sha256": "43dfde74e6d83bee65457892bd220c789ecd6f3d4bc7c14e0ba2e7c392c13419"
+      },
+      {
+        "path": "check-results.json",
+        "sha256": "b7b65a33fd804ebb802de4fdb4d7723bbc01f34e57e99e10f709077c32691e6b"
+      }
+    ],
+    "framework": "FedRAMP 20x Key Security Indicators",
+    "graded_as_of": "2026-11-12T22:50:56Z",
+    "indicators": [
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CED-RAT",
+        "name": "Reviewing All Training",
+        "preventive_rules": [],
+        "statement": "The effectiveness of relevant cybersecurity education and training is persistently reviewed, including at least general training for all employees, role-specific training for employees in high risk roles, training for development and engineering staff on secure software delivery, and training for staff involved with incident response or disaster recovery.",
+        "status": "not_covered",
+        "theme": "Cybersecurity Education"
+      },
+      {
+        "checks": [
+          {
+            "check": "SCP-03",
+            "findings": [
+              "security group secuguard-planted-analytics: not in the approved baseline (declared out-of-scope)",
+              "security group secuguard-planted-open-admin: not in the approved baseline (declared out-of-scope)",
+              "security group secuguard-planted-unclassified: not in the approved baseline (declared with no scope)"
+            ],
+            "status": "fail",
+            "title": "The network matches the approved scope baseline"
+          },
+          {
+            "check": "LOG-01",
+            "findings": [],
+            "status": "pass",
+            "title": "Account activity is recorded and the record is protected"
+          },
+          {
+            "check": "MON-01",
+            "findings": [],
+            "status": "pass",
+            "title": "Every change to the account's resources is recorded"
+          }
+        ],
+        "covers": "AWS Config records every change to resources, CloudTrail records who made it, and scope changes are compared with an approved baseline.",
+        "does_not_cover": "Review of those logs by a person or an alerting system.",
+        "id": "KSI-CMT-LMC",
+        "name": "Logging Changes",
+        "preventive_rules": [],
+        "statement": "Modifications to the cloud service offering are logged and monitored.",
+        "status": "fail",
+        "theme": "Change Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CMT-RMV",
+        "name": "Redeploying vs Modifying",
+        "preventive_rules": [],
+        "statement": "Changes to machine-based information resources are executed through the redeployment of version controlled resources rather than direct modification wherever reasonable.",
+        "status": "not_covered",
+        "theme": "Change Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CMT-RVP",
+        "name": "Reviewing Change Procedures",
+        "preventive_rules": [],
+        "statement": "The effectiveness of documented change management procedures is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Change Management"
+      },
+      {
+        "checks": [],
+        "covers": "Planned changes are validated by automated rules before deployment, and the deployed result is checked again on the next run.",
+        "does_not_cover": "Testing during deployment itself, such as staged rollouts.",
+        "id": "KSI-CMT-VTD",
+        "name": "Validating Throughout Deployment",
+        "preventive_rules": [
+          "PLAN-01",
+          "PLAN-02",
+          "PLAN-03",
+          "PLAN-04",
+          "PLAN-05",
+          "PLAN-06",
+          "PLAN-07",
+          "PLAN-08"
+        ],
+        "statement": "Persistent testing and validation of changes throughout deployment is automated.",
+        "status": "preventive_only",
+        "theme": "Change Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CNA-DFP",
+        "name": "Defining Functionality and Privileges",
+        "preventive_rules": [],
+        "statement": "The functionality and privileges for infrastructure and services are strictly defined.",
+        "status": "not_covered",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [
+          {
+            "check": "SCP-02",
+            "findings": [
+              "security group secuguard-planted-analytics: declared out-of-scope, but it can reach the card data zone (port 5432 on secuguard-cde), so PCI DSS applies to it"
+            ],
+            "status": "fail",
+            "title": "Declared PCI scope matches the firewall rules"
+          },
+          {
+            "check": "MON-02",
+            "findings": [
+              "account: Security Hub is not switched on, so nothing is evaluating the account against a standard"
+            ],
+            "status": "fail",
+            "title": "The account is evaluated continuously against a security standard"
+          }
+        ],
+        "covers": "Declared PCI scope is compared with actual connectivity, and Security Hub evaluates the account against a standard.",
+        "does_not_cover": "Automatic correction. Drift is reported, not reverted.",
+        "id": "KSI-CNA-EIS",
+        "name": "Enforcing Intended State",
+        "preventive_rules": [],
+        "statement": "Class B: **Optional:** Automated services are used to persistently assess the security of all machine-based information resources and automatically enforce their intended operational state. Class C: Automated services are used to persistently assess the security of all machine-based information resources and automatically enforce their intended operational state.",
+        "status": "fail",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CNA-IBP",
+        "name": "Implementing Best Practices",
+        "preventive_rules": [],
+        "statement": "The use and configuration of third-party machine-based information resources is persistently compared against the original provider's best practices and guidance.",
+        "status": "not_covered",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [
+          {
+            "check": "NET-01",
+            "findings": [
+              "security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)"
+            ],
+            "status": "fail",
+            "title": "No administrative port is open to the internet"
+          },
+          {
+            "check": "NET-03",
+            "findings": [],
+            "status": "pass",
+            "title": "Default security groups allow nothing"
+          },
+          {
+            "check": "CRY-03",
+            "findings": [
+              "bucket secuguard-legacy-exports-123456789012: public access protections switched off: BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, RestrictPublicBuckets"
+            ],
+            "status": "fail",
+            "title": "Storage cannot be made public"
+          },
+          {
+            "check": "SCP-04",
+            "findings": [],
+            "status": "pass",
+            "title": "The card data zone has no route to the internet"
+          }
+        ],
+        "covers": "Default firewall groups, internet-facing administrative ports, public storage settings, and internet routes are checked on every run.",
+        "does_not_cover": "Software and services running on servers. This environment has no servers.",
+        "id": "KSI-CNA-MAT",
+        "name": "Minimizing Attack Surface",
+        "preventive_rules": [],
+        "statement": "Machine-based information resources are persistently reviewed to ensure they have a minimal attack surface and that lateral movement is minimized if compromised.",
+        "status": "fail",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CNA-OFA",
+        "name": "Optimizing for Availability",
+        "preventive_rules": [],
+        "statement": "Machine-based information resources are persistently reviewed to ensure they are appropriately optimized for high availability and rapid recovery.",
+        "status": "not_covered",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [
+          {
+            "check": "NET-01",
+            "findings": [
+              "security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)"
+            ],
+            "status": "fail",
+            "title": "No administrative port is open to the internet"
+          },
+          {
+            "check": "NET-02",
+            "findings": [
+              "security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope"
+            ],
+            "status": "fail",
+            "title": "The card data zone accepts traffic only from in-scope systems"
+          },
+          {
+            "check": "SCP-04",
+            "findings": [],
+            "status": "pass",
+            "title": "The card data zone has no route to the internet"
+          }
+        ],
+        "covers": "Firewall rules are read on every run and checked for administrative ports open to the internet, for what may enter the card data zone, and for routes to the internet.",
+        "does_not_cover": "Outbound traffic rules, and anything enforced outside AWS security groups and route tables.",
+        "id": "KSI-CNA-RNT",
+        "name": "Restricting Network Traffic",
+        "preventive_rules": [],
+        "statement": "Machine-based information resources are persistently reviewed to ensure they are appropriately configured to limit inbound and outbound network traffic.",
+        "status": "fail",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-CNA-RVP",
+        "name": "Reviewing Protections",
+        "preventive_rules": [],
+        "statement": "The effectiveness of protection against denial of service attacks and other unwanted activity for machine-based information resources is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [
+          {
+            "check": "NET-02",
+            "findings": [
+              "security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope"
+            ],
+            "status": "fail",
+            "title": "The card data zone accepts traffic only from in-scope systems"
+          },
+          {
+            "check": "SCP-02",
+            "findings": [
+              "security group secuguard-planted-analytics: declared out-of-scope, but it can reach the card data zone (port 5432 on secuguard-cde), so PCI DSS applies to it"
+            ],
+            "status": "fail",
+            "title": "Declared PCI scope matches the firewall rules"
+          }
+        ],
+        "covers": "The network is split into labelled zones, and the labels are compared with the real firewall rules on every run.",
+        "does_not_cover": "Network controls inside a zone, between systems that share a security group.",
+        "id": "KSI-CNA-ULN",
+        "name": "Using Logical Networking",
+        "preventive_rules": [],
+        "statement": "Logical networking and related capabilities are used and persistently reviewed to enforce traffic flow controls.",
+        "status": "fail",
+        "theme": "Cloud Native Architecture"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-IAM-AAM",
+        "name": "Automating Account Management",
+        "preventive_rules": [],
+        "statement": "The lifecycle and privileges of all accounts, roles, and groups are securely managed using automation.",
+        "status": "not_covered",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [
+          {
+            "check": "IAM-01",
+            "findings": [
+              "root user: MFA is not on"
+            ],
+            "status": "fail",
+            "title": "The root user has MFA"
+          },
+          {
+            "check": "IAM-03",
+            "findings": [],
+            "status": "pass",
+            "title": "A strong password policy is set"
+          },
+          {
+            "check": "IAM-04",
+            "findings": [
+              "user secuguard-dev-alice: can sign in to the console with a password and no MFA"
+            ],
+            "status": "fail",
+            "title": "Every user who can sign in has MFA"
+          }
+        ],
+        "covers": "Root user MFA, MFA for every user with a console password, and the password policy are checked on every run.",
+        "does_not_cover": "Whether the MFA in use is phishing-resistant, and identities managed in IAM Identity Center.",
+        "id": "KSI-IAM-APM",
+        "name": "Adopting Passwordless Methods",
+        "preventive_rules": [],
+        "statement": "Secure passwordless methods are used for user authentication and authorization when feasible, otherwise strong passwords with phishing-resistant MFA is used.",
+        "status": "fail",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [
+          {
+            "check": "IAM-02",
+            "findings": [],
+            "status": "pass",
+            "title": "The root user has no access keys"
+          },
+          {
+            "check": "IAM-05",
+            "findings": [
+              "user secuguard-svc-reports: has AdministratorAccess attached directly"
+            ],
+            "status": "fail",
+            "title": "No user holds administrator rights directly"
+          },
+          {
+            "check": "IAM-07",
+            "findings": [
+              "role secuguard-legacy-vendor: trusts outside account 127311923021 with no external ID"
+            ],
+            "status": "fail",
+            "title": "Outside accounts need an external ID to use a role"
+          }
+        ],
+        "covers": "Users with administrator rights attached directly, root access keys, and roles that outside accounts may use are checked on every run.",
+        "does_not_cover": "Whether each identity's rights are the minimum its job needs. That takes a review of each policy.",
+        "id": "KSI-IAM-ELP",
+        "name": "Ensuring Least Privilege",
+        "preventive_rules": [],
+        "statement": "Identity and access management measures are used and persistently reviewed to ensure each user or device can only access the resources they need.",
+        "status": "fail",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-IAM-JIT",
+        "name": "Authorizing Just-in-Time",
+        "preventive_rules": [],
+        "statement": "A least-privileged, role and attribute-based, and just-in-time security authorization model is used and persistently reviewed for all user and non-user accounts and services.",
+        "status": "not_covered",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [
+          {
+            "check": "IAM-06",
+            "findings": [
+              "user secuguard-svc-reports access key ending YL67: active but has never been used"
+            ],
+            "status": "fail",
+            "title": "Access keys are in use and not stale"
+          },
+          {
+            "check": "IAM-07",
+            "findings": [
+              "role secuguard-legacy-vendor: trusts outside account 127311923021 with no external ID"
+            ],
+            "status": "fail",
+            "title": "Outside accounts need an external ID to use a role"
+          }
+        ],
+        "covers": "Access keys that are unused or older than 90 days, and outside-account trust, are checked on every run.",
+        "does_not_cover": "Automatic disabling. Stale credentials are reported, not switched off.",
+        "id": "KSI-IAM-SNU",
+        "name": "Securing Non-User Authentication",
+        "preventive_rules": [],
+        "statement": "Appropriately secure authentication methods are used and persistently reviewed for non-user accounts and services.",
+        "status": "fail",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-IAM-SUS",
+        "name": "Responding to Suspicious Activity",
+        "preventive_rules": [],
+        "statement": "Accounts with privileged access are disabled or otherwise secured in response to suspicious activity.",
+        "status": "not_covered",
+        "theme": "Identity and Access Management"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-INR-AAR",
+        "name": "Generating After Action Reports",
+        "preventive_rules": [],
+        "statement": "Incident after action reports are generated and lessons learned are persistently incorporated.",
+        "status": "not_covered",
+        "theme": "Incident Response"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-INR-RIR",
+        "name": "Reviewing Incident Response Procedures",
+        "preventive_rules": [],
+        "statement": "The effectiveness of documented incident response procedures is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Incident Response"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-INR-RPI",
+        "name": "Reviewing Past Incidents",
+        "preventive_rules": [],
+        "statement": "Past incidents are persistently reviewed for patterns or vulnerabilities that were not previously apparent or identified.",
+        "status": "not_covered",
+        "theme": "Incident Response"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-MLA-ALA",
+        "name": "Authorizing Log Access",
+        "preventive_rules": [],
+        "statement": "Class B: **Optional:** A least-privileged, role and attribute-based, and just-in-time access authorization model is used and persistently reviewed for access to log data based on organizationally defined data sensitivity. Class C: A least-privileged, role and attribute-based, and just-in-time access authorization model is used and persistently reviewed for access to log data based on organizationally defined data sensitivity.",
+        "status": "not_covered",
+        "theme": "Monitoring, Logging, and Auditing"
+      },
+      {
+        "checks": [
+          {
+            "check": "MON-02",
+            "findings": [
+              "account: Security Hub is not switched on, so nothing is evaluating the account against a standard"
+            ],
+            "status": "fail",
+            "title": "The account is evaluated continuously against a security standard"
+          }
+        ],
+        "covers": "Every planned Terraform change is tested against rules before it is applied, and Security Hub evaluates the running account.",
+        "does_not_cover": "Enforcement on every change. The plan check is run by choice on the author's computer until it is wired into GitHub.",
+        "id": "KSI-MLA-EVC",
+        "name": "Evaluating Configurations",
+        "preventive_rules": [
+          "PLAN-01",
+          "PLAN-02",
+          "PLAN-03",
+          "PLAN-04",
+          "PLAN-05",
+          "PLAN-06",
+          "PLAN-07",
+          "PLAN-08"
+        ],
+        "statement": "The configuration of machine-based information resources, especially infrastructure as code, is persistently evaluated and tested.",
+        "status": "fail",
+        "theme": "Monitoring, Logging, and Auditing"
+      },
+      {
+        "checks": [
+          {
+            "check": "NET-04",
+            "findings": [
+              "VPC default (vpc-434d96aa41c404b26): no flow logs, so network traffic is not recorded"
+            ],
+            "status": "fail",
+            "title": "Network traffic is logged"
+          },
+          {
+            "check": "LOG-01",
+            "findings": [],
+            "status": "pass",
+            "title": "Account activity is recorded and the record is protected"
+          }
+        ],
+        "covers": "CloudTrail and network flow logging are checked on every run, including whether the trail covers every region and validates its files.",
+        "does_not_cover": "A written list of which event types are logged and why.",
+        "id": "KSI-MLA-LET",
+        "name": "Logging Event Types",
+        "preventive_rules": [],
+        "statement": "A list of information resources and event types that will be logged, monitored, and audited is maintained and persistently reviewed to ensure these activities occur.",
+        "status": "fail",
+        "theme": "Monitoring, Logging, and Auditing"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-MLA-OSM",
+        "name": "Operating SIEM Capability",
+        "preventive_rules": [],
+        "statement": "A Security Information and Event Management (SIEM) or similar system(s) is used and persistently reviewed for centralized, tamper-resistant logging of events, activities, and changes.",
+        "status": "not_covered",
+        "theme": "Monitoring, Logging, and Auditing"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-MLA-RVL",
+        "name": "Reviewing Logs",
+        "preventive_rules": [],
+        "statement": "Logs are persistently reviewed and audited.",
+        "status": "not_covered",
+        "theme": "Monitoring, Logging, and Auditing"
+      },
+      {
+        "checks": [
+          {
+            "check": "SCP-01",
+            "findings": [
+              "security group secuguard-planted-unclassified: has no PCI scope tag, so nobody has decided whether PCI DSS applies to it"
+            ],
+            "status": "fail",
+            "title": "Every part of the network has a declared PCI scope"
+          },
+          {
+            "check": "SCP-03",
+            "findings": [
+              "security group secuguard-planted-analytics: not in the approved baseline (declared out-of-scope)",
+              "security group secuguard-planted-open-admin: not in the approved baseline (declared out-of-scope)",
+              "security group secuguard-planted-unclassified: not in the approved baseline (declared with no scope)"
+            ],
+            "status": "fail",
+            "title": "The network matches the approved scope baseline"
+          },
+          {
+            "check": "MON-01",
+            "findings": [],
+            "status": "pass",
+            "title": "Every change to the account's resources is recorded"
+          }
+        ],
+        "covers": "AWS Config keeps a live inventory of resources, and each run records the network, identities, keys, certificates, and storage directly from AWS.",
+        "does_not_cover": "Software, data, and anything outside this AWS account and region.",
+        "id": "KSI-PIY-GIV",
+        "name": "Generating Inventories",
+        "preventive_rules": [],
+        "statement": "Authoritative sources are used to automatically generate real-time inventories of all information resources when needed.",
+        "status": "fail",
+        "theme": "Policy and Inventory"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-PIY-RES",
+        "name": "Reviewing Executive Support",
+        "preventive_rules": [],
+        "statement": "Executive support for achieving the provider's security goals is persistently reviewed and demonstrated.",
+        "status": "not_covered",
+        "theme": "Policy and Inventory"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-PIY-RIS",
+        "name": "Reviewing Investments in Security",
+        "preventive_rules": [],
+        "statement": "The effectiveness of the provider's investments in achieving security goals is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Policy and Inventory"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-PIY-RSD",
+        "name": "Reviewing Security in the SDLC",
+        "preventive_rules": [],
+        "statement": "The effectiveness of building security and privacy considerations into the Software Development Lifecycle and aligning with CISA Secure By Design principles is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Policy and Inventory"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-PIY-RVD",
+        "name": "Reviewing Vulnerability Disclosures",
+        "preventive_rules": [],
+        "statement": "The effectiveness of the provider's vulnerability disclosure program is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Policy and Inventory"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-RPL-ABO",
+        "name": "Aligning Backups with Objectives",
+        "preventive_rules": [],
+        "statement": "The alignment of machine-based information resource backups with defined recovery objectives is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Recovery Planning"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-RPL-ARP",
+        "name": "Aligning Recovery Plan",
+        "preventive_rules": [],
+        "statement": "The alignment of recovery plans with defined recovery objectives is persistently reviewed.",
+        "status": "not_covered",
+        "theme": "Recovery Planning"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-RPL-RRO",
+        "name": "Reviewing Recovery Objectives",
+        "preventive_rules": [],
+        "statement": "The desired Recovery Time Objectives (RTO) and Recovery Point Objectives (RPO) are defined and persistently reviewed for alignment with the provider's business needs and capabilities.",
+        "status": "not_covered",
+        "theme": "Recovery Planning"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-RPL-TRC",
+        "name": "Testing Recovery Capabilities",
+        "preventive_rules": [],
+        "statement": "The capability to recover from incidents and contingencies aligned with defined recovery objectives is persistently tested.",
+        "status": "not_covered",
+        "theme": "Recovery Planning"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SCR-MIT",
+        "name": "Mitigating Supply Chain Risk",
+        "preventive_rules": [],
+        "statement": "Potential supply chain risks are persistently identified, reviewed, and mitigated.",
+        "status": "not_covered",
+        "theme": "Supply Chain Risk"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SCR-MON",
+        "name": "Monitoring Supply Chain Risk",
+        "preventive_rules": [],
+        "statement": "Third party software information resources are automatically monitored for upstream vulnerabilities using mechanisms that may include contractual notification requirements or active monitoring services.",
+        "status": "not_covered",
+        "theme": "Supply Chain Risk"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SVC-ACM",
+        "name": "Automating Configuration Management",
+        "preventive_rules": [],
+        "statement": "The configuration of machine-based information resources is managed using automation and persistently reviewed for drift.",
+        "status": "not_covered",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [
+          {
+            "check": "CRY-01",
+            "findings": [
+              "KMS key alias/secuguard-legacy-no-rotation: automatic rotation is off"
+            ],
+            "status": "fail",
+            "title": "Encryption keys rotate automatically"
+          },
+          {
+            "check": "CRY-05",
+            "findings": [
+              "certificate legacy-api.secuguard.example: expires in 19 days, inside the 30-day warning window"
+            ],
+            "status": "fail",
+            "title": "No certificate is expired or about to expire"
+          },
+          {
+            "check": "IAM-06",
+            "findings": [
+              "user secuguard-svc-reports access key ending YL67: active but has never been used"
+            ],
+            "status": "fail",
+            "title": "Access keys are in use and not stale"
+          }
+        ],
+        "covers": "Encryption key rotation, certificate expiry, and access key age are checked on every run.",
+        "does_not_cover": "Secrets held outside AWS KMS, ACM, and IAM, such as passwords in application settings.",
+        "id": "KSI-SVC-ASM",
+        "name": "Automating Secret Management",
+        "preventive_rules": [],
+        "statement": "Management, protection, and regular rotation of digital keys, certificates, and other secrets is automated and persistently reviewed.",
+        "status": "fail",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SVC-EIS",
+        "name": "Evaluating and Improving Security",
+        "preventive_rules": [],
+        "statement": "Information resources are persistently evaluated for opportunities to improve security and those improvements are persistently made.",
+        "status": "not_covered",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SVC-PRR",
+        "name": "Preventing Residual Risk",
+        "preventive_rules": [],
+        "statement": "Class B: **Optional:** Plans, procedures, and the state of information resources are persistently reviewed after making changes to limit and remove unwanted residual elements that would likely negatively affect the confidentiality, integrity, or availability of federal customer data. Class C: Plans, procedures, and the state of information resources are persistently reviewed after making changes to limit and remove unwanted residual elements that would likely negatively affect the confidentiality, integrity, or availability of federal customer data.",
+        "status": "not_covered",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [],
+        "covers": null,
+        "does_not_cover": null,
+        "id": "KSI-SVC-RUD",
+        "name": "Removing Unwanted Data",
+        "preventive_rules": [],
+        "statement": "Class B: **Optional:** Unwanted federal customer data is removed promptly when requested by an agency in alignment with customer agreements, including from backups if appropriate; this typically applies when a customer spills information or when a customer seeks to remove information from a service due to a change in usage. Class C: Unwanted federal customer data is removed promptly when requested by an agency in alignment with customer agreements, including from backups if appropriate; this typically applies when a customer spills information or when a customer seeks to remove information from a service due to a change in usage.",
+        "status": "not_covered",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [
+          {
+            "check": "CRY-02",
+            "findings": [
+              "bucket secuguard-legacy-exports-123456789012: not encrypted with a customer managed key (uses the AWS default)"
+            ],
+            "status": "fail",
+            "title": "Storage is encrypted with keys SecuGuard controls"
+          },
+          {
+            "check": "CRY-03",
+            "findings": [
+              "bucket secuguard-legacy-exports-123456789012: public access protections switched off: BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, RestrictPublicBuckets"
+            ],
+            "status": "fail",
+            "title": "Storage cannot be made public"
+          },
+          {
+            "check": "CRY-04",
+            "findings": [
+              "certificate legacy-api.secuguard.example: RSA key of 1024 bits, below the 2048-bit minimum"
+            ],
+            "status": "fail",
+            "title": "Certificates use strong keys and signatures"
+          },
+          {
+            "check": "CRY-06",
+            "findings": [
+              "load balancer secuguard-portal port 443: TLS policy ELBSecurityPolicy-2016-08 still allows TLS 1.0 or 1.1"
+            ],
+            "status": "fail",
+            "title": "Connections require TLS 1.2 or newer"
+          },
+          {
+            "check": "LOG-02",
+            "findings": [],
+            "status": "pass",
+            "title": "Compliance evidence cannot be altered or deleted"
+          }
+        ],
+        "covers": "Storage encryption, public access settings, certificate strength, TLS versions, and the evidence lock are checked on every run.",
+        "does_not_cover": "Encryption inside applications and databases. This environment has none.",
+        "id": "KSI-SVC-SIN",
+        "name": "Securing Information",
+        "preventive_rules": [],
+        "statement": "Information is encrypted or otherwise secured from unwanted access or modification.",
+        "status": "fail",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [
+          {
+            "check": "CRY-04",
+            "findings": [
+              "certificate legacy-api.secuguard.example: RSA key of 1024 bits, below the 2048-bit minimum"
+            ],
+            "status": "fail",
+            "title": "Certificates use strong keys and signatures"
+          },
+          {
+            "check": "CRY-06",
+            "findings": [
+              "load balancer secuguard-portal port 443: TLS policy ELBSecurityPolicy-2016-08 still allows TLS 1.0 or 1.1"
+            ],
+            "status": "fail",
+            "title": "Connections require TLS 1.2 or newer"
+          },
+          {
+            "check": "CRY-07",
+            "findings": [
+              "certificate portal.secuguard.example: self-signed, and in use by load balancer secuguard-portal. No certificate authority vouches for it."
+            ],
+            "status": "fail",
+            "title": "Certificates in use are issued by a certificate authority"
+          }
+        ],
+        "covers": "Certificate key strength, signature method, issuer, and the TLS policy on each listener are checked on every run.",
+        "does_not_cover": "Connections between systems inside the network, which are not inspected.",
+        "id": "KSI-SVC-VCM",
+        "name": "Validating Communications",
+        "preventive_rules": [],
+        "statement": "Class B: **Optional:** The authenticity and integrity of communications between machine-based information resources is persistently validated using automation. Class C: The authenticity and integrity of communications between machine-based information resources is persistently validated using automation.",
+        "status": "fail",
+        "theme": "Service Configuration"
+      },
+      {
+        "checks": [
+          {
+            "check": "LOG-02",
+            "findings": [],
+            "status": "pass",
+            "title": "Compliance evidence cannot be altered or deleted"
+          }
+        ],
+        "covers": "Every evidence file is hashed, each run is chained to the one before, and the store is locked against change.",
+        "does_not_cover": "Integrity of deployed software. This environment deploys none.",
+        "id": "KSI-SVC-VRI",
+        "name": "Validating Resource Integrity",
+        "preventive_rules": [],
+        "statement": "Use cryptographic methods to validate the integrity of machine-based information resources.",
+        "status": "pass",
+        "theme": "Service Configuration"
+      }
+    ],
+    "rules_source": "https://github.com/FedRAMP/rules (fedramp-consolidated-rules.json)",
+    "rules_version": "2026.11.02.01",
+    "summary": {
+      "addressed": 16,
+      "error": 0,
+      "fail": 14,
+      "not_covered": 30,
+      "pass": 1,
+      "preventive_only": 1,
+      "total": 46
+    }
+  },
+  "payload_sha256": "2009189893415edd5891e25f768ceb392f850b33f3962832982b1ba1abfef61c",
+  "relevant_to": {
+    "fedramp_20x": [
+      "KSI-CMT-LMC",
+      "KSI-CMT-VTD",
+      "KSI-CNA-EIS",
+      "KSI-CNA-MAT",
+      "KSI-CNA-RNT",
+      "KSI-CNA-ULN",
+      "KSI-IAM-APM",
+      "KSI-IAM-ELP",
+      "KSI-IAM-SNU",
+      "KSI-MLA-EVC",
+      "KSI-MLA-LET",
+      "KSI-PIY-GIV",
+      "KSI-SVC-ASM",
+      "KSI-SVC-SIN",
+      "KSI-SVC-VCM",
+      "KSI-SVC-VRI"
+    ]
+  },
+  "run_id": "20261112T225055Z-752165-66fc",
+  "schema_version": "1.0",
+  "source": {
+    "account_id": "123456789012",
+    "collected_by": "arn:aws:sts::123456789012:user/moto",
+    "mode": "mock",
+    "region": "us-east-1",
+    "tool_version": "0.4.0"
+  }
+}

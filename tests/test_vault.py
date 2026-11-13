@@ -53,6 +53,8 @@ def test_report_command_runs_on_a_practice_collection(tmp_path, capsys):
     assert main(["report", str(tmp_path)]) == 0
     out = capsys.readouterr().out
     assert "PCI scope of the network" in out and "Certificate inventory" in out
+    # Read back from disk, requirements must still be in reading order: 2.2.1 before 10.2.1.
+    assert out.index("  2.2.1 ") < out.index("  3.5.1 ") < out.index("  10.2.1 ") < out.index("  12.5.1 ")
     assert main(["report", str(tmp_path), "--markdown", "--regrade"]) == 0
     assert "| NET-01 |" in capsys.readouterr().out
     assert main(["report", str(tmp_path), "--fail-on-findings"]) == 1

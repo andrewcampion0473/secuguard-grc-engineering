@@ -4,15 +4,34 @@
     "cloudtrail:GetTrailStatus",
     "ec2:DescribeFlowLogs"
   ],
-  "collected_at": "2026-11-12T22:04:57Z",
+  "collected_at": "2026-11-12T22:50:55Z",
   "collector": "audit_logging",
   "description": "CloudTrail trails, which record who did what in the account, and VPC flow logs, which record network traffic. An empty list means that kind of logging is not set up.",
-  "evidence_id": "2783da62-d8dc-4235-909f-a0ea9908cb3b",
+  "evidence_id": "da507805-53eb-47b0-8deb-cfc72f68a6c4",
   "payload": {
-    "flow_logs": [],
-    "trails": []
+    "flow_logs": [
+      {
+        "destination": "arn:aws:s3:::secuguard-logs-123456789012",
+        "id": "fl-45734303e7543e486",
+        "resource_id": "vpc-b583a4ac272044dc8",
+        "status": "ACTIVE",
+        "traffic_type": "ALL"
+      }
+    ],
+    "trails": [
+      {
+        "arn": "arn:aws:cloudtrail:us-east-1:123456789012:trail/secuguard-trail",
+        "home_region": "us-east-1",
+        "is_logging": true,
+        "kms_key_id": null,
+        "log_file_validation": true,
+        "multi_region": true,
+        "name": "secuguard-trail",
+        "s3_bucket": "secuguard-logs-123456789012"
+      }
+    ]
   },
-  "payload_sha256": "7b7b5c520ee2075d613e23bee74995aef1eac70422f10fb42a9d31dd9753a80a",
+  "payload_sha256": "7af90ca225df733bb80983137fa7b2f814b11202651f3ed7872e67e35124ed73",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-MLA-LET",
@@ -26,13 +45,13 @@
       "CC7.2"
     ]
   },
-  "run_id": "20261112T220457Z-560277-8fba",
+  "run_id": "20261112T225055Z-752165-66fc",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",
     "collected_by": "arn:aws:sts::123456789012:user/moto",
     "mode": "mock",
     "region": "us-east-1",
-    "tool_version": "0.2.0"
+    "tool_version": "0.4.0"
   }
 }

@@ -458,6 +458,36 @@ def log_evidence_immutable(evidence, as_of):
     return results
 
 
+# ---------------------------------------------------------------- monitoring
+
+def mon_config_recording(evidence, as_of):
+    recorders = _need(evidence, "monitoring", "config_recorders")
+    statuses = {s.get("name"): s for s in _need(evidence, "monitoring", "config_recorder_status")}
+    if not recorders:
+        return [_result("account", False, "AWS Config is not recording, so changes to resources leave no history")]
+    results = []
+    for recorder in recorders:
+        group = recorder.get("recordingGroup") or {}
+        running = bool(statuses.get(recorder.get("name"), {}).get("recording"))
+        everything = bool(group.get("allSupported"))
+        problems = [text for text, bad in (("is switched off", not running),
+                                           ("does not record every kind of resource", not everything)) if bad]
+        results.append(_result(f"configuration recorder {recorder.get('name')}", not problems,
+                               " and ".join(problems) if problems else "running and recording every supported kind of resource"))
+    return results
+
+
+def mon_security_standard(evidence, as_of):
+    hub = _need(evidence, "monitoring", "security_hub")
+    if not hub.get("enabled"):
+        return [_result("account", False, "Security Hub is not switched on, so nothing is evaluating the account against a standard")]
+    standards = _need(evidence, "monitoring", "security_hub_standards")
+    ready = [s["standard"].split("standards/")[-1] for s in standards or [] if s.get("status") in {"READY", "PENDING", "INCOMPLETE"}]
+    return [_result("Security Hub", bool(ready),
+                    f"evaluating the account against: {', '.join(ready)}" if ready
+                    else "switched on, but no security standard is enabled")]
+
+
 def _fw(pci, soc2, fedramp):
     return {"pci_dss_4_0_1": pci, "soc_2": soc2, "fedramp_20x": fedramp}
 
@@ -532,6 +562,12 @@ CHECKS: list[Check] = [
     Check("LOG-01", "Account activity is recorded and the record is protected",
           "CloudTrail is the record of who did what. Without it, changes cannot be traced after the fact.",
           "high", _fw(["10.2.1", "10.3.4"], ["CC7.2"], ["KSI-MLA-LET", "KSI-CMT-LMC"]), log_cloudtrail),
+    Check("MON-01", "Every change to the account's resources is recorded",
+          "Without a running history of configuration, nobody can say what changed, when, or what existed at a given date.",
+          "high", _fw(["2.2.1", "12.5.1"], ["CC7.1"], ["KSI-CMT-LMC", "KSI-PIY-GIV"]), mon_config_recording),
+    Check("MON-02", "The account is evaluated continuously against a security standard",
+          "A standard that is checked automatically every day catches misconfigurations that an annual review misses.",
+          "medium", _fw(["2.2.1"], ["CC4.1", "CC7.1"], ["KSI-MLA-EVC", "KSI-CNA-EIS"]), mon_security_standard),
     Check("LOG-02", "Compliance evidence cannot be altered or deleted",
           "Evidence an administrator can edit proves little. The store must refuse changes from everyone.",
           "high", _fw(["10.3.2", "10.5.1"], ["CC7.2"], ["KSI-SVC-VRI", "KSI-SVC-SIN"]), log_evidence_immutable),

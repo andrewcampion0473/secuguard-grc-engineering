@@ -1,6 +1,6 @@
 """Evidence collectors. Each one makes read-only AWS calls and returns plain data."""
 
-from . import audit_logging, certificates, iam, identities, kms, loadbalancers, network, s3
+from . import audit_logging, certificates, iam, identities, kms, loadbalancers, monitoring, network, s3
 from .base import Collector
 
 COLLECTORS: list[Collector] = [
@@ -12,6 +12,7 @@ COLLECTORS: list[Collector] = [
     certificates.COLLECTOR,
     loadbalancers.COLLECTOR,
     audit_logging.COLLECTOR,
+    monitoring.COLLECTOR,
 ]
 
 __all__ = ["COLLECTORS", "Collector"]

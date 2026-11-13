@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "secuguard-grc"
-version = "0.2.0"
+version = "0.4.0"
 description = "GRC engineering demo for the fictional company SecuGuard: automated evidence collection and compliance checks on AWS."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "boto3>=1.35",
-    "moto[ec2,s3,kms,iam,sts,acm,elbv2,cloudtrail]>=5.0",
+    "moto[ec2,s3,kms,iam,sts,acm,elbv2,cloudtrail,config,securityhub]>=5.0",
     "cryptography>=42",
 ]
 
@@ -22,6 +22,9 @@ secuguard = "secuguard_grc.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+secuguard_grc = ["data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+from .checks import _natural
+
 FRAMEWORK_NAMES = {
     "pci_dss_4_0_1": "PCI DSS 4.0.1",
     "soc_2": "SOC 2",
     "fedramp_20x": "FedRAMP 20x",
 }
 WORDS = {"pass": "PASS", "fail": "FAIL", "error": "NO EVIDENCE", "not_applicable": "N/A"}
+
+
+def _ordered(rows: dict) -> list:
+    """Requirements in reading order: 2.2.1 before 10.2.1. Results saved to disk come back alphabetical."""
+    return sorted(rows.items(), key=lambda item: _natural(item[0]))
 
 
 def _summary_line(summary: dict) -> str:
@@ -51,7 +58,7 @@ def render_text(results: dict, run_id: str, source: dict) -> str:
     lines += ["", "The same results, by framework", "-" * 96]
     for framework, rows in results["by_framework"].items():
         lines.append(FRAMEWORK_NAMES.get(framework, framework))
-        for requirement, row in rows.items():
+        for requirement, row in _ordered(rows):
             lines.append(f"  {requirement:<14}{WORDS[row['status']]:<13}{', '.join(row['checks'])}")
         lines.append("")
     return "\n".join(lines)
@@ -106,6 +113,6 @@ def render_markdown(results: dict, run_id: str, source: dict) -> str:
     for framework, rows in results["by_framework"].items():
         out += [f"### {FRAMEWORK_NAMES.get(framework, framework)}", "",
                 "| Requirement | Result | Checks |", "|---|---|---|"]
-        out += [f"| {req} | {WORDS[row['status']]} | {', '.join(row['checks'])} |" for req, row in rows.items()]
+        out += [f"| {req} | {WORDS[row['status']]} | {', '.join(row['checks'])} |" for req, row in _ordered(rows)]
         out.append("")
     return "\n".join(out)

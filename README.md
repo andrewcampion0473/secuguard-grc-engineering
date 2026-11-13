@@ -31,7 +31,8 @@ flowchart LR
     AWS -->|read-only API calls| COL[Collectors]
     MOCK[Simulated AWS] -.->|practice mode| COL
     COL --> EV[Evidence files with SHA-256 hashes]
-    EV --> CHK[24 checks, reported against three frameworks]
+    EV --> CHK[26 checks, reported against three frameworks]
+    CHK --> KSI[FedRAMP 20x indicator validation]
     CHK --> MAN[Run manifest, linked to the previous run]
     MAN --> S3[(Locked S3 evidence vault)]
     GH[GitHub Actions, daily] -->|short-lived credentials| COL
@@ -48,9 +49,9 @@ secuguard report
 secuguard verify
 ```
 
-`secuguard report` shows 24 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x, plus the PCI scope of the network and a certificate inventory. `secuguard scope` shows what has drifted from the approved scope. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
+`secuguard report` shows 26 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x, plus the PCI scope of the network and a certificate inventory. `secuguard scope` shows what has drifted from the approved scope. `secuguard ksi` shows where the environment stands against FedRAMP's 46 Key Security Indicators. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
 
-To look without installing anything, see [examples/sample-report.md](examples/sample-report.md) for the results and [examples/sample-run](examples/sample-run) for the evidence behind them.
+To look without installing anything, see [examples/sample-report.md](examples/sample-report.md) for the results, [examples/sample-ksi-validation.md](examples/sample-ksi-validation.md) for the FedRAMP 20x validation, and [examples/sample-run](examples/sample-run) for the evidence behind them.
 
 ## What is built so far
 
@@ -79,7 +80,14 @@ To look without installing anything, see [examples/sample-report.md](examples/sa
 - An exceptions register in which each accepted risk has a reason, an approver, and an expiry date
 - A certificate inventory in every report
 
-There are 24 checks and 8 plan rules in total.
+**Stage 4, monitoring and FedRAMP 20x**
+
+- CloudTrail, network flow logs, AWS Config, and Security Hub, built by Terraform, which fix real findings the earlier stages reported
+- A FedRAMP 20x validation that states, for each of FedRAMP's 46 Key Security Indicators, whether it is validated, failing, or not covered, in FedRAMP's own wording
+- For every indicator addressed, a plain statement of what the evidence establishes and what it does not
+- A machine-readable copy of the validation sealed into every run, listing the evidence files it rests on and their hashes
+
+There are 26 checks and 8 plan rules in total. They speak to 16 of the 46 indicators. The other 30 are listed as not covered.
 
 | Area | Example checks | PCI DSS 4.0.1 | SOC 2 | FedRAMP 20x |
 |---|---|---|---|---|
@@ -88,17 +96,18 @@ There are 24 checks and 8 plan rules in total.
 | Encryption | Keys rotate. Certificates are strong, trusted, and not expiring. TLS 1.2 or newer. | 3.7.4, 4.2.1 | CC6.7 | KSI-SVC-ASM, KSI-SVC-VCM |
 | Identity | MFA for everyone who can sign in. No direct admin rights. No unused keys. | 7.2.1, 8.4.2 | CC6.1, CC6.3 | KSI-IAM-APM, KSI-IAM-ELP |
 | Logging | Account activity is recorded. Evidence cannot be altered. | 10.2.1, 10.3.2 | CC7.2 | KSI-MLA-LET, KSI-SVC-VRI |
+| Monitoring | Every resource change is recorded. The account is evaluated daily against a standard. | 2.2.1, 12.5.1 | CC7.1 | KSI-CMT-LMC, KSI-MLA-EVC |
 | Change control | Planned changes are checked against rules before they are applied. | 1.2.2, 6.5.1 | CC8.1 | KSI-MLA-EVC, KSI-CMT-VTD |
 
-The mapping of checks to requirements is the author's reading of each framework. It is a starting point for discussion with an assessor, not an assessor's opinion.
+The mapping of checks to requirements is the author's reading of each framework. It is a starting point for discussion with an assessor, not an assessor's opinion. FedRAMP's indicator text comes from [FedRAMP's published rules](https://github.com/FedRAMP/rules). This project has not been reviewed by FedRAMP.
 
 ## Roadmap
 
 | Stage | Adds |
 |---|---|
-| 4 | FedRAMP 20x Key Security Indicator validation, with AWS Config and Security Hub |
+| 4, second part | The plan check enforced on GitHub for every proposed change |
 | 5 | Readable report, diagrams, and video walkthrough |
 
 ## Cost
 
-About $20 a month in AWS, nearly all of it one load balancer that can be paused with a single setting. `terraform destroy` removes everything.
+About $25 a month in AWS, most of it one load balancer that can be paused with a single setting. `terraform destroy` removes everything.

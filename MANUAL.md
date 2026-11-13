@@ -4,7 +4,7 @@ This manual takes you from a Windows computer with nothing installed to a workin
 
 SecuGuard is a fictional company invented for this project. It is not a real business, and nothing here describes a real company's systems.
 
-**This manual covers stages 1 to 3 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. New parts are added as each later stage is built.
+**This manual covers stages 1 to 4 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. Parts 15 and 16 add stage 4, monitoring and FedRAMP 20x validation. New parts are added as each later stage is built.
 
 ## Contents
 
@@ -22,11 +22,13 @@ SecuGuard is a fictional company invented for this project. It is not a real bus
 - [Part 12: Prove the vault from the command line](#part-12-prove-the-vault-from-the-command-line)
 - [Part 13: Stage 3: Catch scope drift](#part-13-stage-3-catch-scope-drift)
 - [Part 14: Block risky changes before they are made](#part-14-block-risky-changes-before-they-are-made)
-- [Part 15: Costs and shutting down](#part-15-costs-and-shutting-down)
-- [Part 16: Daily use](#part-16-daily-use)
-- [Part 17: When something goes wrong](#part-17-when-something-goes-wrong)
-- [Part 18: Glossary](#part-18-glossary)
-- [Part 19: What each file in the project does](#part-19-what-each-file-in-the-project-does)
+- [Part 15: Stage 4: Switch on monitoring and fix real findings](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings)
+- [Part 16: Validate against FedRAMP 20x](#part-16-validate-against-fedramp-20x)
+- [Part 17: Costs and shutting down](#part-17-costs-and-shutting-down)
+- [Part 18: Daily use](#part-18-daily-use)
+- [Part 19: When something goes wrong](#part-19-when-something-goes-wrong)
+- [Part 20: Glossary](#part-20-glossary)
+- [Part 21: What each file in the project does](#part-21-what-each-file-in-the-project-does)
 
 ---
 
@@ -79,7 +81,7 @@ Stage 2 grades the evidence. Parts 10 to 12 cover it.
 
 - **Realistic resources with deliberate weaknesses**: users, a service account, a vendor role, certificates, a load balancer, an old encryption key, and a storage bucket
 - **Four more collectors**, for identities, certificates, load balancers, and logging
-- **Checks** across network, encryption, identity, and logging. There are 24 once stage 3 is included. Each is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x.
+- **Checks** across network, encryption, identity, and logging. There are 26 once stages 3 and 4 are included. Each is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x.
 - **A report** showing results by check and by framework
 - **Two commands that prove the vault**: one tests the lock, one verifies the copy of record
 
@@ -92,10 +94,21 @@ Stage 3 watches PCI scope and stops risky changes. Parts 13 and 14 cover it.
 - **An exceptions register** recording each accepted risk with a reason, an approver, and an expiry date
 - **A certificate inventory** in the report, and a check for certificates no authority has issued
 
+### What stage 4 adds
+
+Stage 4 switches on monitoring and reports against FedRAMP 20x. Parts 15 and 16 cover it.
+
+- **Four monitoring services**: CloudTrail, network flow logs, AWS Config, and Security Hub, which fix real findings the earlier stages reported
+- **A FedRAMP 20x validation**: a statement about each of FedRAMP's 46 Key Security Indicators, saying which are validated, which are failing, and which this project does not cover, with the evidence each rests on
+
 ### What comes later
 
 | Stage | What it adds |
 |---|---|
+| 4, second part | The plan check enforced on GitHub, so a risky change cannot be merged |
+| 5 | A readable report, diagrams, and the video walkthrough |
+
+---|---|
 | 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
 | 5 | A readable report, diagrams, and the video walkthrough |
 
@@ -126,6 +139,8 @@ You only need eight ideas to follow the rest of this manual. Each one comes with
 **The cloud and AWS.** AWS (Amazon Web Services) rents out computers, storage, and networks over the internet. You build things there by clicking in a website or by sending instructions. When this manual says "the cloud environment," it means the things you rent from AWS.
 
 **The terminal.** A terminal is a window where you type commands instead of clicking buttons. On Windows the terminal program is called PowerShell. Every command in this manual is meant to be copied, pasted into PowerShell, and run by pressing Enter.
+
+**Security Hub.** The AWS service that evaluates an account against security standards and gathers the findings in one place.
 
 **Service account.** An identity used by a program instead of a person.
 
@@ -199,7 +214,7 @@ terraform -version
 aws --version
 ```
 
-**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 17](#part-17-when-something-goes-wrong).
+**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 19](#part-19-when-something-goes-wrong).
 
 ### Step 5: Allow PowerShell to run setup scripts
 
@@ -309,8 +324,10 @@ Run 20261110T150035Z-482913-a67f  (mock mode, account 123456789012, us-east-1)
   ok      certificates  -> evidence\20261110T150035Z-482913-a67f\certificates.json
   ok      loadbalancers -> evidence\20261110T150035Z-482913-a67f\loadbalancers.json
   ok      audit_logging -> evidence\20261110T150035Z-482913-a67f\audit_logging.json
-  graded  24 checks -> evidence\20261110T150035Z-482913-a67f\check-results.json
-          5 passed, 19 failed, 0 could not be assessed
+  ok      monitoring    -> evidence\20261110T150035Z-482913-a67f\monitoring.json
+  graded  26 checks -> evidence\20261110T150035Z-482913-a67f\check-results.json
+          7 passed, 19 failed, 0 could not be assessed
+          FedRAMP 20x: 1 indicators validated, 14 failing, 30 not covered
 Manifest evidence\20261110T150035Z-482913-a67f\manifest.json
   sha256   8ae916fbe7992ae1...
   previous none (first run in this chain)
@@ -402,7 +419,7 @@ Remove-Item -Recurse evidence
 pytest
 ```
 
-**What you should see:** a row of dots and `59 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
+**What you should see:** a row of dots and `67 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
 
 ---
 
@@ -540,7 +557,7 @@ aws sso login --profile secuguard
 
 **What you will do:** have Terraform build the network and the evidence vault in your AWS account.
 **Time:** about 15 minutes.
-**Cost:** about $20 a month while it exists. Nearly all of that is one load balancer, which [Part 15](#part-15-costs-and-shutting-down) shows how to pause.
+**Cost:** about $25 a month while it exists. Most of that is one load balancer, which [Part 17](#part-17-costs-and-shutting-down) shows how to pause.
 
 ### What gets built
 
@@ -594,9 +611,9 @@ terraform plan
 
 Terraform lists everything it intends to create and changes nothing. Read through it. Each block starting with `+` is one thing to be created.
 
-**What you should see:** the last line reads `Plan: 58 to add, 0 to change, 0 to destroy.`
+**What you should see:** the last line reads `Plan: 74 to add, 0 to change, 0 to destroy.`
 
-Of those 58, 30 are the foundation described above. The other 28 are deliberate, harmless weaknesses for the checks to find later. [Part 10](#part-10-stage-2-give-the-checks-something-to-find) and [Part 13](#part-13-stage-3-catch-scope-drift) explain each one and why it is safe.
+Of those 74, 30 are the foundation described above. Another 28 are deliberate, harmless weaknesses for the checks to find later, explained in [Part 10](#part-10-stage-2-give-the-checks-something-to-find) and [Part 13](#part-13-stage-3-catch-scope-drift). The last 16 are monitoring services, explained in [Part 15](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings).
 
 ### Step 5: Build it
 
@@ -608,7 +625,7 @@ Terraform shows the plan again and asks for confirmation. Type `yes` and press E
 
 The load balancer takes two to three minutes to create, so expect a wait near the end.
 
-**What you should see:** `Apply complete! Resources: 58 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
+**What you should see:** `Apply complete! Resources: 74 added, 0 changed, 0 destroyed.` followed by a list of outputs, including a line like:
 
 ```
 evidence_bucket = "secuguard-evidence-123456789012"
@@ -657,10 +674,10 @@ secuguard collect --profile secuguard --upload --bucket $bucket
 **What you should see:** the same kind of output as practice mode, with three differences. It says `aws mode`. The account number is your own. And a final line reads:
 
 ```
-Uploaded 12 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
+Uploaded 14 files to s3://secuguard-evidence-123456789012/runs/20261110T.../
 ```
 
-The twelve files are eight evidence files, a copy of the approved scope baseline, the check results, the manifest, and the manifest's fingerprint.
+The fourteen files are nine evidence files, a copy of the approved scope baseline, the check results, the FedRAMP 20x validation, the manifest, and the manifest's fingerprint.
 
 The collectors only read. They ask AWS how things are configured and cannot change anything in your environment.
 
@@ -818,7 +835,7 @@ Neither value is a secret. They are names, not keys. Knowing them does not let a
 3. Click **Run workflow**, then the green **Run workflow** button.
 4. Wait about a minute and refresh the page.
 
-**What you should see:** a green check mark. Click the run, then **collect**, then **Collect, grade, and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 12 files`.
+**What you should see:** a green check mark. Click the run, then **collect**, then **Collect, grade, and upload evidence** to see the same output you saw on your own computer, ending with `Uploaded 14 files`.
 
 From now on this runs by itself every day at 11:17 UTC. Each run links to the one before it, so the vault holds an unbroken daily record of how SecuGuard's environment was configured.
 
@@ -828,7 +845,7 @@ From now on this runs by itself every day at 11:17 UTC. Each run links to the on
 
 **What you will do:** update the project, add realistic resources with deliberate weaknesses to SecuGuard's AWS environment, and collect evidence about them.
 **Time:** about 30 minutes.
-**Cost:** about $18 a month more while the load balancer exists. See [Part 15](#part-15-costs-and-shutting-down).
+**Cost:** about $18 a month more while the load balancer exists. See [Part 17](#part-17-costs-and-shutting-down).
 
 Stage 1 collected evidence and stopped there. Stage 2 adds **checks**. A check is a rule that reads the evidence and answers pass or fail, for example "every encryption key rotates automatically."
 
@@ -884,7 +901,7 @@ Use your own folder if the project is somewhere else.
 pytest
 ```
 
-**What you should see:** `59 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
+**What you should see:** `67 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
 
 ### Step 4: Try it in practice mode first
 
@@ -893,7 +910,7 @@ secuguard collect --mock
 secuguard report
 ```
 
-**What you should see:** the first command prints eight `ok` lines, then a line like `graded 24 checks` followed by how many passed and failed. The second prints a table of every check, then the same results grouped by framework. [Part 11](#part-11-read-the-check-results) explains how to read it.
+**What you should see:** the first command prints nine `ok` lines, then a line like `graded 26 checks` followed by how many passed and failed. The second prints a table of every check, then the same results grouped by framework. [Part 11](#part-11-read-the-check-results) explains how to read it.
 
 Then delete the practice evidence so it does not mix with real evidence:
 
@@ -925,7 +942,7 @@ If you have real evidence in that folder that you want to keep, skip the delete.
    terraform -chdir=terraform plan
    ```
 
-   **What you should see:** the last line reads `Plan: 28 to add, 1 to change, 0 to destroy.` Of the 28, 25 belong to this part and 3 to [Part 13](#part-13-stage-3-catch-scope-drift). The one change gives the GitHub collector permission to read the new kinds of resources.
+   **What you should see:** a last line starting with `Plan:` that ends in `0 to destroy`. Nothing should be removed.
 
    If you set the project up for the first time with this version of the manual, Part 7 already built these resources. Terraform then says `No changes`, and you can skip to step 6.
 
@@ -937,7 +954,7 @@ If you have real evidence in that folder that you want to keep, skip the delete.
 
    Type `yes` when asked. The load balancer takes two to three minutes to create, so this apply is slower than the first one.
 
-   **What you should see:** `Apply complete! Resources: 28 added, 1 changed, 0 destroyed.`
+   **What you should see:** a line starting with `Apply complete!` that ends in `0 destroyed`.
 
 ### Step 6: Collect evidence about the new resources
 
@@ -946,7 +963,7 @@ $bucket = terraform -chdir=terraform output -raw evidence_bucket
 secuguard collect --profile secuguard --upload --bucket $bucket
 ```
 
-**What you should see:** eight `ok` lines, a `graded 24 checks` line with pass and fail counts, and `Uploaded 12 files`. The twelve files are eight evidence files, a copy of the approved scope baseline, the check results, the manifest, and the manifest's fingerprint.
+**What you should see:** nine `ok` lines, a `graded 26 checks` line with pass and fail counts, and `Uploaded 14 files`. The fourteen files are nine evidence files, a copy of the approved scope baseline, the check results, the FedRAMP 20x validation, the manifest, and the manifest's fingerprint.
 
 The check results are sealed and stored in the vault with the evidence they were graded from. Nobody can quietly change a "fail" to a "pass" afterward.
 
@@ -1011,11 +1028,11 @@ Your exact counts depend on your account. Expect most checks to fail, which is t
 | NET-02, SCP-01 to SCP-03 | FAIL | The planted scope drift, explained in Part 13 |
 | CRY-07 | FAIL | Real finding: the certificate on the load balancer was not issued by a certificate authority |
 | LOG-02, SCP-04 | PASS | The evidence vault is built correctly, and the card data zone has no route to the internet |
+| LOG-01, MON-01, MON-02 | PASS | The monitoring services from Part 15 are switched on. LOG-01 failed until then. |
 | IAM-01, IAM-02 | PASS | You protected the root user in Part 6 |
 | IAM-03 | FAIL | Real finding: no password policy has been set |
 | NET-03 | FAIL | Real finding: AWS's own default network in your account has a permissive default firewall group |
-| NET-04 | FAIL | Real finding: network traffic is not being logged |
-| LOG-01 | FAIL | Real finding: no CloudTrail trail is recording account activity |
+| NET-04 | FAIL | Real finding: AWS's own default network is not being logged |
 
 ### Step 2: See what a check means
 
@@ -1023,7 +1040,7 @@ Your exact counts depend on your account. Expect most checks to fail, which is t
 secuguard checks
 ```
 
-This lists all 24 checks. Each one shows a plain-language reason it matters and the requirements it reports against in each framework.
+This lists all 26 checks. Each one shows a plain-language reason it matters and the requirements it reports against in each framework.
 
 ### Step 3: Fix a real finding and watch it change
 
@@ -1103,7 +1120,7 @@ Tried to delete that stored version permanently, asking AWS to bypass the lock.
 REFUSED (AccessDenied). The vault would not delete a locked file, even on request to bypass.
 ```
 
-If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 17](#part-17-when-something-goes-wrong).
+If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 19](#part-19-when-something-goes-wrong).
 
 ### Step 2: Verify the copy of record
 
@@ -1176,7 +1193,7 @@ Stage 3 also adds check CRY-07, which reports certificates in use that no certif
    pytest
    ```
 
-**What you should see:** `59 passed`.
+**What you should see:** `67 passed`.
 
 ### Step 2: See drift in practice mode
 
@@ -1222,7 +1239,7 @@ Delete the practice evidence afterward if you do not want it mixed with real run
 
    Type `yes` when asked.
 
-**What you should see:** `Plan: 3 to add, 0 to change, 0 to destroy.` and then `Apply complete! Resources: 3 added, 0 changed, 0 destroyed.`
+**What you should see:** a plan ending in `0 to destroy`, and then a line starting with `Apply complete!`. If Part 7 already built everything, Terraform says `No changes`.
 
 ### Step 4: Collect and look
 
@@ -1232,9 +1249,9 @@ secuguard collect --profile secuguard --upload --bucket $bucket
 secuguard scope
 ```
 
-**What you should see:** `graded 24 checks`, `Uploaded 12 files`, and then the same mismatch and drift you saw in practice mode, now from your real network.
+**What you should see:** `graded 26 checks`, `Uploaded 14 files`, and then the same mismatch and drift you saw in practice mode, now from your real network.
 
-The twelfth file is new. It is a copy of the approved baseline as it stood at the moment of collection, sealed with the rest. That way the record shows what was approved at the time, even if the baseline changes later.
+One of those files is a copy of the approved baseline as it stood at the moment of collection, sealed with the rest. That way the record shows what was approved at the time, even if the baseline changes later.
 
 Now show the full report:
 
@@ -1404,7 +1421,197 @@ git push
 
 ---
 
-## Part 15: Costs and shutting down
+## Part 15: Stage 4: Switch on monitoring and fix real findings
+
+**What you will do:** turn on four AWS services that watch the account, and see three failing checks turn to PASS.
+**Time:** about 25 minutes.
+**Cost:** a few dollars a month. See [Part 17](#part-17-costs-and-shutting-down).
+
+Since stage 2, the report has shown real findings about your account that nothing planted caused. Nobody was recording who did what, nobody was recording network traffic, and nothing was keeping a history of changes. Stage 4 fixes them.
+
+| Service | What it does | Check it satisfies |
+|---|---|---|
+| CloudTrail | Records every action taken in the account, by whom, and when, in every region | LOG-01 |
+| VPC flow logs | Record the network traffic in SecuGuard's network | NET-04, for that network |
+| AWS Config | Records every change to every resource, and keeps a live inventory | MON-01 |
+| Security Hub CSPM | Evaluates the account against AWS's security best practices standard every day. AWS used to call it Security Hub. | MON-02 |
+
+All four write to a new log bucket with its own encryption key. Each service may write only to its own folder in that bucket.
+
+MON-01 and MON-02 are new checks in this stage.
+
+### Step 1: Update the project
+
+1. Download the newest `secuguard-grc-engineering.zip` and unzip it over your project folder, replacing files.
+2. In PowerShell, in the project folder with the workspace on:
+
+   ```powershell
+   pip install -e ".[dev]"
+   pytest
+   ```
+
+**What you should see:** `67 passed`.
+
+### Step 2: Check the change before making it
+
+Use the habit from Part 14. Sign in, then let the plan check judge the change.
+
+```powershell
+aws sso login --profile secuguard
+secuguard plan-check
+```
+
+**What you should see:**
+
+```
+Asking Terraform what it would change...
+Plan: 16 to add, 1 to change, 0 to destroy.
+Examined 17 planned changes against 8 rules.
+
+ALLOWED. No planned change breaks a rule.
+```
+
+The one change gives the GitHub collector permission to read the two new services. If you built the project for the first time with this version of the manual, Part 7 already created these resources and the plan says `No changes`.
+
+### Step 3: Apply the plan that was checked
+
+```powershell
+terraform -chdir=terraform apply tfplan
+```
+
+There is no `yes` to type this time. Applying a saved plan runs exactly what was checked.
+
+**What you should see:** `Apply complete! Resources: 16 added, 1 changed, 0 destroyed.` It takes a minute or two.
+
+### Step 4: Collect and compare
+
+```powershell
+$bucket = terraform -chdir=terraform output -raw evidence_bucket
+secuguard collect --profile secuguard --upload --bucket $bucket
+secuguard report
+```
+
+**What you should see:** nine `ok` lines, `graded 26 checks`, a new line starting `FedRAMP 20x:`, and `Uploaded 14 files`.
+
+In the report, three checks that could not pass before now do:
+
+| Check | Before | Now |
+|---|---|---|
+| LOG-01 Account activity is recorded and the record is protected | FAIL | PASS |
+| MON-01 Every change to the account's resources is recorded | did not exist | PASS |
+| MON-02 The account is evaluated continuously against a security standard | did not exist | PASS |
+
+NET-04 still shows FAIL, with one line where there were two. SecuGuard's network is now logged. The line that remains is AWS's own default network, which exists in every account and which this project does not manage. That is a real finding, reported accurately.
+
+You now have a sealed run from before the fix showing LOG-01 failing, and one from after showing it passing. Together they are the proof of remediation an auditor asks for.
+
+### Step 5: Look at what the services collect
+
+This step is optional. It takes a few hours for the services to fill in.
+
+1. In the AWS Console, check that the region in the top bar says **N. Virginia**. If it says anything else, switch it. The services exist only in the region where they were switched on.
+2. Search for **Security Hub CSPM** and open it. AWS has two products with similar names. **Security Hub CSPM** is the one this project uses. If you land on a page offering to "Try the new Security Hub," that is the other product. Do not choose **Get started** there. Go back and search for the CSPM name.
+
+   Its summary shows a score against the best practices standard and a list of findings. Many will be about the planted weaknesses. Two independent tools, this project and Security Hub CSPM, are now reporting on the same account.
+3. Search for **Config** and open it. **Resources** lists everything in the account. Click any resource, then **Resource timeline**, to see its history of changes.
+4. Search for **CloudTrail** and open **Event history** to see recent actions, including your own Terraform runs.
+
+---
+
+## Part 16: Validate against FedRAMP 20x
+
+**What you will do:** produce a statement about each FedRAMP 20x Key Security Indicator, backed by sealed evidence.
+**Time:** about 15 minutes.
+
+### What FedRAMP 20x asks for
+
+FedRAMP is the U.S. government's program for approving cloud services. Its older process ran on long written documents reviewed by hand. FedRAMP 20x replaces much of that with **Key Security Indicators**, or KSIs. Each is a short statement of something a provider must be able to show, for example "Information is encrypted or otherwise secured from unwanted access or modification." Providers are expected to show it with evidence a computer can read and re-check, kept up to date continuously.
+
+FedRAMP publishes the indicators in a form software can read. This project uses version 2026.11.02.01, which has 46 indicators.
+
+### Step 1: Show the validation
+
+```powershell
+secuguard ksi
+```
+
+**What you should see:** a headline, then each indicator this project speaks to with the checks behind it.
+
+```
+FedRAMP 20x Key Security Indicators, rules version 2026.11.02.01
+
+16 of 46 indicators addressed: 2 validated, 13 failing, 1 covered by a preventive control only, 0 without evidence. 30 not covered.
+
+Indicator     Status        Name
+------------------------------------------------------------------------------------------------
+KSI-CMT-LMC   FAILING       Logging Changes
+                SCP-03 FAIL  The network matches the approved scope baseline
+                LOG-01 PASS  Account activity is recorded and the record is protected
+                MON-01 PASS  Every change to the account's resources is recorded
+KSI-SVC-VRI   VALIDATED     Validating Resource Integrity
+                LOG-02 PASS  Compliance evidence cannot be altered or deleted
+```
+
+Your counts will differ a little. The list of indicators not covered is printed at the end.
+
+### What the statuses mean
+
+| Status | Meaning |
+|---|---|
+| VALIDATED | Every check that speaks to this indicator passed |
+| FAILING | At least one of its checks failed |
+| PREVENTIVE | No check reads evidence for it, but the plan check enforces it before changes are made |
+| NO EVIDENCE | A check it depends on could not read its evidence |
+| NOT COVERED | This project collects nothing for it |
+
+Most indicators show FAILING. That is expected and it is the point of the planted weaknesses: one weak certificate is enough to fail the indicator about validating communications. A tool that reported everything as validated in this account would be wrong.
+
+### Step 2: Read the full report
+
+```powershell
+secuguard ksi --markdown | Out-File -Encoding utf8 ksi-report.md
+code ksi-report.md
+```
+
+Press Ctrl+Shift+V to see it formatted. For each indicator it shows:
+
+- **FedRAMP's own statement**, word for word
+- **What this project establishes** about it
+- **What it does not establish**
+- **Each check and its result**, with the specific resources that failed
+
+The third item matters most. Each indicator is broad, and a handful of automated checks cannot prove all of it. Saying exactly where the evidence stops is what makes the rest believable.
+
+### Step 3: See the machine-readable version
+
+```powershell
+secuguard ksi --json
+```
+
+This prints the same validation as structured data. It includes a list named `evidence_files`, giving each evidence file the validation rests on and its fingerprint. Someone receiving this can confirm that the evidence they were handed is the evidence the validation was built from.
+
+A copy is written into every run as `ksi-validation.json`, sealed in the manifest and stored in the vault with everything else.
+
+### What this is and is not
+
+- **It covers 16 of 46 indicators.** The other 30 need things this project does not collect: policies, training records, incident response, recovery testing, and supplier reviews. They are listed, not hidden.
+- **The format is this project's own.** FedRAMP has published the indicators. This project has not been reviewed by FedRAMP or by an assessor, and it does not claim to meet any submission format.
+- **The mapping is the author's reading.** Which checks speak to which indicator is a judgment. It is written down in `src\secuguard_grc\checks.py` and `src\secuguard_grc\ksi.py` so it can be challenged.
+- **SecuGuard is fictional.** Nothing here is a real authorization.
+
+### Step 4: Publish stage 4
+
+```powershell
+git add .
+git commit -m "Stage 4: monitoring services and FedRAMP 20x indicator validation"
+git push
+```
+
+**What you should see:** the **Tests** job on GitHub goes green. Run **Collect evidence** once by hand. Its Summary page now ends with the FedRAMP 20x validation for your real account, refreshed every day from then on.
+
+---
+
+## Part 17: Costs and shutting down
 
 ### What it costs
 
@@ -1417,8 +1624,21 @@ git push
 | Load balancer with the outdated TLS policy | 2 | About $17 a month |
 | Second encryption key, with rotation off | 2 | About $1 a month |
 | Users, role, certificates, empty bucket | 2 | Free |
+| Log encryption key | 4 | About $1 a month |
+| AWS Config and Security Hub | 4 | A few dollars a month in an account this small. Security Hub is free for its first 30 days. |
+| CloudTrail, flow logs, log storage | 4 | Cents |
 
-Together that is about $20 a month. The load balancer is nearly all of it.
+Together that is roughly $25 a month. The load balancer is most of it. AWS Config and Security Hub charge by how much they record and evaluate, so their cost cannot be stated exactly in advance. Your budget alert from Part 6 will tell you if the total heads past what you set.
+
+### How to pause the monitoring services
+
+Add this line to `terraform\terraform.tfvars`, then run `secuguard plan-check` and apply the plan it saves:
+
+```
+monitoring = false
+```
+
+Checks LOG-01, MON-01, and MON-02 go back to FAIL, which is accurate. Delete the line and apply again to switch monitoring back on.
 
 ### How to pause the load balancer
 
@@ -1461,7 +1681,7 @@ Destroying the environment does not close your AWS account. If you want to close
 
 ---
 
-## Part 16: Daily use
+## Part 18: Daily use
 
 Once everything is set up, a working session looks like this.
 
@@ -1480,6 +1700,8 @@ Then use whichever command you need.
 | Collect from AWS and store in the vault | `secuguard collect --profile secuguard --upload --bucket $bucket` |
 | Show check results by check and by framework | `secuguard report` |
 | Show the PCI scope of the network and any drift | `secuguard scope` |
+| Show the FedRAMP 20x indicator validation | `secuguard ksi` |
+| Save the FedRAMP 20x report and open it | `secuguard ksi --markdown \| Out-File -Encoding utf8 ksi-report.md` then `code ksi-report.md` |
 | Check a planned change before applying it | `secuguard plan-check` |
 | Apply exactly the plan that was checked | `terraform -chdir=terraform apply tfplan` |
 | Save the report as a file and open it | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` then `code report.md` |
@@ -1495,7 +1717,7 @@ Then use whichever command you need.
 
 ---
 
-## Part 17: When something goes wrong
+## Part 19: When something goes wrong
 
 **The AWS Console has no region name in the top bar, or says a service "is not available to your project."**
 The account was created with AWS's simplified sign-up. Do not choose **Activate advanced features**, because that cannot be undone. Create a new account with the advanced sign-up link in Part 6, step 1, and use that account for this project. The simplified account costs nothing while it sits unused, and you can close it later.
@@ -1580,12 +1802,39 @@ The approvals in `policy\exceptions.json` have an end date. Review whether each 
 **`secuguard scope` or the report shows drift you did not expect.**
 Something in the network differs from `scope-baseline.json`. That is the check doing its job. Look at the item named, decide whether the change is correct, and either undo it or, once the network is right, approve a new baseline as shown in Part 13.
 
+**`terraform apply` fails while creating the CloudTrail trail, the flow log, the Config recorder, or Security Hub.**
+Copy the error text so it can be fixed in the project. To carry on meanwhile, switch off the one service that failed by adding the matching line to `terraform\terraform.tfvars`: `monitoring_cloudtrail = false`, `monitoring_flow_logs = false`, `monitoring_config = false`, or `monitoring_security_hub = false`. Then run the apply again. Everything already created stays in place.
+
+**`terraform apply` stops with "timeout while waiting for state to become 'READY, INCOMPLETE'" on the Security Hub standard.**
+Security Hub was still switching the standard on when Terraform stopped waiting. Nothing is broken, and everything else was created. Finish it this way:
+
+1. Wait about ten minutes, then ask AWS whether the standard is ready:
+
+   ```powershell
+   aws securityhub get-enabled-standards --profile secuguard --query "StandardsSubscriptions[].StandardsStatus"
+   ```
+
+   Carry on when it prints `READY` or `INCOMPLETE`. If it prints `PENDING`, wait a few more minutes and ask again.
+2. Tell Terraform the standard is fine as it is, so it does not delete and recreate it:
+
+   ```powershell
+   terraform -chdir=terraform untaint 'aws_securityhub_standards_subscription.best_practices[0]'
+   ```
+
+3. Run `secuguard plan-check`. It should say `No changes`.
+
+**Security Hub says it is already enabled, or AWS Config says a recorder already exists.**
+The service was switched on in this account before, outside this project. Switch off that one service in `terraform\terraform.tfvars` as described above. The checks read whatever is running, so MON-01 and MON-02 still report correctly.
+
+**MON-02 fails right after Security Hub is switched on.**
+The standard can take a few minutes to register. Collect again after ten minutes.
+
 **Something else.**
 Copy the full error text. Most of the time the last two or three lines say what is wrong. Search for that text along with the name of the tool that printed it.
 
 ---
 
-## Part 18: Glossary
+## Part 20: Glossary
 
 **Access portal.** The web page where you sign in to AWS with your everyday user.
 
@@ -1594,6 +1843,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **AWS.** Amazon Web Services, the cloud provider this project uses.
 
 **Baseline.** A list of what the network should look like, approved by a named person on a date. The project compares the real network against it.
+
+**AWS Config.** The AWS service that records every change to every resource and keeps a live inventory.
 
 **Bucket.** AWS's name for a storage container in its S3 storage service.
 
@@ -1634,6 +1885,8 @@ Copy the full error text. Most of the time the last two or three lines say what 
 **IAM.** Identity and Access Management. The AWS service that controls who can sign in and what they can do.
 
 **KMS.** Key Management Service. The AWS service that creates and guards encryption keys.
+
+**KSI.** Key Security Indicator. One of the short statements FedRAMP 20x asks a cloud provider to show it meets.
 
 **Load balancer.** A service that receives incoming connections and passes them to the systems behind it. It is where encryption settings for incoming traffic are chosen.
 
@@ -1679,21 +1932,24 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 ---
 
-## Part 19: What each file in the project does
+## Part 21: What each file in the project does
 
 | File or folder | What it is |
 |---|---|
 | `MANUAL.md` | This manual |
 | `README.md` | The short introduction people see first on GitHub |
 | `terraform/network.tf` | The blueprint for the network, its three zones, and the firewall rules |
+| `terraform/monitoring.tf` | The blueprint for CloudTrail, flow logs, AWS Config, Security Hub, and the log bucket |
 | `terraform/planted.tf` | The blueprint for the deliberate, harmless weaknesses the checks are meant to find |
 | `terraform/evidence.tf` | The blueprint for the evidence vault and its encryption key |
 | `terraform/github_oidc.tf` | The blueprint for GitHub's password-free, read-only access |
 | `terraform/variables.tf` | The settings you can change, each with an explanation |
 | `terraform/outputs.tf` | The values Terraform prints after building |
 | `terraform/terraform.tfvars.example` | A template for your personal settings file |
-| `src/secuguard_grc/collectors/` | The eight collectors: network, encryption keys, storage, sign-in settings, identities, certificates, load balancers, and logging |
-| `src/secuguard_grc/checks.py` | The 24 checks, each with its reason and the requirements it reports against |
+| `src/secuguard_grc/collectors/` | The nine collectors: network, encryption keys, storage, sign-in settings, identities, certificates, load balancers, logging, and monitoring |
+| `src/secuguard_grc/checks.py` | The 26 checks, each with its reason and the requirements it reports against |
+| `src/secuguard_grc/ksi.py` | Lines FedRAMP's indicators up with the checks, and states what each validation covers and leaves out |
+| `src/secuguard_grc/data/fedramp_ksi.json` | FedRAMP's 46 Key Security Indicators, in FedRAMP's own words |
 | `src/secuguard_grc/scope.py` | Works out the real PCI scope of the network and compares it with the labels and the baseline |
 | `src/secuguard_grc/plan_check.py` | The eight rules that judge a Terraform plan before it is applied |
 | `scope-baseline.json` | The approved PCI scope of the network, with who approved it and when |
@@ -1705,6 +1961,7 @@ Copy the full error text. Most of the time the last two or three lines say what 
 | `src/secuguard_grc/cli.py` | Defines the `secuguard` commands |
 | `src/secuguard_grc/mock/environment.py` | Builds the simulated AWS used in practice mode |
 | `tests/` | Self-tests that prove tampering is caught |
+| `examples/sample-ksi-validation.md` | The FedRAMP 20x validation from one practice-mode run |
 | `examples/sample-report.md` | The check results from one practice-mode run, as a formatted report |
 | `examples/sample-run/` | One practice-mode run, so readers can see evidence without installing anything |
 | `.github/workflows/ci.yml` | Tells GitHub to run the self-tests on every change |

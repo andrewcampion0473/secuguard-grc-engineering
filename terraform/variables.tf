@@ -102,3 +102,33 @@ variable "planted_vendor_account_id" {
     error_message = "planted_vendor_account_id must be a 12-digit AWS account number."
   }
 }
+
+variable "monitoring" {
+  description = "Switch on the monitoring services in monitoring.tf: CloudTrail, VPC flow logs, AWS Config, and Security Hub. Together they cost a few dollars a month in an account this small."
+  type        = bool
+  default     = true
+}
+
+variable "monitoring_cloudtrail" {
+  description = "Create the CloudTrail trail. Ignored when monitoring is false."
+  type        = bool
+  default     = true
+}
+
+variable "monitoring_flow_logs" {
+  description = "Record network traffic in SecuGuard's network. Ignored when monitoring is false."
+  type        = bool
+  default     = true
+}
+
+variable "monitoring_config" {
+  description = "Record every resource change with AWS Config. Ignored when monitoring is false."
+  type        = bool
+  default     = true
+}
+
+variable "monitoring_security_hub" {
+  description = "Switch on Security Hub and its best practices standard. Ignored when monitoring is false."
+  type        = bool
+  default     = true
+}

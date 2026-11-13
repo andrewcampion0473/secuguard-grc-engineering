@@ -1,22 +1,24 @@
 {
   "api_calls": [],
-  "collected_at": "2026-11-12T22:04:57Z",
+  "collected_at": "2026-11-12T22:50:56Z",
   "collector": "check-results",
   "description": "The outcome of every check, graded from the evidence files in this run. Each check lists the resources it looked at and the requirements it reports against.",
-  "evidence_id": "e4b7774c-7ea8-4602-9efe-c4780658a10d",
+  "evidence_id": "fbf01f81-1146-4fd6-a2a7-3ac400545bfe",
   "payload": {
     "by_framework": {
       "fedramp_20x": {
         "KSI-CMT-LMC": {
           "checks": [
             "SCP-03",
-            "LOG-01"
+            "LOG-01",
+            "MON-01"
           ],
           "status": "fail"
         },
         "KSI-CNA-EIS": {
           "checks": [
-            "SCP-02"
+            "SCP-02",
+            "MON-02"
           ],
           "status": "fail"
         },
@@ -67,6 +69,12 @@
           ],
           "status": "fail"
         },
+        "KSI-MLA-EVC": {
+          "checks": [
+            "MON-02"
+          ],
+          "status": "fail"
+        },
         "KSI-MLA-LET": {
           "checks": [
             "NET-04",
@@ -77,7 +85,8 @@
         "KSI-PIY-GIV": {
           "checks": [
             "SCP-01",
-            "SCP-03"
+            "SCP-03",
+            "MON-01"
           ],
           "status": "fail"
         },
@@ -183,11 +192,17 @@
           "checks": [
             "LOG-01"
           ],
-          "status": "fail"
+          "status": "pass"
         },
         "10.5.1": {
           "checks": [
             "LOG-02"
+          ],
+          "status": "pass"
+        },
+        "12.5.1": {
+          "checks": [
+            "MON-01"
           ],
           "status": "pass"
         },
@@ -196,6 +211,13 @@
             "SCP-01",
             "SCP-02",
             "SCP-03"
+          ],
+          "status": "fail"
+        },
+        "2.2.1": {
+          "checks": [
+            "MON-01",
+            "MON-02"
           ],
           "status": "fail"
         },
@@ -297,6 +319,12 @@
           ],
           "status": "fail"
         },
+        "CC4.1": {
+          "checks": [
+            "MON-02"
+          ],
+          "status": "fail"
+        },
         "CC6.1": {
           "checks": [
             "NET-02",
@@ -347,6 +375,13 @@
           ],
           "status": "fail"
         },
+        "CC7.1": {
+          "checks": [
+            "MON-01",
+            "MON-02"
+          ],
+          "status": "fail"
+        },
         "CC7.2": {
           "checks": [
             "NET-04",
@@ -389,42 +424,42 @@
         "results": [
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group default (sg-03eed37280dda1598)",
+            "resource": "security group default (sg-68a2c852dda90b19c)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group default (sg-5192d1cd9ce24f993)",
+            "resource": "security group default (sg-8e36596c372a8dd54)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-cde (sg-d838dc5daaae75965)",
+            "resource": "security group secuguard-cde (sg-cf8635368ad008a71)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-shared (sg-f0a5e2aa1c90e61af)",
+            "resource": "security group secuguard-shared (sg-d4aef4b0c6c1309f8)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-corporate (sg-17e47c42b874f9dfb)",
+            "resource": "security group secuguard-corporate (sg-49d1c21507649f76b)",
             "status": "pass"
           },
           {
             "detail": "open to the whole internet: SSH (port 22)",
-            "resource": "security group secuguard-planted-open-admin (sg-84b087b6d3dcf1fe2)",
+            "resource": "security group secuguard-planted-open-admin (sg-e1003d6a40009d65c)",
             "status": "fail"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-planted-analytics (sg-293317828131c3383)",
+            "resource": "security group secuguard-planted-analytics (sg-3727fc01f0fee94b2)",
             "status": "pass"
           },
           {
             "detail": "no administrative port is open to the internet",
-            "resource": "security group secuguard-planted-unclassified (sg-535b7ec78d1809c8d)",
+            "resource": "security group secuguard-planted-unclassified (sg-d90ccd525a3118a40)",
             "status": "pass"
           }
         ],
@@ -452,8 +487,8 @@
         "note": null,
         "results": [
           {
-            "detail": "accepts traffic from sg-293317828131c3383, tagged out-of-scope",
-            "resource": "security group secuguard-cde (sg-d838dc5daaae75965)",
+            "detail": "accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope",
+            "resource": "security group secuguard-cde (sg-cf8635368ad008a71)",
             "status": "fail"
           }
         ],
@@ -479,12 +514,12 @@
         "results": [
           {
             "detail": "has no inbound rules",
-            "resource": "security group default (sg-03eed37280dda1598)",
+            "resource": "security group default (sg-68a2c852dda90b19c)",
             "status": "pass"
           },
           {
             "detail": "has no inbound rules",
-            "resource": "security group default (sg-5192d1cd9ce24f993)",
+            "resource": "security group default (sg-8e36596c372a8dd54)",
             "status": "pass"
           }
         ],
@@ -510,13 +545,13 @@
         "results": [
           {
             "detail": "no flow logs, so network traffic is not recorded",
-            "resource": "VPC default (vpc-25404d4a490a6eead)",
+            "resource": "VPC default (vpc-434d96aa41c404b26)",
             "status": "fail"
           },
           {
-            "detail": "no flow logs, so network traffic is not recorded",
-            "resource": "VPC secuguard-vpc (vpc-8df6d067ee25fd22b)",
-            "status": "fail"
+            "detail": "flow logs are on",
+            "resource": "VPC secuguard-vpc (vpc-b583a4ac272044dc8)",
+            "status": "pass"
           }
         ],
         "severity": "medium",
@@ -548,6 +583,11 @@
             "detail": "automatic rotation is off",
             "resource": "KMS key alias/secuguard-legacy-no-rotation",
             "status": "fail"
+          },
+          {
+            "detail": "rotates automatically",
+            "resource": "KMS key alias/secuguard-logs",
+            "status": "pass"
           }
         ],
         "severity": "medium",
@@ -581,6 +621,11 @@
             "detail": "not encrypted with a customer managed key (uses the AWS default)",
             "resource": "bucket secuguard-legacy-exports-123456789012",
             "status": "fail"
+          },
+          {
+            "detail": "encrypted with a key SecuGuard controls",
+            "resource": "bucket secuguard-logs-123456789012",
+            "status": "pass"
           }
         ],
         "severity": "medium",
@@ -614,6 +659,11 @@
             "detail": "public access protections switched off: BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, RestrictPublicBuckets",
             "resource": "bucket secuguard-legacy-exports-123456789012",
             "status": "fail"
+          },
+          {
+            "detail": "all four public access protections are on",
+            "resource": "bucket secuguard-logs-123456789012",
+            "status": "pass"
           }
         ],
         "severity": "high",
@@ -670,12 +720,12 @@
         "note": null,
         "results": [
           {
-            "detail": "expires in 20 days, inside the 30-day warning window",
+            "detail": "expires in 19 days, inside the 30-day warning window",
             "resource": "certificate legacy-api.secuguard.example",
             "status": "fail"
           },
           {
-            "detail": "valid for another 365 days",
+            "detail": "valid for another 364 days",
             "resource": "certificate portal.secuguard.example",
             "status": "pass"
           }
@@ -1134,7 +1184,7 @@
         "results": [
           {
             "detail": "active but has never been used",
-            "resource": "user secuguard-svc-reports access key ending X4OH",
+            "resource": "user secuguard-svc-reports access key ending YL67",
             "status": "fail"
           }
         ],
@@ -1190,15 +1240,71 @@
         "note": null,
         "results": [
           {
-            "detail": "no CloudTrail trail exists, so account activity is not being kept",
+            "detail": "records every region, is running, and validates its log files",
+            "resource": "trail secuguard-trail",
+            "status": "pass"
+          }
+        ],
+        "severity": "high",
+        "status": "pass",
+        "title": "Account activity is recorded and the record is protected",
+        "why": "CloudTrail is the record of who did what. Without it, changes cannot be traced after the fact."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-CMT-LMC",
+            "KSI-PIY-GIV"
+          ],
+          "pci_dss_4_0_1": [
+            "2.2.1",
+            "12.5.1"
+          ],
+          "soc_2": [
+            "CC7.1"
+          ]
+        },
+        "id": "MON-01",
+        "note": null,
+        "results": [
+          {
+            "detail": "running and recording every supported kind of resource",
+            "resource": "configuration recorder secuguard",
+            "status": "pass"
+          }
+        ],
+        "severity": "high",
+        "status": "pass",
+        "title": "Every change to the account's resources is recorded",
+        "why": "Without a running history of configuration, nobody can say what changed, when, or what existed at a given date."
+      },
+      {
+        "frameworks": {
+          "fedramp_20x": [
+            "KSI-MLA-EVC",
+            "KSI-CNA-EIS"
+          ],
+          "pci_dss_4_0_1": [
+            "2.2.1"
+          ],
+          "soc_2": [
+            "CC4.1",
+            "CC7.1"
+          ]
+        },
+        "id": "MON-02",
+        "note": null,
+        "results": [
+          {
+            "detail": "Security Hub is not switched on, so nothing is evaluating the account against a standard",
             "resource": "account",
             "status": "fail"
           }
         ],
-        "severity": "high",
+        "severity": "medium",
         "status": "fail",
-        "title": "Account activity is recorded and the record is protected",
-        "why": "CloudTrail is the record of who did what. Without it, changes cannot be traced after the fact."
+        "title": "The account is evaluated continuously against a security standard",
+        "why": "A standard that is checked automatically every day catches misconfigurations that an annual review misses."
       },
       {
         "frameworks": {
@@ -1229,7 +1335,7 @@
         "why": "Evidence an administrator can edit proves little. The store must refuse changes from everyone."
       }
     ],
-    "graded_as_of": "2026-11-12T22:04:57Z",
+    "graded_as_of": "2026-11-12T22:50:56Z",
     "inventories": {
       "certificates": [
         {
@@ -1255,7 +1361,7 @@
         {
           "declared": "cde",
           "effective": "cde",
-          "id": "sg-d838dc5daaae75965",
+          "id": "sg-cf8635368ad008a71",
           "kind": "security group",
           "name": "secuguard-cde",
           "reaches_cde_by": []
@@ -1263,7 +1369,7 @@
         {
           "declared": "out-of-scope",
           "effective": "out-of-scope",
-          "id": "sg-17e47c42b874f9dfb",
+          "id": "sg-49d1c21507649f76b",
           "kind": "security group",
           "name": "secuguard-corporate",
           "reaches_cde_by": []
@@ -1271,7 +1377,7 @@
         {
           "declared": "out-of-scope",
           "effective": "connected",
-          "id": "sg-293317828131c3383",
+          "id": "sg-3727fc01f0fee94b2",
           "kind": "security group",
           "name": "secuguard-planted-analytics",
           "reaches_cde_by": [
@@ -1281,7 +1387,7 @@
         {
           "declared": "out-of-scope",
           "effective": "out-of-scope",
-          "id": "sg-84b087b6d3dcf1fe2",
+          "id": "sg-e1003d6a40009d65c",
           "kind": "security group",
           "name": "secuguard-planted-open-admin",
           "reaches_cde_by": []
@@ -1289,7 +1395,7 @@
         {
           "declared": null,
           "effective": "out-of-scope",
-          "id": "sg-535b7ec78d1809c8d",
+          "id": "sg-d90ccd525a3118a40",
           "kind": "security group",
           "name": "secuguard-planted-unclassified",
           "reaches_cde_by": []
@@ -1297,7 +1403,7 @@
         {
           "declared": "connected",
           "effective": "connected",
-          "id": "sg-f0a5e2aa1c90e61af",
+          "id": "sg-d4aef4b0c6c1309f8",
           "kind": "security group",
           "name": "secuguard-shared",
           "reaches_cde_by": [
@@ -1307,7 +1413,7 @@
         {
           "declared": "cde",
           "effective": "cde",
-          "id": "subnet-a25bcf64ee5a846f9",
+          "id": "subnet-6f79c2379a7bd7815",
           "kind": "subnet",
           "name": "secuguard-cde-a",
           "reaches_cde_by": []
@@ -1315,7 +1421,7 @@
         {
           "declared": "cde",
           "effective": "cde",
-          "id": "subnet-42dc5397f1618277f",
+          "id": "subnet-c9c77e1b6928daf81",
           "kind": "subnet",
           "name": "secuguard-cde-b",
           "reaches_cde_by": []
@@ -1323,7 +1429,7 @@
         {
           "declared": "out-of-scope",
           "effective": "out-of-scope",
-          "id": "subnet-ef7d03d471a3dff7a",
+          "id": "subnet-90ffaa7a077cb3f9f",
           "kind": "subnet",
           "name": "secuguard-corporate-a",
           "reaches_cde_by": []
@@ -1331,7 +1437,7 @@
         {
           "declared": "out-of-scope",
           "effective": "out-of-scope",
-          "id": "subnet-c9e0c7bd2d0ab0869",
+          "id": "subnet-c825af3ad0de249c0",
           "kind": "subnet",
           "name": "secuguard-corporate-b",
           "reaches_cde_by": []
@@ -1339,7 +1445,7 @@
         {
           "declared": "connected",
           "effective": "connected",
-          "id": "subnet-23ce3e6e50f107c4c",
+          "id": "subnet-995c0d048ddd4875a",
           "kind": "subnet",
           "name": "secuguard-shared-a",
           "reaches_cde_by": []
@@ -1347,7 +1453,7 @@
         {
           "declared": "connected",
           "effective": "connected",
-          "id": "subnet-9a0819cd426d3b07e",
+          "id": "subnet-3ec9dc05378730848",
           "kind": "subnet",
           "name": "secuguard-shared-b",
           "reaches_cde_by": []
@@ -1358,10 +1464,10 @@
       "error": 0,
       "fail": 19,
       "not_applicable": 0,
-      "pass": 5
+      "pass": 7
     }
   },
-  "payload_sha256": "d3a3bff13998138aee3dca9d1030fb943d10b30b31819e7b42dc4d632feaf464",
+  "payload_sha256": "569617344c553b5cd585234a8cf67646f7b0a1e5d3f30d6066d0264336913280",
   "relevant_to": {
     "fedramp_20x": [
       "KSI-CMT-LMC",
@@ -1372,6 +1478,7 @@
       "KSI-IAM-APM",
       "KSI-IAM-ELP",
       "KSI-IAM-SNU",
+      "KSI-MLA-EVC",
       "KSI-MLA-LET",
       "KSI-PIY-GIV",
       "KSI-SVC-ASM",
@@ -1392,7 +1499,9 @@
       "10.3.2",
       "10.3.4",
       "10.5.1",
+      "12.5.1",
       "12.5.2",
+      "2.2.1",
       "3.5.1",
       "3.6.1",
       "3.7.4",
@@ -1410,23 +1519,25 @@
     ],
     "soc_2": [
       "CC3.4",
+      "CC4.1",
       "CC6.1",
       "CC6.2",
       "CC6.3",
       "CC6.6",
       "CC6.7",
+      "CC7.1",
       "CC7.2",
       "CC8.1",
       "CC9.2"
     ]
   },
-  "run_id": "20261112T220457Z-560277-8fba",
+  "run_id": "20261112T225055Z-752165-66fc",
   "schema_version": "1.0",
   "source": {
     "account_id": "123456789012",
     "collected_by": "arn:aws:sts::123456789012:user/moto",
     "mode": "mock",
     "region": "us-east-1",
-    "tool_version": "0.2.0"
+    "tool_version": "0.4.0"
   }
 }
