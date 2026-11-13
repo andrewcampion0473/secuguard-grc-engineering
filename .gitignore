@@ -22,6 +22,7 @@ Thumbs.db
 
 # A report saved with 'secuguard report --markdown'. It names your account.
 /report.md
+/report.html
 
 # A saved Terraform plan. It can contain secrets.
 terraform/tfplan
@@ -31,3 +32,6 @@ terraform/tfplan
 # Both are specific to one AWS account. See Part 17 of MANUAL.md.
 terraform/backend.tf
 terraform/backend.hcl
+
+# The throwaway practice folder used for the tampering demonstration in the video. See Part 18 of MANUAL.md.
+/demo/

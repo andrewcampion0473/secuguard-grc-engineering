@@ -155,11 +155,28 @@ def cmd_report(args) -> int:
             return 2
         target = runs[-1]
     manifest, payloads = load_run(target)
-    payloads.pop("ksi-validation", None)
+    validation = payloads.pop("ksi-validation", None)
     results = payloads.pop("check-results", None)
     if results is None or args.regrade:
         # Older runs, or a request to grade again with the current checks.
         results = run_checks(payloads, manifest["started_at"], manifest["source"])
+        validation = None
+    if args.html:
+        from .report_html import render_html
+
+        if validation is None:
+            validation = ksi.validate(results, [{"path": f["path"], "sha256": f["sha256"]} for f in manifest["files"]])
+        fingerprint = target / "manifest.sha256"
+        page = render_html(
+            results, validation, manifest,
+            fingerprint.read_text(encoding="utf-8").split()[0] if fingerprint.is_file() else None,
+            verify_run(target), payloads.get("scope_baseline"))
+        # Written straight to a file as UTF-8. Redirecting output in Windows PowerShell would change the encoding.
+        Path(args.out).write_text(page, encoding="utf-8")
+        print(f"Wrote {args.out} for run {manifest['run_id']}. Open it in a web browser.")
+        if args.fail_on_findings and (results["summary"]["fail"] or results["summary"]["error"]):
+            return 1
+        return 0
     render = render_markdown if args.markdown else render_text
     print(render(results, manifest["run_id"], manifest["source"]))
     if args.fail_on_findings and (results["summary"]["fail"] or results["summary"]["error"]):
@@ -398,6 +415,8 @@ def main(argv: list[str] | None = None) -> int:
     report = commands.add_parser("report", help="Show check results for a run, by check and by framework")
     report.add_argument("path", nargs="?", default=DEFAULT_OUTPUT, help="A run folder or an evidence folder")
     report.add_argument("--markdown", action="store_true", help="Print Markdown, for pasting or publishing")
+    report.add_argument("--html", action="store_true", help="Write a web page that opens in any browser")
+    report.add_argument("--out", default="report.html", help="Where --html writes the page (default report.html)")
     report.add_argument("--regrade", action="store_true", help="Grade the evidence again with the current checks")
     report.add_argument("--fail-on-findings", action="store_true", help="Exit with an error if any check fails")
     report.set_defaults(func=cmd_report)

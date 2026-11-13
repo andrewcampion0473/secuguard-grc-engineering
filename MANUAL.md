@@ -4,7 +4,7 @@ This manual takes you from a Windows computer with nothing installed to a workin
 
 SecuGuard is a fictional company invented for this project. It is not a real business, and nothing here describes a real company's systems.
 
-**This manual covers stages 1 to 4 of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. Parts 15 to 17 add stage 4: monitoring, FedRAMP 20x validation, and the plan check enforced on GitHub. New parts are added as each later stage is built.
+**This manual covers all five stages of the project.** Parts 3 to 9 set up stage 1, the evidence foundation. Parts 10 to 12 add stage 2, the checks. Parts 13 and 14 add stage 3, scope drift and the check that blocks risky changes. Parts 15 to 17 add stage 4: monitoring, FedRAMP 20x validation, and the plan check enforced on GitHub. Part 18 is stage 5: a report that opens in a web browser, diagrams, and a video walkthrough.
 
 ## Contents
 
@@ -25,11 +25,12 @@ SecuGuard is a fictional company invented for this project. It is not a real bus
 - [Part 15: Stage 4: Switch on monitoring and fix real findings](#part-15-stage-4-switch-on-monitoring-and-fix-real-findings)
 - [Part 16: Validate against FedRAMP 20x](#part-16-validate-against-fedramp-20x)
 - [Part 17: Enforce the plan check on GitHub](#part-17-enforce-the-plan-check-on-github)
-- [Part 18: Costs and shutting down](#part-18-costs-and-shutting-down)
-- [Part 19: Daily use](#part-19-daily-use)
-- [Part 20: When something goes wrong](#part-20-when-something-goes-wrong)
-- [Part 21: Glossary](#part-21-glossary)
-- [Part 22: What each file in the project does](#part-22-what-each-file-in-the-project-does)
+- [Part 18: Stage 5: Show the work](#part-18-stage-5-show-the-work)
+- [Part 19: Costs and shutting down](#part-19-costs-and-shutting-down)
+- [Part 20: Daily use](#part-20-daily-use)
+- [Part 21: When something goes wrong](#part-21-when-something-goes-wrong)
+- [Part 22: Glossary](#part-22-glossary)
+- [Part 23: What each file in the project does](#part-23-what-each-file-in-the-project-does)
 
 ---
 
@@ -103,33 +104,13 @@ Stage 4 switches on monitoring, reports against FedRAMP 20x, and turns the plan 
 - **A FedRAMP 20x validation**: a statement about each of FedRAMP's 46 Key Security Indicators, saying which are validated, which are failing, and which this project does not cover, with the evidence each rests on
 - **An enforced gate on GitHub**: every proposed change is judged against the real AWS account, and one that breaks a rule cannot be merged
 
-### What comes later
+### What stage 5 adds
 
-| Stage | What it adds |
-|---|---|
-| 5 | A readable report, diagrams, and the video walkthrough |
+Stage 5 makes the project easy to understand for someone who will never open a terminal. Part 18 covers it.
 
----|---|
-| 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
-| 5 | A readable report, diagrams, and the video walkthrough |
-
----|---|
-| 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made |
-| 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end, with AWS Config and Security Hub |
-| 5 | A readable report, diagrams, and the video walkthrough |
-
----|---|---|---|---|
-| 1 (this stage) | Sealed evidence, labelled for each rulebook | Labelled | Labelled | Labelled |
-| 2 | Checks on certificates and encryption strength | Checked | Checked | Checked |
-| 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made | Checked | Checked | Checked |
-| 4 | A FedRAMP 20x validation run covering 10 to 12 indicators end to end | | | Checked in depth |
-| 5 | A readable report, diagrams, and the video walkthrough | Reported | Reported | Reported |
-
----|---|
-| 2 | Checks on certificates and encryption strength |
-| 3 | Detection of systems drifting into PCI scope, plus a check that blocks risky changes before they are made |
-| 4 | Automated validation for FedRAMP 20x |
-| 5 | A readable report, diagrams, and the video walkthrough |
+- **A web page report**: one page with the check results, the three framework views, PCI scope, certificates, and the FedRAMP 20x validation
+- **Diagrams**: four pictures of how the parts fit together
+- **A video script and a draft post**: what to show and say in a walkthrough
 
 ---
 
@@ -215,7 +196,7 @@ terraform -version
 aws --version
 ```
 
-**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 20](#part-20-when-something-goes-wrong).
+**What you should see:** each command prints a version number, for example `git version 2.47.0.windows.1`. The exact numbers do not matter. If a command prints an error instead, see [Part 21](#part-21-when-something-goes-wrong).
 
 ### Step 5: Allow PowerShell to run setup scripts
 
@@ -420,7 +401,7 @@ Remove-Item -Recurse evidence
 pytest
 ```
 
-**What you should see:** a row of dots and `67 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
+**What you should see:** a row of dots and `72 passed`. These tests check that the sealing system catches edited files, missing files, added files, and rewritten history, and that every check finds the weaknesses it is meant to find.
 
 ---
 
@@ -558,7 +539,7 @@ aws sso login --profile secuguard
 
 **What you will do:** have Terraform build the network and the evidence vault in your AWS account.
 **Time:** about 15 minutes.
-**Cost:** about $25 a month while it exists. Most of that is one load balancer, which [Part 18](#part-18-costs-and-shutting-down) shows how to pause.
+**Cost:** about $25 a month while it exists. Most of that is one load balancer, which [Part 19](#part-19-costs-and-shutting-down) shows how to pause.
 
 ### What gets built
 
@@ -846,7 +827,7 @@ From now on this runs by itself every day at 11:17 UTC. Each run links to the on
 
 **What you will do:** update the project, add realistic resources with deliberate weaknesses to SecuGuard's AWS environment, and collect evidence about them.
 **Time:** about 30 minutes.
-**Cost:** about $18 a month more while the load balancer exists. See [Part 18](#part-18-costs-and-shutting-down).
+**Cost:** about $18 a month more while the load balancer exists. See [Part 19](#part-19-costs-and-shutting-down).
 
 Stage 1 collected evidence and stopped there. Stage 2 adds **checks**. A check is a rule that reads the evidence and answers pass or fail, for example "every encryption key rotates automatically."
 
@@ -902,7 +883,7 @@ Use your own folder if the project is somewhere else.
 pytest
 ```
 
-**What you should see:** `67 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
+**What you should see:** `72 passed`. The new tests confirm that every planted weakness is caught, that healthy resources are left alone, and that a check never reports pass when its evidence is missing.
 
 ### Step 4: Try it in practice mode first
 
@@ -1121,7 +1102,7 @@ Tried to delete that stored version permanently, asking AWS to bypass the lock.
 REFUSED (AccessDenied). The vault would not delete a locked file, even on request to bypass.
 ```
 
-If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 20](#part-20-when-something-goes-wrong).
+If it prints NOT PROTECTED, the vault is not in compliance mode. See [Part 21](#part-21-when-something-goes-wrong).
 
 ### Step 2: Verify the copy of record
 
@@ -1194,7 +1175,7 @@ Stage 3 also adds check CRY-07, which reports certificates in use that no certif
    pytest
    ```
 
-**What you should see:** `67 passed`.
+**What you should see:** `72 passed`.
 
 ### Step 2: See drift in practice mode
 
@@ -1426,7 +1407,7 @@ git push
 
 **What you will do:** turn on four AWS services that watch the account, and see three failing checks turn to PASS.
 **Time:** about 25 minutes.
-**Cost:** a few dollars a month. See [Part 18](#part-18-costs-and-shutting-down).
+**Cost:** a few dollars a month. See [Part 19](#part-19-costs-and-shutting-down).
 
 Since stage 2, the report has shown real findings about your account that nothing planted caused. Nobody was recording who did what, nobody was recording network traffic, and nothing was keeping a history of changes. Stage 4 fixes them.
 
@@ -1451,7 +1432,7 @@ MON-01 and MON-02 are new checks in this stage.
    pytest
    ```
 
-**What you should see:** `67 passed`.
+**What you should see:** `72 passed`.
 
 ### Step 2: Check the change before making it
 
@@ -1638,7 +1619,7 @@ A proposed change on GitHub is called a **pull request**. It is a set of changes
    pytest
    ```
 
-**What you should see:** `67 passed`.
+**What you should see:** `72 passed`.
 
 ### Step 2: Build the state bucket and the new role
 
@@ -1694,8 +1675,10 @@ Copy-Item terraform\backend.tf.example terraform\backend.tf
 ### Step 6: Move the state
 
 ```powershell
-terraform -chdir=terraform init -migrate-state -backend-config=backend.hcl
+terraform -chdir=terraform init -migrate-state "-backend-config=backend.hcl"
 ```
+
+The quotation marks matter. Without them, PowerShell splits the setting at the dot in `backend.hcl` and Terraform reports `No positional arguments are expected`.
 
 Terraform asks: `Do you want to copy existing state to the new backend?` Type `yes` and press Enter.
 
@@ -1813,6 +1796,8 @@ Switching back to main removes `risky-change.tf` from the `terraform` folder, be
 
 Main only accepts pull requests now. Each change follows the same path.
 
+**Do not run these commands now.** This section is a reference for the next time you have something to change. The names in it are placeholders, and Part 17 is finished at the end of step 13.
+
 1. Start a branch: `git checkout -b short-name-for-the-change`
 2. Edit files.
 3. Save and send the branch:
@@ -1845,7 +1830,200 @@ GitHub keeps every pull request, with its checks and who merged it. That history
 
 ---
 
-## Part 18: Costs and shutting down
+## Part 18: Stage 5: Show the work
+
+**What you will do:** send the stage 5 files through a pull request, make a report that opens in a web browser, and record a video walkthrough.
+**Time:** about 30 minutes to set up, then two or three sessions to rehearse and record.
+**Cost:** nothing.
+
+Stages 1 to 4 built a system that works. Stage 5 makes it easy to understand for someone who will never open a terminal. It adds four things.
+
+| What | Where | What it is for |
+|---|---|---|
+| A web page report | `secuguard report --html` | One page a compliance person can read, with the check results, the three framework views, PCI scope, certificates, and the FedRAMP 20x validation |
+| Diagrams | `docs/architecture.md` and `docs/images/` | Four pictures that explain the parts, the evidence chain, one check answering three frameworks, and a blocked change |
+| A video script | `docs/video-script.md` | What to show and what to say, scene by scene, for a 9-minute walkthrough and a 90-second cut |
+| A LinkedIn post | `docs/linkedin-post.md` | A draft to post with the short video |
+
+### Step 1: Send the new files through a pull request
+
+Main only accepts pull requests now, so this update travels the same path any change would. This is your first real trip through the gate you built in Part 17.
+
+1. In PowerShell, in the project folder with the workspace on, make sure you are on main and up to date, then start a branch:
+
+   ```powershell
+   git checkout main
+   git pull
+   git checkout -b stage-5
+   ```
+
+2. Download the newest `secuguard-grc-engineering.zip` and unzip it over your project folder, replacing files.
+3. Install and test:
+
+   ```powershell
+   pip install -e ".[dev]"
+   pytest
+   ```
+
+   **What you should see:** `72 passed`.
+
+4. Save the change and send the branch to GitHub:
+
+   ```powershell
+   git add .
+   git commit -m "Stage 5: web page report, diagrams, video script"
+   git push -u origin stage-5
+   ```
+
+5. On GitHub, open your repository. A yellow bar offers **Compare & pull request**. Choose it, then choose **Create pull request**.
+6. Wait about two minutes for the checks at the bottom of the pull request.
+
+   **What you should see:** green checks beside **Tests** and **Plan check**. Plan check passes this time because stage 5 changes nothing in AWS. Its summary says `No changes`.
+
+7. Choose **Merge pull request**, then **Confirm merge**, then **Delete branch**.
+8. Bring your computer up to date and remove your copy of the branch:
+
+   ```powershell
+   git checkout main
+   git pull
+   git branch -d stage-5
+   ```
+
+If a check fails, do not merge. Open the failed check, read its summary, and see [Part 21](#part-21-when-something-goes-wrong).
+
+### Step 2: Make the web page report
+
+1. Sign in and collect a fresh run:
+
+   ```powershell
+   aws sso login --profile secuguard
+   $bucket = terraform -chdir=terraform output -raw evidence_bucket
+   secuguard collect --profile secuguard --upload --bucket $bucket
+   ```
+
+2. Make the page and open it:
+
+   ```powershell
+   secuguard report --html
+   start report.html
+   ```
+
+**What you should see:** `Wrote report.html for run ...`, then the report opens in your web browser.
+
+The page is a single file. It needs no internet connection and loads nothing from anywhere else, so you can email it or put it on a shared drive. It is left out of Git because it names your AWS account.
+
+How to read it, from the top:
+
+| Section | What it tells you |
+|---|---|
+| The green or red banner | Whether the evidence behind the page matched its fingerprints when the page was made. Red means do not rely on the results. |
+| The four tiles | How many checks pass, and how many requirements are met in each framework. These count only the requirements this project tests. |
+| What needs fixing | Failing checks, most serious first, with the exact resource at fault |
+| The same results, by framework | Three tabs. Each lists that framework's requirements, whether each is met, and which checks test it. |
+| PCI scope of the network | Each part of the network, its label, and what the firewall rules make it. A highlighted row has a wrong label. |
+| Certificate inventory | Every certificate, its issuer, key strength, expiry date, and what uses it |
+| FedRAMP 20x Key Security Indicators | Select an indicator to see FedRAMP's wording, what the evidence establishes, and what it does not |
+| Every check | All 26 checks. Select one to see each resource it looked at. |
+| The evidence behind this page | The evidence files and their fingerprints |
+
+The daily job on GitHub now makes this page too. To get it, open the **Actions** tab, choose a **Collect evidence** run, and scroll to **Artifacts** at the bottom. Download **secuguard-report**, unzip it, and open `report.html`.
+
+To see the page without an AWS account, download `examples/sample-report.html` from the repository and open it. It was made from a practice-mode run.
+
+### Step 3: Look at the diagrams
+
+1. On GitHub, open the `docs` folder and choose `architecture.md`. GitHub draws the four diagrams on the page.
+2. On your computer, the same four diagrams are saved as pictures in `docs\images`. Open the folder:
+
+   ```powershell
+   start docs\images
+   ```
+
+Use the pictures in the video. They are easier to show full screen than a web page.
+
+### Step 4: Get the screen ready to record
+
+A recording is easier to follow when the text is large and the screen is tidy.
+
+1. Close everything you will not show. Turn on **Do not disturb** in Windows so no notification appears mid-recording.
+2. Make PowerShell's text larger: hold **Ctrl** and scroll the mouse wheel up, or press **Ctrl** and **+**, until about 30 lines fit on the screen.
+3. Clear the PowerShell window before each scene:
+
+   ```powershell
+   cls
+   ```
+
+4. In your browser, press **Ctrl** and **+** until the report's text is easy to read from arm's length. Press **F11** for full screen.
+5. Open the five things listed under "Before you record" in `docs/video-script.md`, in that order.
+
+### Step 5: Rehearse the tampering demonstration
+
+Scene 4 of the script edits an evidence file to show the edit being caught. Do this on a throwaway practice copy, never on your real evidence.
+
+1. Make a practice run in its own folder and confirm it verifies:
+
+   ```powershell
+   secuguard collect --mock --output demo
+   secuguard verify demo
+   ```
+
+   **What you should see:** `OK. 1 run(s) verified.`
+
+2. Open the folder in VS Code:
+
+   ```powershell
+   code demo
+   ```
+
+3. In VS Code, open the run folder, then `identities.json`. Press **Ctrl** and **F**, search for `secuguard-dev-alice`, and a few lines above it change `"mfa_devices": 0` to `"mfa_devices": 1`. Press **Ctrl** and **S** to save.
+4. Verify again:
+
+   ```powershell
+   secuguard verify demo
+   ```
+
+   **What you should see:** `TAMPERING OR DAMAGE DETECTED`, naming `identities.json`.
+
+5. Delete the practice copy so the next take starts clean:
+
+   ```powershell
+   Remove-Item -Recurse -Force demo
+   ```
+
+The `demo` folder is left out of Git, so it can never be sent to GitHub by mistake.
+
+### Step 6: Record
+
+Windows 11 includes Clipchamp, a free video editor that records your screen and microphone and lets you trim and join clips.
+
+1. Open the Start menu, type `Clipchamp`, and open it. If it is not installed, get it free from the Microsoft Store.
+2. Choose **Create a new video**.
+3. In the left sidebar, choose **Record & create**, then **Screen**. To appear in a corner of the video yourself, choose **Screen and camera**.
+4. Choose the red record button, pick the window or screen to share, and start.
+5. Record **one scene at a time**, following `docs/video-script.md`. Stop after each scene. Each recording drops onto the timeline at the bottom.
+6. When all scenes are recorded, drag the ends of each clip on the timeline to trim the pauses.
+7. Choose **Export**, then **1080p**.
+
+Clipchamp changes its menus from time to time. If a name here does not match, look for the closest one. A simpler option with no editing is the Snipping Tool: press the **Windows** key, **Shift**, and **R**, drag over the area to record, and choose **Start**.
+
+Advice that saves time:
+
+- Read the script aloud twice before recording. Change any sentence you trip over. It should sound like you.
+- Do not talk while a command runs. Wait, then describe the result. Cut the wait out afterwards.
+- A scene with a mistake is quicker to record again than to fix.
+
+### Step 7: Make the short cut and post
+
+1. In Clipchamp, start a second video. Reuse the clips listed under "The short cut for LinkedIn" in the script, and record the shorter narration over them.
+2. Turn on captions: select the video on the timeline, choose **Captions** on the right, then **Turn on autocaptions**. Most people watch without sound.
+3. Before posting, watch both videos once and check the three items under "After recording" in the script.
+4. Post the short video with the text in `docs/linkedin-post.md`. Link the full walkthrough from the repository's README or send it directly to the people you want to see it.
+
+**What you have now:** a working system, a page that explains its results, and a walkthrough that explains the system. The project is complete.
+
+---
+
+## Part 19: Costs and shutting down
 
 ### What it costs
 
@@ -1925,7 +2103,7 @@ Destroying the environment does not close your AWS account. If you want to close
 
 ---
 
-## Part 19: Daily use
+## Part 20: Daily use
 
 Once everything is set up, a working session looks like this.
 
@@ -1950,6 +2128,7 @@ Then use whichever command you need.
 | Start a change on its own branch | `git checkout -b short-name` |
 | Return to main and bring it up to date | `git checkout main` then `git pull` |
 | Apply exactly the plan that was checked | `terraform -chdir=terraform apply tfplan` |
+| Make the web page report and open it | `secuguard report --html` then `start report.html` |
 | Save the report as a file and open it | `secuguard report --markdown \| Out-File -Encoding utf8 report.md` then `code report.md` |
 | List the checks and what each reports against | `secuguard checks` |
 | Check that local evidence has not been altered | `secuguard verify` |
@@ -1963,7 +2142,7 @@ Then use whichever command you need.
 
 ---
 
-## Part 20: When something goes wrong
+## Part 21: When something goes wrong
 
 **The AWS Console has no region name in the top bar, or says a service "is not available to your project."**
 The account was created with AWS's simplified sign-up. Do not choose **Activate advanced features**, because that cannot be undone. Create a new account with the advanced sign-up link in Part 6, step 1, and use that account for this project. The simplified account costs nothing while it sits unused, and you can close it later.
@@ -2088,7 +2267,7 @@ Check that the `TF_STATE_BUCKET` variable on GitHub matches the `terraform_state
 Your `terraform.tfvars` holds a setting that GitHub does not have, so its plan differs from yours. Compare the plan in the job's log with `secuguard plan-check` on your computer.
 
 **Terraform says "Backend initialization required" or "Backend configuration changed."**
-Run `terraform -chdir=terraform init -backend-config=backend.hcl`. This happens after unzipping an update, because the update does not include your `backend.tf`. If `terraform\backend.tf` is missing, copy it again with `Copy-Item terraform\backend.tf.example terraform\backend.tf` first.
+Run `terraform -chdir=terraform init "-backend-config=backend.hcl"`. This happens after unzipping an update, because the update does not include your `backend.tf`. If `terraform\backend.tf` is missing, copy it again with `Copy-Item terraform\backend.tf.example terraform\backend.tf` first.
 
 **Terraform says the state is locked.**
 A previous run was interrupted. Read the lock ID in the message, then run `terraform -chdir=terraform force-unlock` followed by that ID. Only do this when you are sure no other Terraform run is in progress.
@@ -2096,9 +2275,21 @@ A previous run was interrupted. Read the lock ID in the message, then run `terra
 **Something else.**
 Copy the full error text. Most of the time the last two or three lines say what is wrong. Search for that text along with the name of the tool that printed it.
 
+**The Plan check on GitHub fails at "Get short-lived, read-only AWS credentials" with `Source Account ID is needed if the Role Name is provided and not the Role Arn`.**
+The `PLAN_ROLE_ARN` variable on GitHub does not hold a full role address. It was probably pasted with its quotation marks, or the two variables were swapped. Copy the right value to the clipboard with `terraform -chdir=terraform output -raw plan_checker_role_arn | Set-Clipboard`. On GitHub, go to **Settings**, **Secrets and variables**, **Actions**, **Variables**, edit `PLAN_ROLE_ARN`, and paste. It must begin with `arn:aws:iam::`. Then re-run the failed job from the pull request.
+
+**`git push` says `src refspec ... does not match any`.**
+Git has no branch by the name you typed. This happens if you run an example command that contains a placeholder, such as `short-name-for-the-change`. Run `git branch` to see the branches you have. The one with a star is the one you are on.
+
+**`git push` to main is rejected with a message about a rule or a required pull request.**
+That is the ruleset from Part 17 doing its job. Put the change on a branch and open a pull request. See "How to make changes from now on" at the end of Part 17.
+
+**`report.html` opens as text, or `start report.html` does nothing.**
+Open File Explorer, go to the project folder, and double-click `report.html`. If it opens in an editor, right-click it, choose **Open with**, and pick your web browser.
+
 ---
 
-## Part 21: Glossary
+## Part 22: Glossary
 
 **Access portal.** The web page where you sign in to AWS with your everyday user.
 
@@ -2202,7 +2393,7 @@ Copy the full error text. Most of the time the last two or three lines say what 
 
 ---
 
-## Part 22: What each file in the project does
+## Part 23: What each file in the project does
 
 | File or folder | What it is |
 |---|---|
@@ -2227,6 +2418,12 @@ Copy the full error text. Most of the time the last two or three lines say what 
 | `scope-baseline.json` | The approved PCI scope of the network, with who approved it and when |
 | `policy/exceptions.json` | The register of accepted rule-breaking changes, each with a reason and an expiry date |
 | `examples/risky-change.tf.example` | A sample risky change for trying the plan check |
+| `src/secuguard_grc/report_html.py` | Turns check results into the web page report |
+| `docs/architecture.md` | Four diagrams of how the system fits together |
+| `docs/images/` | The same diagrams as pictures, for the video |
+| `docs/video-script.md` | What to show and say in the video walkthrough, scene by scene |
+| `docs/linkedin-post.md` | A draft post to go with the short video |
+| `examples/sample-report.html` | The web page report from one practice-mode run |
 | `src/secuguard_grc/report.py` | Turns check results into the terminal table and the Markdown report |
 | `src/secuguard_grc/evidence.py` | The sealing system: fingerprints, manifests, the chain, and verification |
 | `src/secuguard_grc/storage.py` | Copies each run into the vault, reads runs back for verification, and runs the lock test |

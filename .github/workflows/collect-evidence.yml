@@ -37,3 +37,13 @@ jobs:
         run: secuguard report --markdown >> "$GITHUB_STEP_SUMMARY"
       - name: Publish the FedRAMP 20x validation
         run: secuguard ksi --markdown >> "$GITHUB_STEP_SUMMARY"
+      # The same results as a web page, attached to this run for anyone who prefers to read it in a browser.
+      - name: Make the web page report
+        run: secuguard report --html --out report.html
+      - name: Attach the web page report to this run
+        uses: actions/upload-artifact@v4
+        continue-on-error: true # the evidence is already stored, so a failed attachment must not fail the run
+        with:
+          name: secuguard-report
+          path: report.html
+          retention-days: 30
