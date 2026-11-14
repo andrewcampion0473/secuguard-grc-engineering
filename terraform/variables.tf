@@ -52,7 +52,8 @@ variable "github_owner_id" {
     The numeric ID of the GitHub account that owns the repository. Repositories created
     after July 15, 2026 identify themselves to AWS with this number as well as the name,
     so that a deleted and re-registered name cannot inherit access. Leave empty only for
-    a repository created before that date. MANUAL.md, Part 9, step 3 shows how to find it.
+    a repository created before that date. The manual page
+    docs/automate/collect-evidence-daily.md shows how to find it.
   EOT
   type        = string
   default     = ""

@@ -1,0 +1,81 @@
+site_name: SecuGuard GRC Engineering Manual
+site_description: How to run the SecuGuard GRC engineering project.
+site_url: https://andrewcampion0473.github.io/secuguard-grc-engineering/
+repo_url: https://github.com/andrewcampion0473/secuguard-grc-engineering
+repo_name: secuguard-grc-engineering
+docs_dir: docs
+copyright: SecuGuard is a fictional company invented for this project.
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.footer
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+  - callouts
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+exclude_docs: |
+  video-script.md
+  linkedin-post.md
+
+validation:
+  links:
+    anchors: warn
+
+nav:
+  - Overview: index.md
+  - Run it on your computer:
+      - Set up your computer: get-started/set-up-your-computer.md
+      - Install the project: get-started/install-the-project.md
+      - Run the project in practice mode: get-started/run-in-practice-mode.md
+  - Run it in your AWS account:
+      - Create and secure an AWS account: run-in-aws/create-an-aws-account.md
+      - Build the environment: run-in-aws/build-the-environment.md
+      - Collect evidence and test the vault: run-in-aws/collect-evidence.md
+      - Review the results: run-in-aws/review-results.md
+  - Automate it on GitHub:
+      - Collect evidence daily: automate/collect-evidence-daily.md
+      - Block noncompliant changes: automate/block-noncompliant-changes.md
+      - Make and approve changes: automate/make-changes.md
+  - Maintain:
+      - Manage costs and shut down: maintain/manage-costs.md
+      - Troubleshooting: troubleshooting.md
+  - Reference:
+      - Command reference: reference/commands.md
+      - Checks and plan rules: reference/checks.md
+      - Project files: reference/files.md
+      - Architecture diagrams: architecture.md
+      - Glossary: reference/glossary.md

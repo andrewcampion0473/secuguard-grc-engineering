@@ -4,7 +4,9 @@ Automated, tamper-evident compliance evidence for PCI DSS, SOC 2, and FedRAMP 20
 
 SecuGuard is a fictional card-issuing software company invented for this project. It is not a real business.
 
-**New here? Read [MANUAL.md](MANUAL.md).** It walks through everything from a Windows computer with nothing installed to a working system, in plain language.
+**Want to understand it?** Read the [Project Guide](docs/project-guide.pdf). It explains how each part works and which requirements it addresses.
+
+**Want to run it?** Read the [manual](MANUAL.md), also available as a [website](https://andrewcampion0473.github.io/secuguard-grc-engineering/) and a [PDF](docs/manual.pdf). It's written for governance, risk, and compliance readers and assumes no experience with a terminal, AWS, or GitHub. The first path takes about an hour and needs no AWS account.
 
 ## The problem this solves
 
@@ -20,7 +22,7 @@ This project gathers evidence the way an engineer would:
 | One spreadsheet per framework | Each check is written once and reported against PCI DSS, SOC 2, and FedRAMP 20x |
 | A tool that always says "compliant" | Deliberate weaknesses are planted, and tests prove each one is caught |
 | Scope confirmed once a year | PCI scope is worked out from the firewall rules on every run and compared with an approved baseline |
-| Problems found after they ship | Every proposed change is checked on GitHub, and a risky one cannot be merged |
+| Problems found after they ship | Every proposed change is checked on GitHub, and a noncompliant one cannot be merged |
 | Someone has to remember to do it | A scheduled job does it, with no stored AWS keys |
 
 ## How it works
@@ -49,11 +51,11 @@ secuguard report
 secuguard verify
 ```
 
-`secuguard report` shows 26 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x, plus the PCI scope of the network and a certificate inventory. `secuguard scope` shows what has drifted from the approved scope. `secuguard ksi` shows where the environment stands against FedRAMP's 46 Key Security Indicators. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
+`secuguard report` shows 26 checks and their results under PCI DSS, SOC 2, and FedRAMP 20x, plus the PCI scope of the network and a certificate inventory. `secuguard scope` shows what has drifted from the approved scope. `secuguard ksi` shows where the environment stands against FedRAMP's 46 Key Security Indicators. `secuguard report --html` writes the same results as a web page. Then edit any file under `evidence/` and run `secuguard verify` again to watch the change get caught.
 
 To look without installing anything, see [examples/sample-report.md](examples/sample-report.md) for the results, [examples/sample-ksi-validation.md](examples/sample-ksi-validation.md) for the FedRAMP 20x validation, and [examples/sample-run](examples/sample-run) for the evidence behind them.
 
-## What is built so far
+## What is built
 
 **Stage 1, the evidence foundation**
 
@@ -89,6 +91,12 @@ To look without installing anything, see [examples/sample-report.md](examples/sa
 - The plan check enforced on GitHub: every pull request is planned against the real AWS account with a read-only role, and a ruleset on main refuses to merge one that breaks a rule
 - Terraform state kept in an encrypted, versioned S3 bucket
 
+**Stage 5, showing the work**
+
+- `secuguard report --html`, one self-contained web page with the check results, the three framework views, PCI scope, certificates, and the FedRAMP 20x validation. It states at the top whether the evidence behind it verified.
+- The same page attached to every daily run on GitHub
+- Diagrams and a manual written for compliance readers
+
 There are 26 checks and 8 plan rules in total. They speak to 16 of the 46 indicators. The other 30 are listed as not covered.
 
 | Area | Example checks | PCI DSS 4.0.1 | SOC 2 | FedRAMP 20x |
@@ -103,11 +111,12 @@ There are 26 checks and 8 plan rules in total. They speak to 16 of the 46 indica
 
 The mapping of checks to requirements is the author's reading of each framework. It is a starting point for discussion with an assessor, not an assessor's opinion. FedRAMP's indicator text comes from [FedRAMP's published rules](https://github.com/FedRAMP/rules). This project has not been reviewed by FedRAMP.
 
-## Roadmap
+## See it explained
 
-| Stage | Adds |
-|---|---|
-| 5 | Readable report, diagrams, and video walkthrough |
+- [docs/architecture.md](docs/architecture.md) has four diagrams: the parts, the evidence chain, one check answering three frameworks, and a blocked change.
+- [examples/sample-report.html](examples/sample-report.html) is the web page report from a practice run. Download it and open it in a browser.
+- The [Project Guide](docs/project-guide.pdf) explains how each part works, with screenshots.
+- The [manual](MANUAL.md) shows how to run each part yourself.
 
 ## Cost
 

@@ -128,3 +128,10 @@ def test_unchanged_resources_are_ignored():
     untouched = change("aws_kms_key", "k", {"enable_key_rotation": False}, ("no-op",))
     outcome = evaluate(plan(untouched), [], TODAY)
     assert outcome["examined"] == 0 and outcome["allowed"]
+
+
+def test_the_sample_noncompliant_plan_is_blocked_for_both_rules(exceptions):
+    sample = json.loads((ROOT / "examples" / "sample-noncompliant-plan.json").read_text())
+    outcome = evaluate(sample, exceptions, TODAY)
+    assert not outcome["allowed"]
+    assert sorted(v["rule"] for v in outcome["violations"]) == ["PLAN-02", "PLAN-04"]

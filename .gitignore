@@ -22,12 +22,19 @@ Thumbs.db
 
 # A report saved with 'secuguard report --markdown'. It names your account.
 /report.md
+/report.html
 
 # A saved Terraform plan. It can contain secrets.
 terraform/tfplan
 /ksi-report.md
 
 # Where this computer finds the Terraform state bucket, and the backend switch itself.
-# Both are specific to one AWS account. See Part 17 of MANUAL.md.
+# Both are specific to one AWS account. See docs/automate/block-noncompliant-changes.md.
 terraform/backend.tf
 terraform/backend.hcl
+
+# A throwaway practice folder, if you collect into one with --output demo.
+/demo/
+
+# The manual built as a website with "mkdocs build".
+/site/

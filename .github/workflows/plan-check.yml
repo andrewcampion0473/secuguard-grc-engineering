@@ -3,7 +3,7 @@
 # For each pull request, this asks Terraform what the change would do to the real AWS
 # account, then tests that plan against the rules in src/secuguard_grc/plan_check.py.
 # A plan that breaks a rule fails this job. A rule on the main branch then refuses the
-# merge. See Part 17 of MANUAL.md.
+# merge. See docs/automate/block-noncompliant-changes.md.
 #
 # The role used here is read-only. This job can look at the account. It cannot change it.
 name: Plan check
