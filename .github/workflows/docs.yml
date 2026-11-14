@@ -1,0 +1,51 @@
+# Builds the manual in docs/ as a website. On the main branch, it also publishes
+# the website to GitHub Pages. Needs no AWS account.
+name: Manual
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", "mkdocs.yml", "requirements-docs.txt", ".github/workflows/docs.yml"]
+  pull_request:
+    paths: ["docs/**", "mkdocs.yml", "requirements-docs.txt", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: manual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: pip install -r requirements-docs.txt
+      - name: Build the manual and fail on broken links
+        run: mkdocs build --strict
+      - name: Keep the built website for publishing
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  publish:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

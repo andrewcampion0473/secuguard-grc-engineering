@@ -1,6 +1,6 @@
 # SecuGuard check results
 
-Run `20261112T225055Z-752165-66fc`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-12T22:50:56Z.
+Run `20261113T175910Z-571550-dd92`. Account `123456789012` in `us-east-1` (mock mode). Evidence collected 2026-11-13T17:59:10Z.
 
 **7 passed, 19 failed, 0 could not be assessed, 0 not applicable.**
 
@@ -39,15 +39,15 @@ Run `20261112T225055Z-752165-66fc`. Account `123456789012` in `us-east-1` (mock 
 
 **NET-01: No administrative port is open to the internet.** SSH and Remote Desktop open to everyone is one of the most common ways attackers get in.
 
-- security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)
+- security group secuguard-planted-open-admin (sg-d52a2bc581931f2bc): open to the whole internet: SSH (port 22)
 
 **NET-02: The card data zone accepts traffic only from in-scope systems.** Anything allowed to reach the cardholder data environment falls under PCI DSS. Unplanned paths widen scope.
 
-- security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope
+- security group secuguard-cde (sg-04e71111435ce734c): accepts traffic from sg-8249c5ccdf1a5fe17, tagged out-of-scope
 
 **NET-04: Network traffic is logged.** Without flow logs there is no record of who connected to what when investigating an incident.
 
-- VPC default (vpc-434d96aa41c404b26): no flow logs, so network traffic is not recorded
+- VPC default (vpc-32b12a214b4c8cfc6): no flow logs, so network traffic is not recorded
 
 **CRY-01: Encryption keys rotate automatically.** A key that never changes protects more and more data with one secret. Rotation limits the damage if it leaks.
 
@@ -67,7 +67,7 @@ Run `20261112T225055Z-752165-66fc`. Account `123456789012` in `us-east-1` (mock 
 
 **CRY-05: No certificate is expired or about to expire.** An expired certificate causes an outage, and pushes people to click through security warnings.
 
-- certificate legacy-api.secuguard.example: expires in 19 days, inside the 30-day warning window
+- certificate legacy-api.secuguard.example: expires in 20 days, inside the 30-day warning window
 
 **CRY-06: Connections require TLS 1.2 or newer.** TLS 1.0 and 1.1 have known weaknesses and are not accepted as strong cryptography.
 
@@ -105,7 +105,7 @@ Run `20261112T225055Z-752165-66fc`. Account `123456789012` in `us-east-1` (mock 
 
 **IAM-06: Access keys are in use and not stale.** Unused and old keys are credentials nobody is watching. They should be removed or replaced.
 
-- user secuguard-svc-reports access key ending YL67: active but has never been used
+- user secuguard-svc-reports access key ending HJVH: active but has never been used
 
 **IAM-07: Outside accounts need an external ID to use a role.** Without an external ID, a vendor's other customers could trick the vendor into using this role.
 
@@ -138,8 +138,8 @@ What each part of the network is declared to be, and what the firewall rules mak
 
 | Name | Issuer | Key | Signature | Expires | In use by |
 |---|---|---|---|---|---|
-| legacy-api.secuguard.example | self-signed | RSA 1024 | SHA256 | 2026-12-02 | nothing |
-| portal.secuguard.example | self-signed | RSA 2048 | SHA256 | 2027-11-12 | load balancer secuguard-portal |
+| legacy-api.secuguard.example | self-signed | RSA 1024 | SHA256 | 2026-12-03 | nothing |
+| portal.secuguard.example | self-signed | RSA 2048 | SHA256 | 2027-11-13 | load balancer secuguard-portal |
 
 ## By framework
 

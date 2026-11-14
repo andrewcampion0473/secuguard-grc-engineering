@@ -1,6 +1,6 @@
 # FedRAMP 20x Key Security Indicator validation
 
-Rules version 2026.11.02.01. Evidence collected 2026-11-12T22:50:56Z.
+Rules version 2026.11.02.01. Evidence collected 2026-11-13T17:59:10Z.
 
 **16 of 46 indicators addressed: 1 validated, 14 failing, 1 covered by a preventive control only, 0 without evidence. 30 not covered.**
 
@@ -74,7 +74,7 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 **What it does not establish.** Software and services running on servers. This environment has no servers.
 
 - NET-01 FAIL: No administrative port is open to the internet
-    - security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)
+    - security group secuguard-planted-open-admin (sg-d52a2bc581931f2bc): open to the whole internet: SSH (port 22)
 - NET-03 PASS: Default security groups allow nothing
 - CRY-03 FAIL: Storage cannot be made public
     - bucket secuguard-legacy-exports-123456789012: public access protections switched off: BlockPublicAcls, IgnorePublicAcls, BlockPublicPolicy, RestrictPublicBuckets
@@ -89,9 +89,9 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 **What it does not establish.** Outbound traffic rules, and anything enforced outside AWS security groups and route tables.
 
 - NET-01 FAIL: No administrative port is open to the internet
-    - security group secuguard-planted-open-admin (sg-e1003d6a40009d65c): open to the whole internet: SSH (port 22)
+    - security group secuguard-planted-open-admin (sg-d52a2bc581931f2bc): open to the whole internet: SSH (port 22)
 - NET-02 FAIL: The card data zone accepts traffic only from in-scope systems
-    - security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope
+    - security group secuguard-cde (sg-04e71111435ce734c): accepts traffic from sg-8249c5ccdf1a5fe17, tagged out-of-scope
 - SCP-04 PASS: The card data zone has no route to the internet
 
 ### KSI-CNA-ULN: Using Logical Networking (FAILING)
@@ -103,7 +103,7 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 **What it does not establish.** Network controls inside a zone, between systems that share a security group.
 
 - NET-02 FAIL: The card data zone accepts traffic only from in-scope systems
-    - security group secuguard-cde (sg-cf8635368ad008a71): accepts traffic from sg-3727fc01f0fee94b2, tagged out-of-scope
+    - security group secuguard-cde (sg-04e71111435ce734c): accepts traffic from sg-8249c5ccdf1a5fe17, tagged out-of-scope
 - SCP-02 FAIL: Declared PCI scope matches the firewall rules
     - security group secuguard-planted-analytics: declared out-of-scope, but it can reach the card data zone (port 5432 on secuguard-cde), so PCI DSS applies to it
 
@@ -144,7 +144,7 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 **What it does not establish.** Automatic disabling. Stale credentials are reported, not switched off.
 
 - IAM-06 FAIL: Access keys are in use and not stale
-    - user secuguard-svc-reports access key ending YL67: active but has never been used
+    - user secuguard-svc-reports access key ending HJVH: active but has never been used
 - IAM-07 FAIL: Outside accounts need an external ID to use a role
     - role secuguard-legacy-vendor: trusts outside account 127311923021 with no external ID
 
@@ -152,9 +152,9 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 
 > The configuration of machine-based information resources, especially infrastructure as code, is persistently evaluated and tested.
 
-**What this project establishes.** Every planned Terraform change is tested against rules before it is applied, and Security Hub evaluates the running account.
+**What this project establishes.** Every proposed Terraform change is tested against rules on GitHub and cannot be merged if it breaks one, and Security Hub evaluates the running account.
 
-**What it does not establish.** Enforcement on every change. The plan check is run by choice on the author's computer until it is wired into GitHub.
+**What it does not establish.** Changes made outside Terraform, and an administrator applying a change from their own computer without merging it first.
 
 - MON-02 FAIL: The account is evaluated continuously against a security standard
     - account: Security Hub is not switched on, so nothing is evaluating the account against a standard
@@ -169,7 +169,7 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 **What it does not establish.** A written list of which event types are logged and why.
 
 - NET-04 FAIL: Network traffic is logged
-    - VPC default (vpc-434d96aa41c404b26): no flow logs, so network traffic is not recorded
+    - VPC default (vpc-32b12a214b4c8cfc6): no flow logs, so network traffic is not recorded
 - LOG-01 PASS: Account activity is recorded and the record is protected
 
 ### KSI-PIY-GIV: Generating Inventories (FAILING)
@@ -199,9 +199,9 @@ Indicator names and statements are FedRAMP's own text. The validation format is 
 - CRY-01 FAIL: Encryption keys rotate automatically
     - KMS key alias/secuguard-legacy-no-rotation: automatic rotation is off
 - CRY-05 FAIL: No certificate is expired or about to expire
-    - certificate legacy-api.secuguard.example: expires in 19 days, inside the 30-day warning window
+    - certificate legacy-api.secuguard.example: expires in 20 days, inside the 30-day warning window
 - IAM-06 FAIL: Access keys are in use and not stale
-    - user secuguard-svc-reports access key ending YL67: active but has never been used
+    - user secuguard-svc-reports access key ending HJVH: active but has never been used
 
 ### KSI-SVC-SIN: Securing Information (FAILING)
 

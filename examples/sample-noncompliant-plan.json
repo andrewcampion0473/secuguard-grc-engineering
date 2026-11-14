@@ -1,0 +1,62 @@
+{
+  "_about": "A small sample Terraform plan, in the JSON form Terraform produces, for trying the plan check without an AWS account. It contains the two changes from examples/noncompliant-change.tf.example. Run: secuguard plan-check --plan-json examples/sample-noncompliant-plan.json",
+  "format_version": "1.2",
+  "resource_changes": [
+    {
+      "address": "aws_kms_key.risky_reports",
+      "mode": "managed",
+      "type": "aws_kms_key",
+      "name": "risky_reports",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "description": "Key for reporting exports",
+          "enable_key_rotation": false,
+          "deletion_window_in_days": 7,
+          "tags": {
+            "Name": "secuguard-reports"
+          }
+        }
+      }
+    },
+    {
+      "address": "aws_vpc_security_group_ingress_rule.risky_office_to_card_database",
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "risky_office_to_card_database",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "after": {
+          "security_group_id": "sg-0cde000000000000a",
+          "cidr_ipv4": "10.20.30.0/24",
+          "ip_protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "description": "Reporting team queries from the office network"
+        }
+      }
+    }
+  ],
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "aws_security_group.tier[\"cde\"]",
+            "values": {
+              "id": "sg-0cde000000000000a",
+              "tags": {
+                "Name": "secuguard-cde",
+                "secuguard:pci-scope": "cde"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

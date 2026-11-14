@@ -6,17 +6,17 @@ aws_profile = "secuguard"
 # Evidence is locked in COMPLIANCE mode for 1 day by default. See terraform/variables.tf
 # before changing either setting.
 
-# Fill this in during Part 9, step 3 of MANUAL.md, then run 'terraform apply' again.
+# Fill these in by following docs/automate/collect-evidence-daily.md.
 # github_repository = "your-github-username/secuguard-grc-engineering"
-# github_owner_id      = "number printed in Part 9, step 3"
-# github_repository_id = "number printed in Part 9, step 3"
+# github_owner_id      = "number printed by PowerShell"
+# github_repository_id = "number printed by PowerShell"
 
-# Stage 2 creates deliberate, harmless weaknesses for the checks to find. See planted.tf.
+# The project creates deliberate, harmless weaknesses for the checks to find. See planted.tf.
 # The load balancer is the only one with a real cost, about $17 a month.
 # planted_findings      = true
 # planted_load_balancer = true
 
-# Stage 4 switches on monitoring: CloudTrail, flow logs, AWS Config, and Security Hub.
+# The project switches on monitoring: CloudTrail, flow logs, AWS Config, and Security Hub.
 # Each can be switched off on its own. See monitoring.tf.
 # monitoring              = true
 # monitoring_cloudtrail   = true
